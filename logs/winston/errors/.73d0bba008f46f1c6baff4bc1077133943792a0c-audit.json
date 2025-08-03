@@ -1,0 +1,30 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\sharif-project\\server\\logs\\winston\\errors\\.73d0bba008f46f1c6baff4bc1077133943792a0c-audit.json",
+    "files": [
+        {
+            "date": 1754151955437,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-02-08-22-error.log",
+            "hash": "8cd48ffb172128c31554de8a364395f7fff289abeadd8fa7f72bb25ab7c59573"
+        },
+        {
+            "date": 1754228943386,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-03-08-19-error.log",
+            "hash": "b8c4431b1ecdd85b2f537b646008edee50029c14c971970b77aa7fed53f6be74"
+        },
+        {
+            "date": 1754231318493,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-03-08-20-error.log",
+            "hash": "b8395d1b4f28c18c1b5a0582b9da45a76e27e950270df512beba14276067094d"
+        },
+        {
+            "date": 1754233346899,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-03-08-21-error.log",
+            "hash": "824c7a9a7339cbffd1bb2cc2447fa32fc2059943cfd8ad0d8931f120df429e92"
+        }
+    ],
+    "hashType": "sha256"
+}

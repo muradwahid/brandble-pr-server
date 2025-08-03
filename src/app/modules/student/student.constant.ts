@@ -1,0 +1,2 @@
+export const StudentFilterAbleFields = ['searchTerm', 'firstName', 'lastName', 'middleName', 'email', 'contactNo', 'bloodgroup'];
+export const StudentSearchAbleField = ['firstName', 'lastName', 'middleName', 'email', 'contactNo', 'bloodgroup'];
