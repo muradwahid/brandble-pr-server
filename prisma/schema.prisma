@@ -8,206 +8,124 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String
-  password  String
+  id            String   @id @default(uuid())
+  userId        String   @unique @default(nanoid(15))
+  name          String
+  email         String
+  password      String
+  role          String   @default("client")
+  image         String?
+  company       String?
+  designation   String?
+  phoneNumber   String?
+  paymentStatus String?
+  orders        Order[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Order {
+  id               String  @id @default(uuid())
+  orderId          String  @unique @default(nanoid(15))
+  service          String
+  detailsSubmitted String?
+  status           String  @default("pending")
+  publicationId  String?
+
+  // Optional fields for different article types
+  wonArticleId   String?
+  writeArticleId String?
+
+  userId       String
+  publication  Publication? @relation(fields: [publicationId], references: [id])
+  user         User          @relation(fields: [userId], references: [id])
+  wonArticle   WonArticle?   @relation(fields: [wonArticleId], references: [id])
+  writeArticle WriteArticle? @relation(fields: [writeArticleId], references: [id])
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("orders")
 }
 
-model AcademicSemester {
-  id                    String                 @id @default(uuid())
-  year                  Int
-  title                 String
-  code                  String
-  startMonth            String
-  endMonth              String
-  createdAt             DateTime               @default(now())
-  updatedAt             DateTime               @updatedAt
-  semesterRegistrations SemesterRegistration[]
-  students              Student[]
+model WonArticle {
+  id        String   @id @default(uuid())
+  file      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[] // Add this relation
 
-  @@map("academic_semesters")
+  @@map("won_articles")
 }
 
-model AcademicFaculty {
-  id                  String               @id @default(uuid())
-  title               String
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  academicDepartments AcademicDepartment[]
-  faculties           Faculty[]
-  students            Student[]
+model WriteArticle {
+  id                String   @id @default(uuid())
+  fullName          String
+  designation       String
+  company           String
+  socialMediaLink   String?
+  blockContentLink  String?
+  additionalLink    String?
+  goal              String
+  mainTheme         String
+  points            String
+  audience          String
+  wishList          String
+  announcement      String?
+  additionalContent String?
+  serviceId         String
+  personImage       String
+  serviceImage      String?
+  brandLogoLogo     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  orders            Order[] // Keep existing relation
 
-  @@map("academic_facultys")
+  @@map("write_articles")
 }
 
-model AcademicDepartment {
-  id                String          @id @default(uuid())
-  title             String
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  academicFacultyId String
-  academicFaculty   AcademicFaculty @relation(fields: [academicFacultyId], references: [id])
-  faculties         Faculty[]
-  offeredCourse     OfferedCourse[]
-  students          Student[]
+model Publication {
+  id        String   @id @default(uuid())
+  title     String
+  logo      String?
+  sponsor   String?
+  doFollow  String?
+  indexed   String?
+  region    String?
+  da        String?
+  dr        String?
+  ttp       String?
+  nicheId     String?
+  favorite  String[]
+  price     String
 
-  @@map("academic_departments")
+  genreId   String?
+
+  genre     Genre?   @relation(fields: [genreId], references: [id])
+  niche     Niche?   @relation(fields: [nicheId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[] 
+
+  @@map("publications")
 }
 
-model Student {
-  id                   String             @id @default(uuid())
-  studentId            String
-  firstName            String
-  lastName             String
-  middleName           String
-  profileImage         String
-  email                String
-  contactNo            String
-  gender               String
-  bloodgroup           String
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  academicSemesterId   String
-  academicDepartmentId String
-  academicFacultyId    String
-  academicDepartment   AcademicDepartment @relation(fields: [academicDepartmentId], references: [id])
-  academicFaculty      AcademicFaculty    @relation(fields: [academicFacultyId], references: [id])
-  academicSemester     AcademicSemester   @relation(fields: [academicSemesterId], references: [id])
-
-  @@map("students")
-}
-
-model Faculty {
-  id                   String             @id @default(uuid())
-  facultyId            String
-  firstName            String
-  lastName             String
-  middleName           String
-  profileImage         String
-  email                String
-  contactNo            String
-  gender               String
-  bloodgroup           String
-  designation          String
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  academicDepartmentId String
-  academicFacultyId    String
-  courses              CourseFaculty[]
-  academicDepartment   AcademicDepartment @relation(fields: [academicDepartmentId], references: [id])
-  academicFaculty      AcademicFaculty    @relation(fields: [academicFacultyId], references: [id])
-
-  @@map("faculties")
-}
-
-model Building {
+model Niche {
   id        String   @id @default(uuid())
   title     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  rooms     Room[]
+  publications Publication[]
 
-  @@map("buildings")
+  @@map("niches")
 }
 
-model Room {
-  id         String   @id @default(uuid())
-  floor      String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  buildingId String
-  romNumber  String
-  building   Building @relation(fields: [buildingId], references: [id])
+model Genre {
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  publications Publication[]
 
-  @@map("rooms")
-}
-
-model Course {
-  id              String                 @id @default(uuid())
-  title           String
-  code            String
-  credits         Int
-  createdAt       DateTime               @default(now())
-  updatedAt       DateTime               @updatedAt
-  preRequisite    CourseToPrerequisite[] @relation("CourseToPrerequisite")
-  preRequisiteFor CourseToPrerequisite[] @relation("PrerequisiteToCourse")
-  faculties       CourseFaculty[]
-  offeredCourse   OfferedCourse[]
-
-  @@map("courses")
-}
-
-model CourseToPrerequisite {
-  courseId       String
-  preRequisiteId String
-  course         Course @relation("CourseToPrerequisite", fields: [courseId], references: [id])
-  prerequisite   Course @relation("PrerequisiteToCourse", fields: [preRequisiteId], references: [id])
-
-  @@id([courseId, preRequisiteId])
-}
-
-model CourseFaculty {
-  courseId  String
-  facultyId String
-  course    Course  @relation(fields: [courseId], references: [id])
-  faculty   Faculty @relation(fields: [facultyId], references: [id])
-
-  @@id([courseId, facultyId])
-  @@map("course_faculties")
-}
-
-model SemesterRegistration {
-  id                   String                      @id @default(uuid())
-  startDate            DateTime
-  endDate              DateTime
-  status               SemesterRegistrationStatus? @default(UPCOMING)
-  createdAt            DateTime                    @default(now())
-  updatedAt            DateTime                    @updatedAt
-  academicSemesterId   String
-  maxCredit            Int                         @default(0)
-  minCredit            Int                         @default(0)
-  offeredCourseSection OfferedCourseSection[]
-  offeredCourses       OfferedCourse[]
-  academicSemester     AcademicSemester            @relation(fields: [academicSemesterId], references: [id])
-
-  @@map("semester_registrations")
-}
-
-model OfferedCourse {
-  id                     String                 @id @default(uuid())
-  createdAt              DateTime               @default(now())
-  updatedAt              DateTime               @updatedAt
-  courseId               String
-  academicDepartmentId   String
-  semesterRegistrationId String
-  offeredCourseSection   OfferedCourseSection[]
-  academicDepartment     AcademicDepartment     @relation(fields: [academicDepartmentId], references: [id])
-  course                 Course                 @relation(fields: [courseId], references: [id])
-  semesterRegistration   SemesterRegistration   @relation(fields: [semesterRegistrationId], references: [id])
-
-  @@map("offered_courses")
-}
-
-model OfferedCourseSection {
-  id                       String               @id @default(uuid())
-  title                    String
-  maxCapacity              Int
-  currentlyEnrolledStudent Int                  @default(0)
-  createdAt                DateTime             @default(now())
-  updatedAt                DateTime             @updatedAt
-  offeredCourseId          String
-  semesterRegestrationId   String
-  offredCourse             OfferedCourse        @relation(fields: [offeredCourseId], references: [id])
-  semesterRegistration     SemesterRegistration @relation(fields: [semesterRegestrationId], references: [id])
-
-  @@map("offered_course_sections")
-}
-
-enum SemesterRegistrationStatus {
-  UPCOMING
-  ONGOING
-  ENDED
+  @@map("genres")
 }

@@ -24,6 +24,11 @@
             "date": 1754233346896,
             "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\phu-2025-03-08-21-success.log",
             "hash": "2363555a2fb19c12605866931911bb85cbf9f564356cec2fa661d5e2d17d5678"
+        },
+        {
+            "date": 1754246696274,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\phu-2025-04-08-00-success.log",
+            "hash": "4ddb37994f52ace8163fa4485f19a48430efb6df2cee9d8bf379e690bac25fec"
         }
     ],
     "hashType": "sha256"
