@@ -19,7 +19,9 @@ model User {
   designation   String?
   phoneNumber   String?
   paymentStatus String?
-  orders        Order[]
+
+  orderId String?
+  order        Order?   @relation(fields: [orderId], references: [id])
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -27,20 +29,22 @@ model User {
 model Order {
   id               String  @id @default(uuid())
   orderId          String  @unique @default(nanoid(15))
-  service          String
-  detailsSubmitted String?
+  serviceId        String[]
+  detailsSubmitted String? @default("not-yet")
   status           String  @default("pending")
-  publicationId  String?
+  publicationId    String?
 
   // Optional fields for different article types
   wonArticleId   String?
   writeArticleId String?
 
   userId       String
-  publication  Publication? @relation(fields: [publicationId], references: [id])
-  user         User          @relation(fields: [userId], references: [id])
-  wonArticle   WonArticle?   @relation(fields: [wonArticleId], references: [id])
+  publication  Publication?  @relation(fields: [publicationId], references: [id])
+  user         User[]
+  wonArticle   WonArticle?   @relation( fields: [wonArticleId], references: [id])
   writeArticle WriteArticle? @relation(fields: [writeArticleId], references: [id])
+
+  service Service[] @relation("OrderToService")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,12 +52,20 @@ model Order {
   @@map("orders")
 }
 
+model Service {
+  id        String   @id @default(uuid())
+  name      String
+  orders    Order[] @relation("OrderToService")
+
+  @@map("services")
+}
+
 model WonArticle {
   id        String   @id @default(uuid())
   file      String
+  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  orders    Order[] // Add this relation
 
   @@map("won_articles")
 }
@@ -79,7 +91,7 @@ model WriteArticle {
   brandLogoLogo     String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  orders            Order[] // Keep existing relation
+  orders            Order[]
 
   @@map("write_articles")
 }
@@ -95,7 +107,7 @@ model Publication {
   da        String?
   dr        String?
   ttp       String?
-  nicheId     String?
+  nicheId   String?
   favorite  String[]
   price     String
 
@@ -103,9 +115,9 @@ model Publication {
 
   genre     Genre?   @relation(fields: [genreId], references: [id])
   niche     Niche?   @relation(fields: [nicheId], references: [id])
+  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  orders    Order[] 
 
   @@map("publications")
 }

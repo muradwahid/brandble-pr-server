@@ -71,7 +71,6 @@ const getDataById = async (id: string): Promise<AcademicDepartment | null> => {
 const insertIntoDb = async (
   data: AcademicDepartment
 ): Promise<AcademicDepartment | null> => {
-    console.log(data);
   const result = await prisma.academicDepartment.create({data:data})
   return result;
 };
