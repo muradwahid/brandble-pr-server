@@ -1,2 +1,0 @@
-export const FacultyFilterAbleFields = ['searchTerm','firstName', 'lastName', 'middleName', 'email', 'contactNo', 'bloodgroup', 'designation'];
-export const FacultySearchAbleField = ['firstName', 'lastName', 'middleName', 'email', 'contactNo', 'designation'];

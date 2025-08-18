@@ -4,13 +4,13 @@ import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
 
 const createWonArticle = async (req: Request, res: Response) => {
-    const { file } = req.body;
-    const wonArticle = await WonArticleService.createWonArticle(file);
+    const data = req.body;
+    const result = await WonArticleService.createWonArticle(data);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: "Won article created successfully",
-        data: wonArticle,
+        data: result,
     });
 };
 
