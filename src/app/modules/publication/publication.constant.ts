@@ -1,2 +1,2 @@
-export const publicationSearchableFields = ['title', 'link', 'date', 'author', 'category', 'tags', 'isFeatured','minPrice','maxPrice','price'];
-export const publicationFilterableFields = ['searchTerm', 'title', 'link', 'date', 'author', 'category', 'tags', 'isFeatured','minPrice','maxPrice','price'];
+export const publicationSearchableFields = ['title', 'link', 'date', 'author', 'category', 'tags', 'isFeatured','minPrice','maxPrice','price','da','dr'];
+export const publicationFilterableFields = ['searchTerm', 'title', 'link', 'date', 'author', 'category', 'tags', 'isFeatured', 'minPrice', 'maxPrice', 'price', 'da', 'dr'];

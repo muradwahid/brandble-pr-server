@@ -1,0 +1,25 @@
+export interface IPublicationSearchableFields {
+  title:String; 
+  link:String;  
+  date:String;  
+  author:String;  
+  category: String;
+  da: String;
+  tags:String;  
+  isFeatured:String;  
+  dr: String;
+  price:String; 
+};
+export interface IPublicationFilterableFields {
+  searchTerm: String;
+  title: String;
+  link: String;
+  date: String;
+  da: String;
+  author: String;
+  dr: String;
+  category: String;
+  tags: String;
+  isFeatured: String;
+  price: String;
+};
