@@ -20,8 +20,7 @@ model User {
   phoneNumber   String?
   paymentStatus String?
 
-  orderId String?
-  order        Order?   @relation(fields: [orderId], references: [id])
+  orders        Order[]
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
@@ -39,9 +38,9 @@ model Order {
   writeArticleId String?
 
   userId       String
+  user         User          @relation(fields: [userId], references: [id])
   publication  Publication?  @relation(fields: [publicationId], references: [id])
-  user         User[]
-  wonArticle   WonArticle?   @relation( fields: [wonArticleId], references: [id])
+  wonArticle   WonArticle?   @relation(fields: [wonArticleId], references: [id])
   writeArticle WriteArticle? @relation(fields: [writeArticleId], references: [id])
 
   service Service[] @relation("OrderToService")
@@ -125,6 +124,7 @@ model Publication {
 model Niche {
   id        String   @id @default(uuid())
   title     String
+  icon      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   publications Publication[]
