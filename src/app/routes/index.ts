@@ -7,6 +7,7 @@ import { ServiceRoutes } from '../modules/service/service.route';
 import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
 import { NicheRoutes } from '../modules/niche/niche.route';
+import { IndexedRoutes } from '../modules/indexed/indexed.route';
 
 const router = express.Router();
 
@@ -42,6 +43,18 @@ const moduleRoutes = [
   {
     path: '/niche',
     routes: NicheRoutes,
+  },
+  {
+    path: '/indexed',
+    routes: IndexedRoutes,
+  },
+  {
+    path: '/sponsor',
+    routes: IndexedRoutes,
+  },
+  {
+    path: '/defollow',
+    routes: IndexedRoutes,
   },
 ];
 

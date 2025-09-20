@@ -8,29 +8,29 @@ datasource db {
 }
 
 model User {
-  id            String   @id @default(uuid())
-  userId        String   @unique @default(nanoid(15))
+  id            String  @id @default(uuid())
+  userId        String  @unique @default(nanoid(15))
   name          String
   email         String
   password      String
-  role          String   @default("client")
+  role          String  @default("client")
   image         String?
   company       String?
   designation   String?
   phoneNumber   String?
   paymentStatus String?
 
-  orders        Order[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  orders    Order[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
-  id               String  @id @default(uuid())
-  orderId          String  @unique @default(nanoid(15))
+  id               String   @id @default(uuid())
+  orderId          String   @unique @default(nanoid(15))
   serviceId        String[]
-  detailsSubmitted String? @default("not-yet")
-  status           String  @default("pending")
+  detailsSubmitted String?  @default("not-yet")
+  status           String   @default("pending")
   publicationId    String?
 
   // Optional fields for different article types
@@ -52,9 +52,9 @@ model Order {
 }
 
 model Service {
-  id        String   @id @default(uuid())
-  name      String
-  orders    Order[] @relation("OrderToService")
+  id     String  @id @default(uuid())
+  name   String
+  orders Order[] @relation("OrderToService")
 
   @@map("services")
 }
@@ -96,48 +96,85 @@ model WriteArticle {
 }
 
 model Publication {
-  id        String   @id @default(uuid())
-  title     String
-  logo      String?
-  sponsor   String?
-  doFollow  String?
-  indexed   String?
-  region    String?
-  da        String?
-  dr        String?
-  ttp       String?
+  id       String   @id @default(uuid())
+  title    String
+  logo     String?
+  region   String?
+  da       String?
+  dr       String?
+  tat      String?
+  ttp      String?
+  favorite String[]
+  price    String
+
+  indexedId String?
   nicheId   String?
-  favorite  String[]
-  price     String
+  sponsorId String?
+  doFollowId  String?
+  // nicheId   String[]
+  // genreId   String[]
+  genreId   String
 
-  genreId   String?
+  genre       Genre?     @relation(fields: [genreId], references: [id])
+  niche       Niche?     @relation(fields: [nicheId], references: [id])
+  index       Indexed?   @relation(fields: [indexedId], references: [id])
+  orders      Order[]
+  Sponsored   Sponsored? @relation(fields: [sponsorId], references: [id])
+  DoFollow    DoFollow?  @relation(fields: [doFollowId], references: [id])
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 
-  genre     Genre?   @relation(fields: [genreId], references: [id])
-  niche     Niche?   @relation(fields: [nicheId], references: [id])
-  orders    Order[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("publications")
 }
 
 model Niche {
-  id        String   @id @default(uuid())
-  title     String
-  icon      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(uuid())
+  title        String
+  icon         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   publications Publication[]
 
   @@map("niches")
 }
 
 model Genre {
-  id        String   @id @default(uuid())
-  title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String        @id @default(uuid())
+  title        String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   publications Publication[]
 
   @@map("genres")
+}
+
+model Indexed {
+  id           String        @id @default(uuid())
+  title        String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publications Publication[]
+
+  @@map("indexes")
+}
+
+model Sponsored {
+  id           String        @id @default(uuid())
+  title        String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publications Publication[]
+
+  @@map("sponsors")
+}
+
+model DoFollow {
+  id           String        @id @default(uuid())
+  title        String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  publications Publication[]
+
+  @@map("dofollows")
 }
