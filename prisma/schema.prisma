@@ -96,45 +96,42 @@ model WriteArticle {
 }
 
 model Publication {
-  id       String   @id @default(uuid())
-  title    String
-  logo     String?
-  region   String?
-  da       String?
-  dr       String?
-  tat      String?
-  ttp      String?
-  favorite String[]
-  price    String
-
-  indexedId String?
-  nicheId   String?
-  sponsorId String?
-  doFollowId  String?
-  // nicheId   String[]
+  id         String   @id @default(uuid())
+  title      String
+  logo       String?
+  region     String?
+  da         String?
+  dr         String?
+  tat        String?
+  ttp        String?
+  favorite   String[]
+  price      String
+  location   String
+  indexedId  String?
+  // nicheId   String?
+  sponsorId  String?
+  doFollowId String?
+  niches     String[]
   // genreId   String[]
-  genreId   String
+  genreId    String
 
-  genre       Genre?     @relation(fields: [genreId], references: [id])
-  niche       Niche?     @relation(fields: [nicheId], references: [id])
-  index       Indexed?   @relation(fields: [indexedId], references: [id])
-  orders      Order[]
-  Sponsored   Sponsored? @relation(fields: [sponsorId], references: [id])
-  DoFollow    DoFollow?  @relation(fields: [doFollowId], references: [id])
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
+  genre     Genre?     @relation(fields: [genreId], references: [id])
+  index     Indexed?   @relation(fields: [indexedId], references: [id])
+  orders    Order[]
+  sponsored Sponsored? @relation(fields: [sponsorId], references: [id])
+  doFollow  DoFollow?  @relation(fields: [doFollowId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@map("publications")
 }
 
 model Niche {
-  id           String        @id @default(uuid())
-  title        String
-  icon         String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  publications Publication[]
+  id        String   @id @default(uuid())
+  title     String
+  icon      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("niches")
 }

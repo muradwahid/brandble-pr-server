@@ -8,6 +8,8 @@ import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
 import { NicheRoutes } from '../modules/niche/niche.route';
 import { IndexedRoutes } from '../modules/indexed/indexed.route';
+import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
+import { DoFollowRoutes } from '../modules/dofollow/dofollow.route';
 
 const router = express.Router();
 
@@ -50,11 +52,11 @@ const moduleRoutes = [
   },
   {
     path: '/sponsor',
-    routes: IndexedRoutes,
+    routes: SponsoredRoutes,
   },
   {
-    path: '/defollow',
-    routes: IndexedRoutes,
+    path: '/dofollow',
+    routes: DoFollowRoutes,
   },
 ];
 

@@ -1,22 +1,27 @@
-import { Request, Response } from 'express';
-import sendResponse from '../../../shared/sendResponse';
+import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { PublicationService } from './publication.service';
-import { publicationSearchableFields } from './publication.constant';
-import pick from '../../../shared/pick';
 import { paginationFields } from '../../../constants/pagination';
 import catchAsync from '../../../shared/catchAsync';
+import pick from '../../../shared/pick';
+import sendResponse from '../../../shared/sendResponse';
+import { publicationSearchableFields } from './publication.constant';
+import { PublicationService } from './publication.service';
 
-const createPublication = catchAsync(async (req: Request, res: Response) => {
-  const data = req.body;
-  const result = await PublicationService.createPublication(data);
+const createPublication = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
+  try {
+      const result = await PublicationService.createPublication(req);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Publication created successfully',
     data: result,
   });
+  } catch (error) {
+    next(error)
+  }
+
 });
+
 
 const getAllPublications = catchAsync(async (req: Request, res: Response) => {
 
@@ -43,15 +48,19 @@ const getPublicationById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updatePublication = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await PublicationService.updatePublication(id, req.body);
+const updatePublication = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
+    const { id } = req.params;
+
+  try { const result = await PublicationService.updatePublication(id,req);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Publication updated successfully',
     data: result,
   });
+  } catch (error) {
+    next(error)
+  }
 });
 
 const deletePublication = catchAsync(async (req: Request, res: Response) => {
