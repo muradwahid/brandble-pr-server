@@ -6,74 +6,9 @@
     "auditLog": "D:\\sharif-project\\server\\logs\\winston\\errors\\.73d0bba008f46f1c6baff4bc1077133943792a0c-audit.json",
     "files": [
         {
-            "date": 1757780118716,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-13-09-22-error.log",
-            "hash": "15738b39dcda8960e234ad7e938c6746f9f88bd5689a3a9aef3a918c75157b29"
-        },
-        {
-            "date": 1758121897233,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-17-09-21-error.log",
-            "hash": "554a1103192b176eaed7403d96addeb99dd22bbe6006fcdccee4f490766ff050"
-        },
-        {
-            "date": 1758279175748,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-19-09-16-error.log",
-            "hash": "ad8aa9afb1122c24720100e8d28d2f33dafec4734c80016429dc8d18bb1e75de"
-        },
-        {
-            "date": 1758382838931,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-20-09-21-error.log",
-            "hash": "2bd787db1db215fa23bf4e4f0e495305bf630fcbe3471318d9791ea7997b3e6d"
-        },
-        {
-            "date": 1758385252705,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-20-09-22-error.log",
-            "hash": "fa173a6558e284e06f854a6b1325a4db632b566fd353ba450010b933be2f344d"
-        },
-        {
-            "date": 1758387748445,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-20-09-23-error.log",
-            "hash": "e58c4d4feb365386261221a0c2aa344f08ec3a212342e4bb7910ec3893f93087"
-        },
-        {
-            "date": 1758468373090,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-21-09-21-error.log",
-            "hash": "e5512b731dd1fe2bbb5ceb07d1bfe8d89724f0a0a8adf18f3ed901bda9697698"
-        },
-        {
-            "date": 1758470774928,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-21-09-22-error.log",
-            "hash": "b0837f6c127ce8a19e33b22162de1d080904bdf164a4ca2559395415cf94fec9"
-        },
-        {
-            "date": 1758549814706,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-22-09-20-error.log",
-            "hash": "3fe9c1caf214e14924d4c2a37f7a36b5910c3ecdabb09eafd75ade2264cde09a"
-        },
-        {
-            "date": 1758553461098,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-22-09-21-error.log",
-            "hash": "839a8c9f3f12b8b7d005910a94687f2c3d566405836906b9ee24b63b44d6ab3b"
-        },
-        {
-            "date": 1758559675700,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-22-09-22-error.log",
-            "hash": "f2c9acd8da8e9c0e2bc5d60f6baffb5bb2f5abc31a43d5235ce685148cfc5674"
-        },
-        {
-            "date": 1758561284483,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-22-09-23-error.log",
-            "hash": "f50daa75e2f54c82d531795b3379eaad9e449a132727010f338c08a9c9965eb9"
-        },
-        {
-            "date": 1758565887857,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-23-09-00-error.log",
-            "hash": "7845f71b61cb976696c97d96e15de382b47b7efbc31e6504e762ab31740ac36e"
-        },
-        {
-            "date": 1758567885140,
-            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-23-09-01-error.log",
-            "hash": "fa8dbb4f2e04b639a7fb4395a0b8365bb7478aa2772c0cff21309e5e28073b10"
+            "date": 1758636085351,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\phu-2025-23-09-20-error.log",
+            "hash": "9c67efd656965e4873b60ea86c3b1f9eaab73d46af7dbc879d854db83e18b7fb"
         }
     ],
     "hashType": "sha256"

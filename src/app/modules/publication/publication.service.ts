@@ -1,11 +1,9 @@
 import { Publication } from '@prisma/client';
 import { FileUploadHelper } from '../../../helpers/FileUploadHelper';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
-import { IGenericResponse } from '../../../interfaces/common';
 import { IUploadFile } from '../../../interfaces/file';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
-import { publicationSearchableFields } from './publication.constant';
 import { IPublicationFilterableFields } from './publication.interface';
 
 
@@ -114,78 +112,233 @@ const createPublication = async (
 //   };
 // };
 
+// const getAllPublications = async (
+//   filters: IPublicationFilterableFields | any,
+//   options: IPaginationOptions | any,
+// ) => {
+//   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+//   const {
+//     searchTerm,
+//     price = 'asc',
+//     title = 'asc',
+//     da = 'asc',
+//     dr = 'asc',
+//     ...filterData
+//   } = filters;
+
+//   const andConditions = new Array();
+
+//   if (searchTerm) {
+//     andConditions.push({
+//       OR: publicationSearchableFields.map(field => ({
+//         [field]: {
+//           contains: searchTerm,
+//           mode: 'insensitive',
+//         },
+//       })),
+//     });
+//   }
+
+//   const filterKeys = Object.keys(filterData);
+//   if (filterKeys.length > 0) {
+//     andConditions.push({
+//       AND: filterKeys.map(key => {
+//         return {
+//           [key]: {
+//             equals: (filterData as any)[key],
+//           },
+//         };
+//       }),
+//     });
+//   }
+
+//   // Fixed: Create orderBy as an array of objects
+//   const orderBy: any[] = [
+//     { createdAt: 'desc' }, // Default sorting
+//   ];
+
+//   // Add additional sorting criteria only if they are explicitly provided
+//   // and not just the default values
+//   if (price && price !== 'asc') {
+//     orderBy.push({ price });
+//   }
+//   if (title && title !== 'asc') {
+//     orderBy.push({ title });
+//   }
+//   if (da && da !== 'asc') {
+//     orderBy.push({ da });
+//   }
+//   if (dr && dr !== 'asc') {
+//     orderBy.push({ dr });
+//   }
+
+//   const whereConditions =
+//     andConditions.length > 0 ? { AND: andConditions } : undefined;
+
+//   const result = await prisma.publication.findMany({
+//     where: whereConditions,
+//     skip,
+//     take: limit,
+//     orderBy, // Now this is an array as expected by Prisma
+//     include: {
+//       genre: true,
+//       doFollow: true,
+//       index: true,
+//       orders: true,
+//       sponsored: true
+//     }
+//   });
+
+//   const niches = await prisma.niche.findMany({
+//     where: {
+//       id: {
+//         in: result.flatMap(publication => publication.niches)
+//       },
+//     },
+//   });
+
+//   result.forEach(async (publication) => {
+//     const nicheDetails =  await prisma.niche.findMany({
+//       where: {
+//       id: {
+//         in: publication.niches
+//       },
+//     },
+//     });
+//     (publication as any).niches = nicheDetails;
+//   });
+
+
+
+
+//   const total = await prisma.publication.count({
+//     where: whereConditions,
+//   });
+
+//   return {
+//     meta: {
+//       page,
+//       limit,
+//       total,
+//     },
+//     data: result,
+//   };
+// };
+
 const getAllPublications = async (
   filters: IPublicationFilterableFields | any,
   options: IPaginationOptions | any,
-): Promise<IGenericResponse<Partial<Publication>[]>> => {
+) => {
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
   const {
     searchTerm,
-    price = 'asc',
-    title = 'asc',
-    da = 'asc',
-    dr = 'asc',
     ...filterData
   } = filters;
 
-  const andConditions = new Array();
+    // ✅ CORRECT: Use values directly without defaults
+  const sortBy = options.sortBy; // No default
+  const sortOrder = options.sortOrder; // No default
+  // DEBUG: More detailed logging
+  console.log('🔍 DEBUG START ====================');
+  console.log('📌 Full filters:', JSON.stringify(filters, null, 2));
+  console.log('📌 Full options:', JSON.stringify(options, null, 2));
+  console.log('📌 Extracted sortBy:', sortBy);
+  console.log('📌 Extracted sortOrder:', sortOrder);
+  console.log('📌 Type of sortBy:', typeof sortBy);
+  console.log('📌 Type of sortOrder:', typeof sortOrder);
 
-  if (searchTerm) {
-    andConditions.push({
-      OR: publicationSearchableFields.map(field => ({
-        [field]: {
-          contains: searchTerm,
-          mode: 'insensitive',
-        },
-      })),
-    });
+  const andConditions: any[] = [];
+
+  // ... (search and filter conditions remain same)
+
+  // FIXED: Simplified and corrected orderBy logic
+ let orderBy: any = { createdAt: 'desc' }; // Default fallback
+
+  if (sortBy && sortOrder) {
+    console.log('✅ Sorting with:', { sortBy, sortOrder });
+    
+    if (sortBy === 'title') {
+      orderBy = { title: sortOrder };
+    }
+    else if (sortBy === 'price') {
+      orderBy = { price: sortOrder };
+    }
+    else if (sortBy === 'da') {
+      orderBy = { da: sortOrder };
+    }
+    else if (sortBy === 'dr') {
+      orderBy = { dr: sortOrder };
+    }
+    else if (sortBy === 'createdAt') {
+      orderBy = { createdAt: sortOrder };
+    }
+    else if (sortBy === 'updatedAt') {
+      orderBy = { updatedAt: sortOrder };
+    }
+    else if (sortBy === 'genre') {
+      orderBy = { genre: { title: sortOrder } };
+    }
+    else if (sortBy === 'sponsored') {
+      orderBy = { sponsored: { title: sortOrder } };
+    }
+    else if (sortBy === 'doFollow') {
+      orderBy = { doFollow: { title: sortOrder } };
+    }
+    else if (sortBy === 'index') {
+      orderBy = { index: { title: sortOrder } };
+    }
+  } else {
+    console.log('ℹ️ Using default sorting');
   }
 
-  const filterKeys = Object.keys(filterData);
-  if (filterKeys.length > 0) {
-    andConditions.push({
-      AND: filterKeys.map(key => {
-        return {
-          [key]: {
-            equals: (filterData as any)[key],
-          },
-        };
-      }),
-    });
-  }
+  console.log('📌 Final orderBy:', orderBy);
+  console.log('🔍 DEBUG END ======================\n');
 
-  // Fixed: Create orderBy as an array of objects
-  const orderBy: any[] = [
-    { createdAt: 'desc' }, // Default sorting
-  ];
+  const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
 
-  // Add additional sorting criteria only if they are explicitly provided
-  // and not just the default values
-  if (price && price !== 'asc') {
-    orderBy.push({ price });
-  }
-  if (title && title !== 'asc') {
-    orderBy.push({ title });
-  }
-  if (da && da !== 'asc') {
-    orderBy.push({ da });
-  }
-  if (dr && dr !== 'asc') {
-    orderBy.push({ dr });
-  }
+  // DEBUG: Log final query
+  console.log('📌 Final query:', {
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy
+  });
 
-  const whereConditions =
-    andConditions.length > 0 ? { AND: andConditions } : undefined;
-
+  // Fetch publications
   const result = await prisma.publication.findMany({
     where: whereConditions,
     skip,
     take: limit,
-    orderBy, // Now this is an array as expected by Prisma
+    orderBy, // This should now work correctly
     include: {
-      genre: true
+      genre: true,
+      doFollow: true,
+      index: true,
+      orders: true,
+      sponsored: true,
     }
   });
+
+
+  // If using array field for nicheIds instead of relation
+  const publicationsWithNiches = await Promise.all(
+    result.map(async (publication) => {
+      if (publication.niches && publication.niches.length > 0) {
+        const nicheDetails = await prisma.niche.findMany({
+          where: {
+            id: {
+              in: publication.niches
+            },
+          },
+        });
+        return {
+          ...publication,
+          niches: nicheDetails
+        };
+      }
+      return publication;
+    })
+  );
 
   const total = await prisma.publication.count({
     where: whereConditions,
@@ -197,7 +350,7 @@ const getAllPublications = async (
       limit,
       total,
     },
-    data: result,
+    data: publicationsWithNiches,
   };
 };
 const getPublicationById = async (id: string): Promise<Publication | null> => {

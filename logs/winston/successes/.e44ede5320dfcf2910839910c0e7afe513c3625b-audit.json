@@ -1,0 +1,30 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\sharif-project\\server\\logs\\winston\\successes\\.e44ede5320dfcf2910839910c0e7afe513c3625b-audit.json",
+    "files": [
+        {
+            "date": 1758636167583,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\brandable-2025-23-09-20-success.log",
+            "hash": "ac33998be081c6b4e19d6592c9692bc6f613f15fb43f9aa397919caa908c11fe"
+        },
+        {
+            "date": 1758643085404,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\brandable-2025-23-09-21-success.log",
+            "hash": "7dc92400dfb486de75684132b09054e75a84e5567d2e30499c32882554f18e7a"
+        },
+        {
+            "date": 1758643306641,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\brandable-2025-23-09-22-success.log",
+            "hash": "0e8a99a234b1c504f42672965b57275a7768aeb52ef1012761e87f199f39b948"
+        },
+        {
+            "date": 1758646841638,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\successes\\brandable-2025-23-09-23-success.log",
+            "hash": "897954ba45b919847d5a9077b2e5521f2afcde9eaba3921868de508d47d193ee"
+        }
+    ],
+    "hashType": "sha256"
+}

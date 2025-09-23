@@ -1,0 +1,30 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "D:\\sharif-project\\server\\logs\\winston\\errors\\.f2eb8304c58efb35b7e456d2cf56dfd2103d18e2-audit.json",
+    "files": [
+        {
+            "date": 1758636160421,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\brandable-2025-23-09-20-error.log",
+            "hash": "abd55b99817790b2f09c78da406d6f7cbc8555c7a6fd4c5c82126258647daf2b"
+        },
+        {
+            "date": 1758643085410,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\brandable-2025-23-09-21-error.log",
+            "hash": "7a09ba3838477164308818d84ebae3f3902a3e536676617381724f3e7cc6329f"
+        },
+        {
+            "date": 1758643306647,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\brandable-2025-23-09-22-error.log",
+            "hash": "b841c395ecdc79f4c73b684ba2e6b2be72a2df5a2de4f0520378e6c17f560f36"
+        },
+        {
+            "date": 1758646841645,
+            "name": "D:\\sharif-project\\server\\logs\\winston\\errors\\brandable-2025-23-09-23-error.log",
+            "hash": "d6c5bcb2cc0f2e6e2ef1470f2b88e9886317b5f0b3462ccf1a7e3140752b3a97"
+        }
+    ],
+    "hashType": "sha256"
+}

@@ -28,6 +28,8 @@ const getAllPublications = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, publicationSearchableFields);
   const options = pick(req.query, paginationFields);
 
+  console.log({filters,options})
+
   const result = await PublicationService.getAllPublications(filters, options);
   sendResponse(res, {
     success: true,
