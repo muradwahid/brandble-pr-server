@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
 import catchAsync from "../../../shared/catchAsync";
@@ -37,9 +37,39 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await AuthService.getSingleUser(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success:true,
+    message:'User retrieved successfully!',
+    data:result
+  })
+
+})
+
+const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
+    const { id } = req.params;
+
+  try { const result = await AuthService.updateUser(id,req);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'User updated successfully',
+    data: result,
+  });
+  } catch (error) {
+    next(error)
+  }
+});
+
+
 
 export const AuthController = {
     allUsers,
     createUser,
-    loginUser
+    loginUser,
+    getSingleUser,
+    updateUser
 }

@@ -1,3 +1,5 @@
+import { IUploadFile } from "../../../interfaces/file";
+
 export type IUserLogin = {
   email: string;
   password?: string;
@@ -7,3 +9,8 @@ export type IUser = {
   email: string;
   password: string;
 };
+
+export interface CustomRequest {
+  body: any;
+  file?: IUploadFile;
+}

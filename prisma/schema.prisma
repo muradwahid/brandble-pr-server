@@ -96,32 +96,28 @@ model WriteArticle {
 }
 
 model Publication {
-  id         String   @id @default(uuid())
-  title      String
-  logo       String?
-  region     String?
-  da         String?
-  dr         String?
-  tat        String?
-  ttp        String?
-  favorite   String[]
-  price      String
-  location   String
-  indexedId  String?
+  id            String   @id @default(uuid())
+  publicationId String   @unique @default(nanoid(15))
+  title         String
+  logo          String?
+  region        String?
+  da            String?
+  dr            String?
+  tat           String?
+  ttp           String?
+  favorite      String[]
+  price         String
+  location      String
+  index         String
   // nicheId   String?
-  sponsorId  String?
-  doFollowId String?
-  niches     String[]
+  sponsor       String
+  doFollow      String
+  niches        String[]
   // genreId   String[]
-  genreId    String
-
-  genre     Genre?     @relation(fields: [genreId], references: [id])
-  index     Indexed?   @relation(fields: [indexedId], references: [id])
-  orders    Order[]
-  sponsored Sponsored? @relation(fields: [sponsorId], references: [id])
-  doFollow  DoFollow?  @relation(fields: [doFollowId], references: [id])
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  genre         String
+  orders        Order[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@map("publications")
 }
@@ -137,41 +133,37 @@ model Niche {
 }
 
 model Genre {
-  id           String        @id @default(uuid())
-  title        String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  publications Publication[]
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("genres")
 }
 
 model Indexed {
-  id           String        @id @default(uuid())
-  title        String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  publications Publication[]
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("indexes")
 }
 
 model Sponsored {
-  id           String        @id @default(uuid())
-  title        String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  publications Publication[]
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("sponsors")
 }
 
 model DoFollow {
-  id           String        @id @default(uuid())
-  title        String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  publications Publication[]
+  id        String   @id @default(uuid())
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("dofollows")
 }

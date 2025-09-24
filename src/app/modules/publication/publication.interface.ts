@@ -22,4 +22,10 @@ export interface IPublicationFilterableFields {
   tags: String;
   isFeatured: String;
   price: String;
+  minPrice: String;
+  maxPrice: String;
+  genre: String;
+  sponsore: String;
+  doFollow: String;
+  index: String;
 };

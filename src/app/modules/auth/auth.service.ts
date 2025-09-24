@@ -1,8 +1,10 @@
+import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
+import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
+import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
-import { IUser, IUserLogin } from "./auth.interface";
-import bcrypt from "bcrypt";
+import { CustomRequest, IUser, IUserLogin } from "./auth.interface";
 
 const allUsers = async ():Promise<IUser[] | null> => {
     const result = await prisma.user.findMany({
@@ -61,8 +63,56 @@ const loginUser = async (user: IUserLogin):Promise<IUser> => {
     return result;
 }
 
+
+const getSingleUser = async (id:string):Promise<IUser | null> => {
+    const result = await prisma.user.findUnique({
+        where:{
+            id
+        },
+        include:{
+          orders:true
+        }
+    });
+    return result;
+}
+const updateUser = async (
+  id: string,
+  req: CustomRequest,
+) => {
+
+
+    const file = req.file as IUploadFile;
+    const data = { ...req.body };
+    console.log({file,data,id})
+    if (file) {
+      const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
+      if (uploadedProfileImage && uploadedProfileImage.secure_url) {
+        data.image = uploadedProfileImage.secure_url;
+        console.log(uploadedProfileImage.secure_url)
+      }
+      
+    }
+
+
+  try {
+    const result = await prisma.user.update({
+      where: {
+        id,
+      },
+      data,
+    });
+    return result;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 export const AuthService = {
     allUsers,
     createUser,
-    loginUser
+    loginUser,
+    getSingleUser,
+    updateUser
 }

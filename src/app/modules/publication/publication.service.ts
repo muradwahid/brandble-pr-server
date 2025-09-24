@@ -4,6 +4,7 @@ import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IUploadFile } from '../../../interfaces/file';
 import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
+import { publicationSearchableFields } from './publication.constant';
 import { IPublicationFilterableFields } from './publication.interface';
 
 
@@ -112,120 +113,114 @@ const createPublication = async (
 //   };
 // };
 
-// const getAllPublications = async (
-//   filters: IPublicationFilterableFields | any,
-//   options: IPaginationOptions | any,
-// ) => {
-//   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
-//   const {
-//     searchTerm,
-//     price = 'asc',
-//     title = 'asc',
-//     da = 'asc',
-//     dr = 'asc',
-//     ...filterData
-//   } = filters;
-
-//   const andConditions = new Array();
-
-//   if (searchTerm) {
-//     andConditions.push({
-//       OR: publicationSearchableFields.map(field => ({
-//         [field]: {
-//           contains: searchTerm,
-//           mode: 'insensitive',
-//         },
-//       })),
-//     });
-//   }
-
-//   const filterKeys = Object.keys(filterData);
-//   if (filterKeys.length > 0) {
-//     andConditions.push({
-//       AND: filterKeys.map(key => {
-//         return {
-//           [key]: {
-//             equals: (filterData as any)[key],
-//           },
-//         };
-//       }),
-//     });
-//   }
-
-//   // Fixed: Create orderBy as an array of objects
-//   const orderBy: any[] = [
-//     { createdAt: 'desc' }, // Default sorting
-//   ];
-
-//   // Add additional sorting criteria only if they are explicitly provided
-//   // and not just the default values
-//   if (price && price !== 'asc') {
-//     orderBy.push({ price });
-//   }
-//   if (title && title !== 'asc') {
-//     orderBy.push({ title });
-//   }
-//   if (da && da !== 'asc') {
-//     orderBy.push({ da });
-//   }
-//   if (dr && dr !== 'asc') {
-//     orderBy.push({ dr });
-//   }
-
-//   const whereConditions =
-//     andConditions.length > 0 ? { AND: andConditions } : undefined;
-
-//   const result = await prisma.publication.findMany({
-//     where: whereConditions,
-//     skip,
-//     take: limit,
-//     orderBy, // Now this is an array as expected by Prisma
-//     include: {
-//       genre: true,
-//       doFollow: true,
-//       index: true,
-//       orders: true,
-//       sponsored: true
-//     }
-//   });
-
-//   const niches = await prisma.niche.findMany({
-//     where: {
-//       id: {
-//         in: result.flatMap(publication => publication.niches)
-//       },
-//     },
-//   });
-
-//   result.forEach(async (publication) => {
-//     const nicheDetails =  await prisma.niche.findMany({
-//       where: {
-//       id: {
-//         in: publication.niches
-//       },
-//     },
-//     });
-//     (publication as any).niches = nicheDetails;
-//   });
-
-
-
-
-//   const total = await prisma.publication.count({
-//     where: whereConditions,
-//   });
-
-//   return {
-//     meta: {
-//       page,
-//       limit,
-//       total,
-//     },
-//     data: result,
-//   };
-// };
-
 const getAllPublications = async (
+  filters: IPublicationFilterableFields | any,
+  options: IPaginationOptions | any,
+) => {
+  const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+
+  const {
+    searchTerm,
+    price = 'asc',
+    title = 'asc',
+    da = 'asc',
+    dr = 'asc',
+    genre= 'asc',
+    sponsor= 'asc',
+    ...filterData
+  } = filters;
+
+  const andConditions = new Array();
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: publicationSearchableFields.map(field => ({
+        [field]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      })),
+    });
+  }
+
+  const filterKeys = Object.keys(filterData);
+  if (filterKeys.length > 0) {
+    andConditions.push({
+      AND: filterKeys.map(key => {
+        return {
+          [key]: {
+            equals: (filterData as any)[key],
+          },
+        };
+      }),
+    });
+  }
+
+  // Fixed: Create orderBy as an array of objects
+  const orderBy: any[] = [];
+
+  // Add additional sorting criteria only if they are explicitly provided
+  // and not just the default values
+  if (price && price !== 'asc') {
+    orderBy.push({ price });
+  }
+  if (title && title !== 'asc') {
+    orderBy.push({ title });
+    console.log("title desc")
+  }
+  if (da && da !== 'asc') {
+    orderBy.push({ da });
+  }
+  if (dr && dr !== 'asc') {
+    orderBy.push({ dr });
+  }
+  if (genre && genre !== 'asc') {
+    orderBy.push({ genre });
+  }
+  if (sponsor && sponsor !== 'asc') {
+    orderBy.push({ sponsor });
+  }
+
+  const whereConditions =
+    andConditions.length > 0 ? { AND: andConditions } : undefined;
+
+  const result = await prisma.publication.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy,
+  });
+
+
+  result.forEach(async (publication) => {
+    const nicheDetails =  await prisma.niche.findMany({
+      where: {
+      id: {
+        in: publication.niches
+      },
+    },
+    });
+    (publication as any).niches = nicheDetails;
+  });
+
+
+
+
+  const total = await prisma.publication.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const getAllPublicationssss = async (
   filters: IPublicationFilterableFields | any,
   options: IPaginationOptions | any,
 ) => {
@@ -310,13 +305,6 @@ const getAllPublications = async (
     skip,
     take: limit,
     orderBy, // This should now work correctly
-    include: {
-      genre: true,
-      doFollow: true,
-      index: true,
-      orders: true,
-      sponsored: true,
-    }
   });
 
 
@@ -359,13 +347,6 @@ const getPublicationById = async (id: string): Promise<Publication | null> => {
       where: {
         id,
       },
-      include: {
-        genre: true,
-        doFollow: true,
-        index: true,
-        orders: true,
-        sponsored: true
-      }
 
     });
 
