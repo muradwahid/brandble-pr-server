@@ -28,10 +28,10 @@ model User {
 model Order {
   id               String   @id @default(uuid())
   orderId          String   @unique @default(nanoid(15))
-  serviceId        String[]
   detailsSubmitted String?  @default("not-yet")
   status           String   @default("pending")
-  publicationId    String?
+  publicationIds   String[]
+  orderType        String   @default("wonArticle")
 
   // Optional fields for different article types
   wonArticleId   String?
@@ -39,11 +39,9 @@ model Order {
 
   userId       String
   user         User          @relation(fields: [userId], references: [id])
-  publication  Publication?  @relation(fields: [publicationId], references: [id])
+  publication  Publication[]
   wonArticle   WonArticle?   @relation(fields: [wonArticleId], references: [id])
   writeArticle WriteArticle? @relation(fields: [writeArticleId], references: [id])
-
-  service Service[] @relation("OrderToService")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,17 +49,18 @@ model Order {
   @@map("orders")
 }
 
-model Service {
-  id     String  @id @default(uuid())
-  name   String
-  orders Order[] @relation("OrderToService")
+// model Service {
+//   id     String  @id @default(uuid())
+//   name   String
+//   orders Order[] @relation("OrderToService")
 
-  @@map("services")
-}
+//   @@map("services")
+// }
 
 model WonArticle {
   id        String   @id @default(uuid())
   file      String
+  message   String?
   orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -77,7 +76,7 @@ model WriteArticle {
   socialMediaLink   String?
   blockContentLink  String?
   additionalLink    String?
-  goal              String
+  mainGoal          String
   mainTheme         String
   points            String
   audience          String

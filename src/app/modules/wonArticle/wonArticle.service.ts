@@ -1,9 +1,26 @@
 import { WonArticle } from '@prisma/client';
+import { FileUploadHelper } from '../../../helpers/FileUploadHelper';
+import { IUploadFile } from '../../../interfaces/file';
 import prisma from '../../../shared/prisma';
+import { WonArticleCustomRequest } from './wonArticle.interface';
 
-export const createWonArticle = async (
-  data: WonArticle,
-): Promise<WonArticle> => {
+export const createWonArticle = async (req:WonArticleCustomRequest) => {
+
+  const files = req.files as IUploadFile[];
+  console.log(files)
+  const fileUploadPromises = files.map(async (file) => {
+    const uploadedFile = await FileUploadHelper.uploadPdfToCloudinary(file);
+    return uploadedFile?.secure_url;
+  });
+
+  const uploadedFiles = await Promise.all(fileUploadPromises);
+  console.log(uploadedFiles)
+
+  const data = {...req.body}
+  if (uploadedFiles) {
+    data.file = JSON.stringify(uploadedFiles);
+  }
+
   const result = await prisma.wonArticle.create({
     data,
   });
@@ -40,7 +57,7 @@ export const deleteWonArticle = async (id: string): Promise<Partial<WonArticle>>
 
 export const getWonArticleByPublicationId = async (publicationId: string): Promise<WonArticle[]> => {
   const result = await prisma.wonArticle.findMany({
-    where: { orders: { some: { publicationId } } },
+    where: { orders: { some: { publicationIds: { has: publicationId } } } },
   });
   return result;
 };

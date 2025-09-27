@@ -1,17 +1,31 @@
-import { Request, Response } from "express";
-import { WonArticleService } from "./wonArticle.service";
-import sendResponse from "../../../shared/sendResponse";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
+import sendResponse from "../../../shared/sendResponse";
+import { WonArticleService } from "./wonArticle.service";
+import { WonArticleCustomRequest } from "./wonArticle.interface";
 
-const createWonArticle = async (req: Request, res: Response) => {
-    const data = req.body;
-    const result = await WonArticleService.createWonArticle(data);
-    sendResponse(res, {
-        statusCode: httpStatus.OK,
-        success: true,
-        message: "Won article created successfully",
-        data: result,
-    });
+const createWonArticle = async (req: Request, res: Response, next: NextFunction) => {
+
+    try {
+        const result = await WonArticleService.createWonArticle(req as WonArticleCustomRequest);
+        sendResponse(res, {
+            success: true,
+            statusCode: httpStatus.OK,
+            message: 'Won Article created successfully',
+            data: result,
+        });
+    } catch (error) {
+        next(error)
+    }
+
+    // const data = req.body;
+    // const result = await WonArticleService.createWonArticle(data);
+    // sendResponse(res, {
+    //     statusCode: httpStatus.OK,
+    //     success: true,
+    //     message: "Won article created successfully",
+    //     data: result,
+    // });
 };
 
 const getAllWonArticles = async (req: Request, res: Response) => {

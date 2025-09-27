@@ -28,6 +28,7 @@ const createUser = async (user: IUser): Promise<IUser> => {
   }
   // Hash password before saving
   const hashedPassword = await bcrypt.hash(user.password, 10);
+  console.log(hashedPassword)
   // Create user with hashed password
     const result = await prisma.user.create({
         data: {
