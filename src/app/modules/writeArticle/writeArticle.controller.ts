@@ -1,18 +1,21 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import httpStatus from 'http-status';
 import sendResponse from '../../../shared/sendResponse';
 import { WriteArticleService } from './writeArticle.service';
+import { CustomRequest } from './writeArticle.interface';
 
-const createWriteArticle = async (req: Request, res: Response) => {
-  const data = req.body;
-  const result = await WriteArticleService.createWriteArticle(data);
-
-  sendResponse(res, {
-    statusCode: httpStatus.OK,
-    success: true,
-    message: 'Write article created successfully',
-    data: result,
-  });
+const createWriteArticle = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await WriteArticleService.createWriteArticle(req as CustomRequest);
+    sendResponse(res, {
+      success: true,
+      statusCode: httpStatus.OK,
+      message: 'Write article created successfully',
+      data: result,
+    });
+  } catch (error) {
+    next(error)
+  }
 };
 
 const getAllWriteArticles = async (req: Request, res: Response) => {

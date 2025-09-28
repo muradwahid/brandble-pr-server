@@ -165,13 +165,6 @@ const uploadPdfToCloudinary = async (file: IUploadFile): Promise<ICloudinaryResp
             const extension = file.originalname?.split('.').pop()?.toLowerCase() || '';
             const resourceType = docExtensions.includes(extension) ? 'raw' : 'auto';
 
-            console.log('Uploading file:', {
-                path: file.path,
-                originalname: file.originalname,
-                resourceType: resourceType,
-                size: file.size
-            });
-
             cloudinary.uploader.upload(file.path, {
                 resource_type: resourceType,
                 public_id: `documents/${file.originalname?.replace(/\.[^/.]+$/, "")}_${Date.now()}`,
@@ -181,7 +174,6 @@ const uploadPdfToCloudinary = async (file: IUploadFile): Promise<ICloudinaryResp
                 try {
                     if (fs.existsSync(file.path)) {
                         fs.unlinkSync(file.path);
-                        console.log('Local file deleted:', file.path);
                     }
                 } catch (unlinkError) {
                     console.error('Error deleting local file:', unlinkError);
@@ -195,7 +187,6 @@ const uploadPdfToCloudinary = async (file: IUploadFile): Promise<ICloudinaryResp
                     reject(error);
                 } else {
                     if (result) {
-                        console.log('Cloudinary upload successful:', result);
                         resolve(result);
                     } else {
                         console.error('Cloudinary upload successful but no result returned.');

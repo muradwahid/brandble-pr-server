@@ -1,4 +1,4 @@
-import { Publication } from '@prisma/client';
+import { Niche, Publication } from '@prisma/client';
 import { FileUploadHelper } from '../../../helpers/FileUploadHelper';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
 import { IUploadFile } from '../../../interfaces/file';
@@ -125,8 +125,8 @@ const getAllPublications = async (
     title = 'asc',
     da = 'asc',
     dr = 'asc',
-    genre= 'asc',
-    sponsor= 'asc',
+    genre = 'asc',
+    sponsor = 'asc',
     ...filterData
   } = filters;
 
@@ -184,24 +184,53 @@ const getAllPublications = async (
   const whereConditions =
     andConditions.length > 0 ? { AND: andConditions } : undefined;
 
-  const result = await prisma.publication.findMany({
-    where: whereConditions,
-    skip,
-    take: limit,
-    orderBy,
-  });
 
-
-  result.forEach(async (publication) => {
-    const nicheDetails =  await prisma.niche.findMany({
-      where: {
-      id: {
-        in: publication.niches
-      },
-    },
+  const result = await prisma.$transaction(async (transactionClient) => {
+    const publication = await transactionClient.publication.findMany({
+      where: whereConditions,
+      skip,
+      take: limit,
+      orderBy,
     });
-    (publication as any).niches = nicheDetails;
-  });
+
+        const newPublication = await Promise.all(publication.map(async (publication) => {
+      const niches = await transactionClient.niche.findMany({
+        where: {
+          id: {
+            in: publication.niches
+          },
+        },
+      });
+      return {
+        ...publication,
+        niches
+      };
+    }));
+
+    return newPublication;
+
+  })
+
+
+  // const result = await prisma.publication.findMany({
+  //   where: whereConditions,
+  //   skip,
+  //   take: limit,
+  //   orderBy,
+  // });
+
+
+  // result.forEach(async (publication) => {
+  //   console.log(publication.niches)
+  //   const nicheDetails = await prisma.niche.findMany({
+  //     where: {
+  //       id: {
+  //         in: publication.niches
+  //       },
+  //     },
+  //   });
+  //   (publication as any).niches = nicheDetails;
+  // });
 
 
 
@@ -230,7 +259,7 @@ const getAllPublicationssss = async (
     ...filterData
   } = filters;
 
-    // ✅ CORRECT: Use values directly without defaults
+  // ✅ CORRECT: Use values directly without defaults
   const sortBy = options.sortBy; // No default
   const sortOrder = options.sortOrder; // No default
   // DEBUG: More detailed logging
@@ -247,11 +276,11 @@ const getAllPublicationssss = async (
   // ... (search and filter conditions remain same)
 
   // FIXED: Simplified and corrected orderBy logic
- let orderBy: any = { createdAt: 'desc' }; // Default fallback
+  let orderBy: any = { createdAt: 'desc' }; // Default fallback
 
   if (sortBy && sortOrder) {
     console.log('✅ Sorting with:', { sortBy, sortOrder });
-    
+
     if (sortBy === 'title') {
       orderBy = { title: sortOrder };
     }
@@ -374,16 +403,16 @@ const updatePublication = async (
 ) => {
 
 
-    const file = req.file as IUploadFile;
-    const data = { ...req.body };
+  const file = req.file as IUploadFile;
+  const data = { ...req.body };
 
-    if (file) {
-      const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
-      if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-        data.logo = uploadedProfileImage.secure_url;
-      }
-      
+  if (file) {
+    const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
+    if (uploadedProfileImage && uploadedProfileImage.secure_url) {
+      data.logo = uploadedProfileImage.secure_url;
     }
+
+  }
 
 
   try {

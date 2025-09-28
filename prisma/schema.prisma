@@ -83,10 +83,10 @@ model WriteArticle {
   wishList          String
   announcement      String?
   additionalContent String?
-  serviceId         String
+  service           String @default("won-article")
   personImage       String
   serviceImage      String?
-  brandLogoLogo     String?
+  brandLogo         String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   orders            Order[]
