@@ -3,6 +3,7 @@ import httpStatus from "http-status";
 import sendResponse from "../../../shared/sendResponse";
 import catchAsync from "../../../shared/catchAsync";
 import { AuthService } from "./auth.service";
+import config from "../../../config";
 
 const allUsers = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.allUsers();
@@ -26,13 +27,21 @@ const createUser = catchAsync(async (req: Request, res: Response) => {
 })
 
 const loginUser = catchAsync(async (req: Request, res: Response) => {
-  const user = req.body;
-  const result = await AuthService.loginUser(user);
+  const data = req.body;
+  const result = await AuthService.loginUser(data);
+  const { refreshToken, ...others } = result;
+  //set refresh token into cookie
+  const cookieOptions = {
+    secure: config.env === 'production',
+    httpOnly: true,
+  }
+  res.cookie('refreshToken', refreshToken, cookieOptions);
+  
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User logged in successfully!',
-    data: result,
+    data: others,
   })
 })
 

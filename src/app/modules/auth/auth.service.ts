@@ -4,17 +4,13 @@ import ApiError from "../../../errors/ApiError";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
-import { CustomRequest, IUser, IUserLogin } from "./auth.interface";
+import { CustomRequest, ILoginUserResponse, IUser, IUserLogin } from "./auth.interface";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
+import config from "../../../config";
+import { Secret } from "jsonwebtoken";
 
-const allUsers = async ():Promise<IUser[] | null> => {
-    const result = await prisma.user.findMany({
-        select:{
-            id:true,
-            name:true,
-            email:true,
-            password:true,
-        }
-    });
+const allUsers = async (): Promise<IUser[] | null> => {
+  const result = await prisma.user.findMany();
     return result;
 }
 
@@ -39,7 +35,7 @@ const createUser = async (user: IUser): Promise<IUser> => {
     return result;
 }
 
-const loginUser = async (user: IUserLogin):Promise<IUser> => {
+const loginUser = async (user: IUserLogin): Promise<ILoginUserResponse> => {
   // Find user by email
     const result = await prisma.user.findFirst({
         where: {
@@ -48,8 +44,9 @@ const loginUser = async (user: IUserLogin):Promise<IUser> => {
         select:{
             id:true,
             name:true,
-            email:true,
-            password:true,
+          email: true,
+          password: true,
+          role: true,
         }
     });
   // Check if user exists
@@ -61,11 +58,28 @@ const loginUser = async (user: IUserLogin):Promise<IUser> => {
   if(!isPasswordCorrect){
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Invalid password');
   }
-    return result;
+
+  //create access token & refresh token
+  const accessToken = jwtHelpers.createToken(
+    { id: result?.id, role: result?.role },
+    config.jwt.secret as Secret,
+    config.jwt.expires_in as string
+  )
+  const refreshToken = jwtHelpers.createToken(
+    { id: result?.id, role: result?.role },
+    config.jwt.refresh_secret as Secret,
+    config.jwt.refresh_expires_in as string
+  )
+
+  return {
+    accessToken,
+    refreshToken,
+  };
 }
 
 
-const getSingleUser = async (id:string):Promise<IUser | null> => {
+const getSingleUser = async (id: string): Promise<IUser | null> => {
+
     const result = await prisma.user.findUnique({
         where:{
             id

@@ -13,7 +13,7 @@ const auth =
       // STEP 1: EXTRACT AUTHORIZATION TOKEN
       // ========================================
       const token = req.headers.authorization;
-
+        
       // Check if token exists in the request
       if (!token) {
         throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');

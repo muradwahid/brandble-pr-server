@@ -4,10 +4,10 @@ import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 
 const router = Router();
 
-router.post('/signup', AuthController.createUser);
-router.post('/signin', AuthController.loginUser);
 router.get('/all-users', AuthController.allUsers);
 router.get('/:id', AuthController.getSingleUser);
+router.post('/signup', AuthController.createUser);
+router.post('/signin', AuthController.loginUser);
 router.patch('/update/:id', FileUploadHelper.upload.single('file'), (req:Request, res:Response,next:NextFunction) => {
         req.body = JSON.parse(req.body.data);
         return AuthController.updateUser(req, res,next)

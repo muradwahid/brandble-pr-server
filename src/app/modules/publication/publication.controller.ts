@@ -22,7 +22,6 @@ const createPublication = catchAsync(async (req: Request, res: Response,next: Ne
 
 });
 
-
 const getAllPublications = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, publicationSearchableFields);
   const options = pick(req.query, paginationFields);

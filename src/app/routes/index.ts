@@ -1,15 +1,16 @@
 import express from 'express';
 import { AuthRoutes } from '../modules/auth/auth.route';
+import { DoFollowRoutes } from '../modules/dofollow/dofollow.route';
 import { GenreRoutes } from '../modules/genre/genre.route';
+import { IndexedRoutes } from '../modules/indexed/indexed.route';
+import { NicheRoutes } from '../modules/niche/niche.route';
 import { OrderRoutes } from '../modules/order/order.route';
+import { StripeRoutes } from '../modules/payment-gateway-stripe/stripe.route';
 import { PublicationRoutes } from '../modules/publication/publication.route';
 import { ServiceRoutes } from '../modules/service/service.route';
+import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
 import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
-import { NicheRoutes } from '../modules/niche/niche.route';
-import { IndexedRoutes } from '../modules/indexed/indexed.route';
-import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
-import { DoFollowRoutes } from '../modules/dofollow/dofollow.route';
 
 const router = express.Router();
 
@@ -58,6 +59,10 @@ const moduleRoutes = [
     path: '/dofollow',
     routes: DoFollowRoutes,
   },
+  {
+    path: '/payment',
+    routes: StripeRoutes
+  }
 ];
 
 moduleRoutes.forEach(route => router.use(route.path, route.routes));

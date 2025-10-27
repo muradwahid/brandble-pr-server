@@ -8,19 +8,21 @@ datasource db {
 }
 
 model User {
-  id            String  @id @default(uuid())
-  userId        String  @unique @default(nanoid(15))
-  name          String
-  email         String
-  password      String
-  role          String  @default("client")
-  image         String?
-  company       String?
-  designation   String?
-  phoneNumber   String?
-  paymentStatus String?
+  id               String  @id @default(uuid())
+  userId           String  @unique @default(nanoid(15))
+  stripeCustomerId String? @unique
+  name             String
+  email            String
+  password         String
+  role             String  @default("client")
+  image            String?
+  company          String?
+  designation      String?
+  phoneNumber      String?
+  paymentStatus    String?
 
   orders    Order[]
+  payment      PaymentMethod[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -31,22 +33,49 @@ model Order {
   detailsSubmitted String?  @default("not-yet")
   status           String   @default("pending")
   publicationIds   String[]
+  methodId         String
   orderType        String   @default("wonArticle")
+  amount           Int
 
   // Optional fields for different article types
   wonArticleId   String?
   writeArticleId String?
 
   userId       String
-  user         User          @relation(fields: [userId], references: [id])
+  user         User            @relation(fields: [userId], references: [id])
   publication  Publication[]
-  wonArticle   WonArticle?   @relation(fields: [wonArticleId], references: [id])
-  writeArticle WriteArticle? @relation(fields: [writeArticleId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  wonArticle   WonArticle?     @relation(fields: [wonArticleId], references: [id])
+  writeArticle WriteArticle?   @relation(fields: [writeArticleId], references: [id])
+  method       PaymentMethod   @relation(fields: [methodId], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
 
   @@map("orders")
+}
+
+model PaymentMethod {
+  id                    String   @id @default(cuid())
+  userId                String
+  stripePaymentMethodId String   @unique
+  type                  String  
+  brand                 String
+  last4                 String
+  expMonth              Int?
+  expYear               Int?
+  isDefault             Boolean  @default(false)
+  
+  // Billing details
+  email                 String?
+  name                  String?
+  phone                 String?
+  billingAddress        String?
+  
+  createdAt             DateTime @default(now())
+  
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order                  Order[]
+  
+  @@map("payment_methods")
 }
 
 // model Service {
@@ -83,7 +112,7 @@ model WriteArticle {
   wishList          String
   announcement      String?
   additionalContent String?
-  service           String @default("won-article")
+  service           String   @default("won-article")
   personImage       String
   serviceImage      String?
   brandLogo         String?

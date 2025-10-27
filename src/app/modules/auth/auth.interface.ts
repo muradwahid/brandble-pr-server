@@ -14,3 +14,8 @@ export interface CustomRequest {
   body: any;
   file?: IUploadFile;
 }
+
+export interface ILoginUserResponse {
+  accessToken: string
+  refreshToken?: string
+}
