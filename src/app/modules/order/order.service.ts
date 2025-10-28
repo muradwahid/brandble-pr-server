@@ -14,7 +14,7 @@ const allOrders = async (
   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
   const andConditions = new Array();
-  if (searchTerm) { 
+  if (searchTerm) {
     andConditions.push({
       OR: orderSearchableFields.map(field => ({
         [field]: {
@@ -27,24 +27,24 @@ const allOrders = async (
 
   const filterKeys = Object.keys(filterData);
 
-  if (filterKeys.length > 0) { 
+  if (filterKeys.length > 0) {
     andConditions.push({
-      AND: filterKeys.map(key => { 
-        if (key === 'publication') { 
+      AND: filterKeys.map(key => {
+        if (key === 'publication') {
           return {
             publication: {
               id: (filterData as any)[key]
             }
           }
         }
-        if (key === 'wonArticle') { 
+        if (key === 'wonArticle') {
           return {
             wonArticle: {
               id: (filterData as any)[key]
             }
           }
         }
-        if (key === 'writeArticle') { 
+        if (key === 'writeArticle') {
           return {
             writeArticle: {
               id: (filterData as any)[key]
@@ -68,32 +68,65 @@ const allOrders = async (
     orderBy:
       options.sortBy && options.sortOrder
         ? {
-            [options.sortBy as any]: options.sortOrder,
-          }
+          [options.sortBy as any]: options.sortOrder,
+        }
         : {
-            createdAt: 'desc',
-          },
+          createdAt: 'desc',
+        },
     include: {
       user: true,
-      publication: true,
       wonArticle: true,
       writeArticle: true,
+      method: true
     },
   });
   const total = await prisma.order.count();
+  // return {
+  //   meta: {
+  //     page,
+  //     limit,
+  //     total,
+  //   },
+  //   data: result as unknown as Partial<IOrder>[],
+  // };
+  // collect all publicationIds from orders (handles undefined)
+  const allPubIds = Array.from(new Set(result.flatMap(r => r.publicationIds || [])));
+
+  // fetch publications once (support both Publication.id (uuid) and Publication.publicationId (nanoid))
+  const publications = allPubIds.length
+    ? await prisma.publication.findMany({
+      where: {
+        OR: [
+          { id: { in: allPubIds } },
+          { publicationId: { in: allPubIds } }
+        ]
+      }
+    })
+    : [];
+
+  // build lookup maps for fast matching
+  const byId = new Map(publications.map(p => [p.id, p]));
+  const byPubId = new Map(publications.map(p => [p.publicationId, p]));
+
+  // attach publications to each order
+  const mapped = result.map(r => {
+    const pubs = (r.publicationIds || []).map(pid => byId.get(pid) ?? byPubId.get(pid)).filter(Boolean);
+    // remove publicationIds if you prefer and add publications
+    return { ...r, publication: pubs } as unknown as Partial<IOrder>;
+  });
   return {
     meta: {
       page,
       limit,
       total,
     },
-    data: result as unknown as Partial<IOrder>[],
+    data: mapped as Partial<IOrder>[],
   };
 };
 
 const createOrder = async (
   order: Partial<IOrder>,
-): Promise<Partial<IOrder >> => {
+): Promise<Partial<IOrder>> => {
   // Destructure only the fields needed for creation
   const {
     id,
@@ -144,12 +177,16 @@ export const getOrderById = async (id: string): Promise<Partial<IOrder> | null> 
     },
     include: {
       user: true,
-      publication: true,
       wonArticle: true,
       writeArticle: true,
+      method:true
     },
   });
-  return result as unknown as Partial<IOrder>;
+  if (!result) return {}
+  const publication = result.publicationIds && result.publicationIds.length
+    ? await prisma.publication.findMany({ where: { id: { in: result.publicationIds } } })
+    : [];
+  return {...result,publication} as unknown as Partial<IOrder>;
 };
 
 export const updateOrder = async (id: string, data: Partial<IOrder | any>): Promise<Partial<IOrder> | null> => {

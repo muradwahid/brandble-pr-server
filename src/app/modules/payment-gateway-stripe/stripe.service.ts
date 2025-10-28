@@ -142,14 +142,12 @@ const savePaymentInfo = async (data: any) => {
 
 const createSetupIntent = async (req:CustomRequest) => {
     const user = req.user;
-    console.log({user});
-    console.log("create setup intent", user);
+
     const currentUser = await prisma.user.findFirst({
         where: {
             id: user.id
         }
     })
-    console.log({ currentUser });
     if (!currentUser) throw new ApiError(httpStatus.NOT_FOUND, 'User not found')
     let customerId = currentUser?.stripeCustomerId;
 
@@ -176,7 +174,7 @@ const createSetupIntent = async (req:CustomRequest) => {
 
     }
 
-    if(customerId) throw new ApiError(httpStatus.NOT_FOUND, 'Stripe customer not found')
+    if(!customerId) throw new ApiError(httpStatus.NOT_FOUND, 'Stripe customer not found')
     //setup intent
     const setupIntent = await stripe.setupIntents.create({
         customer: customerId ?? '',
