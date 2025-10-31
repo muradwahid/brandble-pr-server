@@ -166,7 +166,6 @@ const getAllPublications = async (
   }
   if (title && title !== 'asc') {
     orderBy.push({ title });
-    console.log("title desc")
   }
   if (da && da !== 'asc') {
     orderBy.push({ da });
@@ -263,13 +262,6 @@ const getAllPublicationssss = async (
   const sortBy = options.sortBy; // No default
   const sortOrder = options.sortOrder; // No default
   // DEBUG: More detailed logging
-  console.log('🔍 DEBUG START ====================');
-  console.log('📌 Full filters:', JSON.stringify(filters, null, 2));
-  console.log('📌 Full options:', JSON.stringify(options, null, 2));
-  console.log('📌 Extracted sortBy:', sortBy);
-  console.log('📌 Extracted sortOrder:', sortOrder);
-  console.log('📌 Type of sortBy:', typeof sortBy);
-  console.log('📌 Type of sortOrder:', typeof sortOrder);
 
   const andConditions: any[] = [];
 
@@ -279,7 +271,6 @@ const getAllPublicationssss = async (
   let orderBy: any = { createdAt: 'desc' }; // Default fallback
 
   if (sortBy && sortOrder) {
-    console.log('✅ Sorting with:', { sortBy, sortOrder });
 
     if (sortBy === 'title') {
       orderBy = { title: sortOrder };
@@ -311,22 +302,10 @@ const getAllPublicationssss = async (
     else if (sortBy === 'index') {
       orderBy = { index: { title: sortOrder } };
     }
-  } else {
-    console.log('ℹ️ Using default sorting');
-  }
+  } 
 
-  console.log('📌 Final orderBy:', orderBy);
-  console.log('🔍 DEBUG END ======================\n');
 
   const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
-
-  // DEBUG: Log final query
-  console.log('📌 Final query:', {
-    where: whereConditions,
-    skip,
-    take: limit,
-    orderBy
-  });
 
   // Fetch publications
   const result = await prisma.publication.findMany({

@@ -7,14 +7,12 @@ import { WonArticleCustomRequest } from './wonArticle.interface';
 export const createWonArticle = async (req:WonArticleCustomRequest) => {
 
   const files = req.files as IUploadFile[];
-  console.log(files)
   const fileUploadPromises = files.map(async (file) => {
     const uploadedFile = await FileUploadHelper.uploadPdfToCloudinary(file);
     return uploadedFile?.secure_url;
   });
 
   const uploadedFiles = await Promise.all(fileUploadPromises);
-  console.log(uploadedFiles)
 
   const data = {...req.body}
   if (uploadedFiles) {

@@ -13,7 +13,7 @@ model User {
   stripeCustomerId String? @unique
   name             String
   email            String
-  password         String
+  password         String?
   role             String  @default("client")
   image            String?
   company          String?
@@ -23,6 +23,12 @@ model User {
 
   orders    Order[]
   payment      PaymentMethod[]
+adminAssignments     AdminAssignment[] @relation("AdminAssignments")
+  userAssignments      AdminAssignment[] @relation("UserAssignments")
+
+  chatParticipants     ChatParticipant[]
+  chatMessages         ChatMessage[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -47,6 +53,8 @@ model Order {
   wonArticle   WonArticle?     @relation(fields: [wonArticleId], references: [id])
   writeArticle WriteArticle?   @relation(fields: [writeArticleId], references: [id])
   method       PaymentMethod   @relation(fields: [methodId], references: [id])
+  adminAssignments AdminAssignment[] @relation("OrderAdminAssignments")
+  chatRoom         ChatRoom?
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
 
@@ -150,6 +158,16 @@ model Publication {
   @@map("publications")
 }
 
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  publicationId String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("favorites")
+}
+
 model Niche {
   id        String   @id @default(uuid())
   title     String
@@ -194,4 +212,80 @@ model DoFollow {
   updatedAt DateTime @updatedAt
 
   @@map("dofollows")
+}
+
+
+model ChatRoom {
+  id          String   @id @default(uuid())
+  roomId      String   @unique @default(nanoid(15))
+  orderId     String   @unique
+  order       Order    @relation(fields: [orderId], references: [id])
+  title       String
+  description String?
+  status      String   @default("active")
+  
+  // Relationships
+  messages    ChatMessage[]
+  participants ChatParticipant[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("chatRoom")
+}
+
+model ChatParticipant {
+  id        String   @id @default(uuid())
+  roomId    String
+  userId    String
+  role      String   @default("member") // member, admin, super_admin
+  
+  // Relationships
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime @default(now())
+  
+  @@unique([roomId, userId])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  messageId String   @unique @default(nanoid(15))
+  roomId    String
+  userId    String
+  content   String
+  type      String   @default("text") // text, file, system
+  fileUrl   String?
+  readBy    String[] // Array of user IDs who read the message
+  
+  // Relationships
+  room      ChatRoom @relation(fields: [roomId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AdminAssignment {
+  id        String   @id @default(uuid())
+  adminId   String
+  userId    String?  // If assigned to specific user
+  orderId   String?  // If assigned to specific order
+  role      String   @default("admin") // admin, super_admin
+  status    String   @default("active")
+  
+  // Relationships
+  // admin     User     @relation(fields: [adminId], references: [id])
+  // user      User?    @relation(fields: [userId], references: [id])
+// admin User    @relation("AdminAssignments", fields: [adminId], references: [id])
+//   user  User?   @relation("UserAssignments", fields: [userId], references: [id])
+  // order     Order?   @relation(fields: [orderId], references: [id])
+  admin User  @relation("AdminAssignments", fields: [adminId], references: [id])
+  user  User? @relation("UserAssignments", fields: [userId], references: [id])
+  order Order? @relation("OrderAdminAssignments", fields: [orderId], references: [id])
+  @@index([adminId])
+  @@index([userId])
+  @@index([orderId])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

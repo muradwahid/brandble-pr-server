@@ -12,7 +12,7 @@ router.patch('/update/:id', FileUploadHelper.upload.single('file'), (req:Request
         req.body = JSON.parse(req.body.data);
         return AuthController.updateUser(req, res,next)
 });
-// router.delete('/:id', AuthController.deleteUser)
+router.delete('/:id', AuthController.deleteUser)
 // router.post('/refresh-token', AuthController.refreshToken);
 
 export const AuthRoutes = router;

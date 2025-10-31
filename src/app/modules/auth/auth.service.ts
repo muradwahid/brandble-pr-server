@@ -1,20 +1,20 @@
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
+import { Secret } from "jsonwebtoken";
+import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
+import { jwtHelpers } from "../../../helpers/jwtHelpers";
 import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
 import { CustomRequest, ILoginUserResponse, IUser, IUserLogin } from "./auth.interface";
-import { jwtHelpers } from "../../../helpers/jwtHelpers";
-import config from "../../../config";
-import { Secret } from "jsonwebtoken";
 
-const allUsers = async (): Promise<IUser[] | null> => {
+const allUsers = async () => {
   const result = await prisma.user.findMany();
     return result;
 }
 
-const createUser = async (user: IUser): Promise<IUser> => {
+const createUser = async (user: IUser) => {
   // Check if user already exists by email
   const existingUser = await prisma.user.findFirst({
     where: { email: user.email }
@@ -24,7 +24,6 @@ const createUser = async (user: IUser): Promise<IUser> => {
   }
   // Hash password before saving
   const hashedPassword = await bcrypt.hash(user.password, 10);
-  console.log(hashedPassword)
   // Create user with hashed password
     const result = await prisma.user.create({
         data: {
@@ -78,7 +77,7 @@ const loginUser = async (user: IUserLogin): Promise<ILoginUserResponse> => {
 }
 
 
-const getSingleUser = async (id: string): Promise<IUser | null> => {
+const getSingleUser = async (id: string) => {
 
     const result = await prisma.user.findUnique({
         where:{
@@ -98,12 +97,10 @@ const updateUser = async (
 
     const file = req.file as IUploadFile;
     const data = { ...req.body };
-    console.log({file,data,id})
     if (file) {
       const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
       if (uploadedProfileImage && uploadedProfileImage.secure_url) {
         data.image = uploadedProfileImage.secure_url;
-        console.log(uploadedProfileImage.secure_url)
       }
       
     }
@@ -122,6 +119,17 @@ const updateUser = async (
   }
 };
 
+const deleteUser = async (id: string) => {
+
+    const result = await prisma.user.delete({
+        where:{
+            id
+        }
+    });
+    return result;
+}
+
+
 
 
 export const AuthService = {
@@ -129,5 +137,6 @@ export const AuthService = {
     createUser,
     loginUser,
     getSingleUser,
-    updateUser
+    updateUser,
+    deleteUser
 }

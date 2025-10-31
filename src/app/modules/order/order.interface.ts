@@ -1,5 +1,5 @@
 import { Publication, WonArticle, WriteArticle } from '@prisma/client';
-import { IUser } from '../modules/auth/auth.interface';
+import { IUser } from '../auth/auth.interface';
 
 export interface IOrder {
   id: string;

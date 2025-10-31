@@ -11,6 +11,7 @@ import { ServiceRoutes } from '../modules/service/service.route';
 import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
 import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
+import { FavoriteRoutes } from '../modules/favorite/favorite.route';
 
 const router = express.Router();
 
@@ -38,6 +39,10 @@ const moduleRoutes = [
   {
     path: '/publication',
     routes: PublicationRoutes,
+  },
+  {
+    path: '/favorite',
+    routes: FavoriteRoutes,
   },
   {
     path: '/genre',

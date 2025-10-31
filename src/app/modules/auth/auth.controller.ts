@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
-import sendResponse from "../../../shared/sendResponse";
-import catchAsync from "../../../shared/catchAsync";
-import { AuthService } from "./auth.service";
 import config from "../../../config";
+import catchAsync from "../../../shared/catchAsync";
+import sendResponse from "../../../shared/sendResponse";
+import { AuthService } from "./auth.service";
 
 const allUsers = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.allUsers();
@@ -73,6 +73,17 @@ const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunct
   }
 });
 
+const deleteUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await AuthService.deleteUser(id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success:true,
+    message:'User deleted successfully!',
+    data:result
+  })
+
+})
 
 
 export const AuthController = {
@@ -80,5 +91,6 @@ export const AuthController = {
     createUser,
     loginUser,
     getSingleUser,
-    updateUser
+  updateUser,
+  deleteUser
 }

@@ -213,6 +213,46 @@ export const deleteOrder = async (id: string): Promise<Partial<IOrder> | null> =
   });
   return result as unknown as Partial<IOrder>;
 };
+const getOrderStatistics = async (): Promise<any> => {
+  const [allOrders, clientOrders] = await Promise.all([
+    prisma.order.findMany({
+      select: { id: true, userId: true, status: true },
+    }),
+    prisma.order.groupBy({
+      by: ['userId'],
+      _count: { id: true },
+    }),
+  ]);
+
+  // Determine which clients are new vs repeat
+  const repeatClients = new Set(
+    clientOrders.filter(c => c._count?.id && c._count.id > 1).map(c => c.userId)
+  );
+
+  let newClient = 0;
+  let repeatClient = 0;
+  let delivered = 0;
+  let inProgress = 0;
+
+  for (const order of allOrders) {
+    if (order.status === 'published') delivered++;
+    if (order.status === 'processing' || order.status === 'pending') inProgress++;
+
+    if (repeatClients.has(order.userId)) repeatClient++;
+    else newClient++;
+  }
+  const totalOrders = allOrders?.length;
+
+  return {
+    totalOrders,
+    newClient,
+    repeatClient,
+    delivered,
+    inProgress,
+  };
+
+
+};
 
 export const OrderService = {
   allOrders,
@@ -220,4 +260,5 @@ export const OrderService = {
   getOrderById,
   updateOrder,
   deleteOrder,
+  getOrderStatistics
 };
