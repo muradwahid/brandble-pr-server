@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SponsoredRoutes = void 0;
+const express_1 = require("express");
+const sponsor_controller_1 = require("./sponsor.controller");
+const router = (0, express_1.Router)();
+router.post('/create', sponsor_controller_1.SponsoredController.createSponsored);
+router.get('/get-all', sponsor_controller_1.SponsoredController.getAllSponsors);
+router.put('/:id', sponsor_controller_1.SponsoredController.updateSponsored);
+router.delete('/:id', sponsor_controller_1.SponsoredController.deleteSponsored);
+router.get('/:id', sponsor_controller_1.SponsoredController.getSponsoredById);
+exports.SponsoredRoutes = router;

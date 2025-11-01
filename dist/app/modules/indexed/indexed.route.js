@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.IndexedRoutes = void 0;
+const express_1 = require("express");
+const indexed_controller_1 = require("./indexed.controller");
+const router = (0, express_1.Router)();
+router.post('/create', indexed_controller_1.IndexedController.createIndexed);
+router.get('/get-all', indexed_controller_1.IndexedController.getAllIndexes);
+router.put('/:id', indexed_controller_1.IndexedController.updateIndexed);
+router.delete('/:id', indexed_controller_1.IndexedController.deleteIndexed);
+router.get('/:id', indexed_controller_1.IndexedController.getIndexedById);
+exports.IndexedRoutes = router;

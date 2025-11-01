@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.NicheRoutes = void 0;
+const express_1 = require("express");
+const niche_controller_1 = require("./niche.controller");
+const router = (0, express_1.Router)();
+router.post('/create', niche_controller_1.NicheController.createNiche);
+router.get('/get-all', niche_controller_1.NicheController.getAllNiches);
+router.put('/:id', niche_controller_1.NicheController.updateNiche);
+router.delete('/:id', niche_controller_1.NicheController.deleteNiche);
+router.get('/:id', niche_controller_1.NicheController.getNicheById);
+exports.NicheRoutes = router;

@@ -7,7 +7,7 @@ import { NicheRoutes } from '../modules/niche/niche.route';
 import { OrderRoutes } from '../modules/order/order.route';
 import { StripeRoutes } from '../modules/payment-gateway-stripe/stripe.route';
 import { PublicationRoutes } from '../modules/publication/publication.route';
-import { ServiceRoutes } from '../modules/service/service.route';
+// import { ServiceRoutes } from '../modules/service/service.route';
 import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
 import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
@@ -32,10 +32,10 @@ const moduleRoutes = [
     path: '/write-article',
     routes: WriteArticleRoutes,
   },
-  {
-    path: '/service',
-    routes: ServiceRoutes,
-  },
+  // {
+  //   path: '/service',
+  //   routes: ServiceRoutes,
+  // },
   {
     path: '/publication',
     routes: PublicationRoutes,

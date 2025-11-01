@@ -7,6 +7,8 @@ const router = Router();
 router.get('/all-users', AuthController.allUsers);
 router.get('/:id', AuthController.getSingleUser);
 router.post('/signup', AuthController.createUser);
+router.get('/get-user-by-cookie', AuthController.getUserByCookie);
+router.post('/signout', AuthController.getUserByCookie);
 router.post('/signin', AuthController.loginUser);
 router.patch('/update/:id', FileUploadHelper.upload.single('file'), (req:Request, res:Response,next:NextFunction) => {
         req.body = JSON.parse(req.body.data);

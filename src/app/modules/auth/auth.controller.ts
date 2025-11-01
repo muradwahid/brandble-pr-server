@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import config from "../../../config";
+import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AuthService } from "./auth.service";
@@ -32,10 +33,14 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const { refreshToken, ...others } = result;
   //set refresh token into cookie
   const cookieOptions = {
+    domain: config.rootUrl,
     secure: config.env === 'production',
     httpOnly: true,
+    path: '/',
+    sameSite: 'none' as any
   }
   res.cookie('refreshToken', refreshToken, cookieOptions);
+  res.cookie('accessToken', others?.accessToken, cookieOptions);
   
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -45,6 +50,27 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const logOutUser = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie('accessToken', { domain: config.rootUrl, path: '/' });
+  res.clearCookie('refreshToken', { domain: config.rootUrl, path: '/' });
+  res.json({ ok: true });
+})
+
+const getUserByCookie = catchAsync(async (req: Request, res: Response) => {
+  const user = req.cookies?.accessToken;
+  if (!user) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'You are not authorized');
+  }
+
+  const result = await AuthService.getUserByCookie(user as string);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Logged in user retrieved successfully!',
+    data: result
+  })
+
+})
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -91,6 +117,8 @@ export const AuthController = {
     createUser,
     loginUser,
     getSingleUser,
-  updateUser,
-  deleteUser
+    updateUser,
+    deleteUser,
+    getUserByCookie,
+    logOutUser
 }

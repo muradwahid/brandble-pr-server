@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DoFollowRoutes = void 0;
+const express_1 = require("express");
+const dofollow_controller_1 = require("./dofollow.controller");
+const router = (0, express_1.Router)();
+router.post('/create', dofollow_controller_1.DoFollowController.createDoFollow);
+router.get('/get-all', dofollow_controller_1.DoFollowController.getAllDoFollow);
+router.put('/:id', dofollow_controller_1.DoFollowController.updateDoFollow);
+router.delete('/:id', dofollow_controller_1.DoFollowController.deleteDoFollow);
+router.get('/:id', dofollow_controller_1.DoFollowController.getDoFollowById);
+exports.DoFollowRoutes = router;

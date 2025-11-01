@@ -76,6 +76,21 @@ const loginUser = async (user: IUserLogin): Promise<ILoginUserResponse> => {
   };
 }
 
+const getUserByCookie = async (token: string) => {
+  const verifiedToken = jwtHelpers.verifyToken(token, config.jwt.secret as Secret);
+  const { id } = verifiedToken;
+  const result = await prisma.user.findUnique({
+    where:{
+      id
+    },
+    include:{
+      orders:true
+    }
+  });
+  return result;
+}
+
+
 
 const getSingleUser = async (id: string) => {
 
@@ -138,5 +153,6 @@ export const AuthService = {
     loginUser,
     getSingleUser,
     updateUser,
-    deleteUser
+  deleteUser,
+  getUserByCookie
 }

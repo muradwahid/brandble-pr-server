@@ -1,0 +1,20 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthRoutes = void 0;
+const express_1 = require("express");
+const auth_controller_1 = require("./auth.controller");
+const FileUploadHelper_1 = require("../../../helpers/FileUploadHelper");
+const router = (0, express_1.Router)();
+router.get('/all-users', auth_controller_1.AuthController.allUsers);
+router.get('/:id', auth_controller_1.AuthController.getSingleUser);
+router.post('/signup', auth_controller_1.AuthController.createUser);
+router.get('/get-user-by-cookie', auth_controller_1.AuthController.getUserByCookie);
+router.post('/signout', auth_controller_1.AuthController.getUserByCookie);
+router.post('/signin', auth_controller_1.AuthController.loginUser);
+router.patch('/update/:id', FileUploadHelper_1.FileUploadHelper.upload.single('file'), (req, res, next) => {
+    req.body = JSON.parse(req.body.data);
+    return auth_controller_1.AuthController.updateUser(req, res, next);
+});
+router.delete('/:id', auth_controller_1.AuthController.deleteUser);
+// router.post('/refresh-token', AuthController.refreshToken);
+exports.AuthRoutes = router;
