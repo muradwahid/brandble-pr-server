@@ -35,7 +35,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const cookieOptions = {
     domain: config.rootUrl,
     secure: true,
-    httpOnly: true,
+    httpOnly: false,
     path: '/',
     sameSite: 'none' as any
   }

@@ -11,10 +11,12 @@ import { initializeSocket } from './socketServer';
 const app: Application = express();
 const socketServer = http.createServer(app);
 // app.use(cors());
+app.set('trust proxy', 1)
 app.use(cors({
-  origin: ['https://app.brandable-pr.com', 'https://www.brandable-pr.com'],
+  origin: ['https://app.brandable-pr.com', 'https://www.app.brandable-pr.com', 'https://www.brandable-pr.com', 'https://brandable-pr.com'],
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 app.use(cookieParser());
 
