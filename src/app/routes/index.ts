@@ -12,6 +12,7 @@ import { SponsoredRoutes } from '../modules/sponsor/sponsor.route';
 import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
 import { FavoriteRoutes } from '../modules/favorite/favorite.route';
+import { ChatRoutes } from '../modules/chat/chat.route';
 
 const router = express.Router();
 
@@ -19,6 +20,10 @@ const moduleRoutes = [
   {
     path: '/auth',
     routes: AuthRoutes,
+  },
+  {
+    path: '/chat',
+    routes: ChatRoutes,
   },
   {
     path: '/order',

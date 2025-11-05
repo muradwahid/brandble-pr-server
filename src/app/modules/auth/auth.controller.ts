@@ -34,7 +34,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   //set refresh token into cookie
   const cookieOptions = {
     domain: config.rootUrl,
-    secure: config.env === 'production',
+    secure: true,
     httpOnly: true,
     path: '/',
     sameSite: 'none' as any
@@ -69,7 +69,6 @@ const getUserByCookie = catchAsync(async (req: Request, res: Response) => {
     message: 'Logged in user retrieved successfully!',
     data: result
   })
-
 })
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {

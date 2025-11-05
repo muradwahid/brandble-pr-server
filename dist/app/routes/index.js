@@ -17,11 +17,16 @@ const sponsor_route_1 = require("../modules/sponsor/sponsor.route");
 const wonArticle_route_1 = require("../modules/wonArticle/wonArticle.route");
 const writeArticle_route_1 = require("../modules/writeArticle/writeArticle.route");
 const favorite_route_1 = require("../modules/favorite/favorite.route");
+const chat_route_1 = require("../modules/chat/chat.route");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
         path: '/auth',
         routes: auth_route_1.AuthRoutes,
+    },
+    {
+        path: '/chat',
+        routes: chat_route_1.ChatRoutes,
     },
     {
         path: '/order',

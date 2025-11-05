@@ -6,16 +6,6 @@
     "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/.9a482a70ff9546ab1eb00b22e838574b7606cbc3-audit.json",
     "files": [
         {
-            "date": 1760967149347,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-20-10-19-error.log",
-            "hash": "9b19b1826aa2cbfdd596626ea5fa32327a7d210b2008149d2c85168625018df4"
-        },
-        {
-            "date": 1760969682482,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-20-10-20-error.log",
-            "hash": "cd3e03b8a4e30d40e6feb5ae2295fc20f8e3beb7c6024732084f610bda1b7de5"
-        },
-        {
             "date": 1761139784948,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-22-10-19-error.log",
             "hash": "33de107b9c82591c2c75d434d2b6bf5594d9ffb16d97b7dda4b0d40b4ed55d44"
@@ -94,6 +84,21 @@
             "date": 1762013598899,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-01-11-22-error.log",
             "hash": "6f2993cfa15128de74f814b6a1e531870bc4a077619187242920e7086f8fc275"
+        },
+        {
+            "date": 1762090248515,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-02-11-19-error.log",
+            "hash": "f9e14f143a9f513aabb7c9156b320cb6f4ef8cc67a485d7366bc5ff071bfcc57"
+        },
+        {
+            "date": 1762093641022,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-02-11-20-error.log",
+            "hash": "662d00ae016202c56d5ce86be2acb7133f4df485b961b1b2aab76f1278a73bfd"
+        },
+        {
+            "date": 1762179827683,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-03-11-20-error.log",
+            "hash": "176ed6e62bf4ebc3dff109f953288332b277d05b1e1b4bfad68db1d353f5f57e"
         }
     ],
     "hashType": "sha256"

@@ -6,16 +6,6 @@
     "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/.5acf5641fa86ace6524e7dde1433854ee4a7e3f2-audit.json",
     "files": [
         {
-            "date": 1760967149339,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-20-10-19-success.log",
-            "hash": "6fddf28342c4a00bc1763f681f0c6e072074231707179987b42cae8de41aaa04"
-        },
-        {
-            "date": 1760969682305,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-20-10-20-success.log",
-            "hash": "b48982154abdac9dcc77107db72dfad5406df6264ad244ae6d41e51ee20568af"
-        },
-        {
             "date": 1761139784946,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-22-10-19-success.log",
             "hash": "2ec3cfe70047f64c160dfb99c7e0cd17f932fd7f830f97cb01d370bf81ec6e7c"
@@ -94,6 +84,21 @@
             "date": 1762013598679,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-01-11-22-success.log",
             "hash": "12ef7b52e73c7081521e555660581793542996752a6aa2a7333755a6ef11cdcf"
+        },
+        {
+            "date": 1762090248514,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-02-11-19-success.log",
+            "hash": "e675ae92be33d3fd7b805729baa8985305bc4c1e00457e262a7f290e1953a701"
+        },
+        {
+            "date": 1762093640844,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-02-11-20-success.log",
+            "hash": "c0709f843a6295626b395180b331c703ad5b81bc87111c50242d5b9efeb73389"
+        },
+        {
+            "date": 1762179827681,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/successes/brandable-2025-03-11-20-success.log",
+            "hash": "02b504e48fa74b0273d4d188cb0a25b52d3cb77795ed7006eb16e3cba08b9623"
         }
     ],
     "hashType": "sha256"
