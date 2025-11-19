@@ -32,15 +32,22 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthService.loginUser(data);
   const { refreshToken, ...others } = result;
   //set refresh token into cookie
-  const cookieOptions = {
+  const refCookieOptions = {
     domain: config.rootUrl,
     secure: true,
     httpOnly: true,
     path: '/',
     sameSite: 'none' as any
   }
-  res.cookie('refreshToken', refreshToken, cookieOptions);
-  res.cookie('accessToken', others?.accessToken, cookieOptions);
+  const AccessCookieOptions = {
+    domain: config.rootUrl,
+    secure: true,
+    httpOnly: false,
+    path: '/',
+    sameSite: 'none' as any
+  }
+  res.cookie('refreshToken', refreshToken, refCookieOptions);
+  res.cookie('accessToken', others?.accessToken, AccessCookieOptions);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
