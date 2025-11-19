@@ -48,14 +48,12 @@ function initializeSocket(server) {
     }));
     // Socket connection handler
     io.on("connection", (socket) => {
-        console.log("User connected:", socket.data.userId);
         // Join room event
         socket.on("join-room", (roomId) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const canAccess = yield chat_service_1.ChatService.canUserAccessRoom(roomId, socket.data.userId);
                 if (canAccess.success) {
                     socket.join(roomId);
-                    console.log(`User ${socket.data.userId} joined room ${roomId}`);
                     // Mark messages as read when joining
                     yield chat_service_1.ChatService.markMessagesAsRead(roomId, socket.data.userId);
                     socket.emit("room-joined", { roomId });
@@ -122,11 +120,10 @@ function initializeSocket(server) {
         // Leave room event
         socket.on("leave-room", (roomId) => {
             socket.leave(roomId);
-            console.log(`User ${socket.data.userId} left room ${roomId}`);
         });
         // Disconnect event
         socket.on("disconnect", () => {
-            console.log("User disconnected:", socket.data.userId);
+            console.info("User disconnected:", socket.data.userId);
         });
     });
     return io;

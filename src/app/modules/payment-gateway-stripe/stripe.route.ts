@@ -11,7 +11,7 @@ router.post('/save-payment-info', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADM
 router.post('/setup-intent', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.createSetupIntent);
 router.post('/save-method', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.savePaymentMethod);
 router.post('/process-payment',
-  // auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
+  auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),
   StripeController.processPayment);
 router.get('/methods', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.getPaymentMethods);
 router.post('/set-default', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.setDefaultPaymentMethod);

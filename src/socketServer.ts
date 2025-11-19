@@ -1,195 +1,111 @@
-// services/socketService.ts
-import http from "http";
-import { Server, Socket } from "socket.io";
-import { ChatService } from "./app/modules/chat/chat.service";
+import { Server } from 'socket.io';
+import { chatService } from './app/modules/chat/chat.service';
 
-/**
- * If your chatService is a CommonJS module (module.exports = ...),
- * TypeScript's default import may be `any`. Adjust as needed.
- * Here we declare an interface that matches the functions used by this file.
- */
-interface CanAccessResult {
-  success: boolean;
-  error?: string;
-}
+// Store connected users
+const connectedUsers = new Map();
 
-interface SendMessageResult {
-  success: boolean;
-  data?: any;    // replace `any` with your Message type
-  error?: string;
-}
-
-interface ChatService {
-  canUserAccessRoom(roomId: string, userId: string): Promise<CanAccessResult>;
-  markMessagesAsRead(roomId: string, userId: string): Promise<void>;
-  sendMessage(args: {
-    roomId: string;
-    userId: string;
-    content?: string | null;
-    type?: string;
-    fileUrl?: string | null;
-  }): Promise<SendMessageResult>;
-}
-
-/**
- * Extend Socket type to include our application data (userId)
- * We'll use `socket.data` (preferred approach in socket.io v4+)
- */
-declare module "socket.io" {
-  interface SocketData {
-    userId?: string;
-  }
-}
-
-let io: Server | null = null;
-
-/**
- * Initialize Socket.IO server
- * @param server - HTTP server instance
- */
-export function initializeSocket(server: http.Server) {
-  if (io) {
-    return io;
-  }
-
-  io = new Server(server, {
+export const initializeSocket = (server: any) => {
+  const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:3000",
-      methods: ["GET", "POST"],
-    },
-  });
-
-  // Socket authentication middleware
-  io.use(async (socket: Socket, next) => {
-    try {
-      const token = socket.handshake.auth?.token as string | undefined;
-
-      if (!token) {
-        return next(new Error("Authentication error"));
-      }
-
-      // In a real app, verify JWT and extract user ID
-      // For this example, assume token is userId
-      const userId = token;
-      socket.data.userId = userId;
-      next();
-    } catch (error) {
-      next(new Error("Authentication error"));
+      origin: [
+        'https://app.brandable-pr.com',
+        'https://www.app.brandable-pr.com',
+        'https://www.brandable-pr.com',
+        'https://brandable-pr.com',
+        'http://localhost:5174',
+        'http://localhost:5173',
+        'http://localhost:5173'
+      ],
+      credentials: true,
+      methods: ["GET", "POST"]
     }
   });
 
-  // Socket connection handler
-  io.on("connection", (socket: Socket) => {
-    console.log("User connected:", socket.data.userId);
+  io.on('connection', (socket) => {
 
-    // Join room event
-    socket.on("join-room", async (roomId: string) => {
-      try {
-        const canAccess = await ChatService.canUserAccessRoom(
-          roomId,
-          socket.data.userId as string
-        );
+    // User joins the chat
+    socket.on('user_join', async (data: { userId: string; userRole: string }) => {
+      const { userId, userRole } = data;
+      connectedUsers.set(userId, socket.id);
+      (socket as any).userId = userId;
 
-        if (canAccess.success) {
-          socket.join(roomId);
-          console.log(`User ${socket.data.userId} joined room ${roomId}`);
+      // Join user to their personal room
+      socket.join(`user_${userId}`);
 
-          // Mark messages as read when joining
-          await ChatService.markMessagesAsRead(roomId, socket.data.userId as string);
-
-          socket.emit("room-joined", { roomId });
-        } else {
-          socket.emit("error", { message: "Access denied to room" });
-        }
-      } catch (error) {
-        socket.emit("error", { message: "Failed to join room" });
+      // If admin, join admin room
+      if (userRole === 'admin') {
+        socket.join('admin_room');
       }
+
     });
 
-    // Send message event
-    socket.on(
-      "send-message",
-      async (data: {
-        roomId: string;
-        content?: string | null;
-        type?: string;
-        fileUrl?: string | null;
-      }) => {
-        try {
-          const { roomId, content, type = "text", fileUrl = null } = data;
+    // Rest of your socket event handlers remain the same...
+    // Join specific chat room
+    socket.on('join_chat_room', (chatRoomId: string) => {
+      socket.join(`chat_${chatRoomId}`);
+    });
 
-          const result = await ChatService.sendMessage({
-            roomId,
-            userId: socket.data.userId as string,
-            content: content ?? null,
-            type,
-            fileUrl,
-          });
+    // Leave chat room
+    socket.on('leave_chat_room', (chatRoomId: string) => {
+      socket.leave(`chat_${chatRoomId}`);
+    });
 
-          if (result as any) {
-            // Broadcast to all users in the room
-            io?.to(roomId).emit("new-message", result);
+    // Send message
+    socket.on('send_message', async (data: {
+      chatRoomId: string;
+      senderId: string;
+      content: string;
+      messageType?: string;
+    }) => {
+      try {
+        const { chatRoomId, senderId, content, messageType = 'text' } = data;
 
-            // Send delivery confirmation to sender
-            socket.emit("message-sent", result);
-          } else {
-            socket.emit("error", { message: result ?? "Failed to send" });
+        // Save message to database
+        const message = await chatService.sendMessage(chatRoomId, senderId, content, messageType);
+
+        // Emit to all users in the chat room
+        io.to(`chat_${chatRoomId}`).emit('new_message', message);
+
+        // Notify participants about new message (for chat list updates)
+        const chatRoom = await chatService.getChatRoom(chatRoomId);
+        if (chatRoom) {
+          // Notify the other user
+          const otherUserId = senderId === chatRoom.userId ? chatRoom.adminId : chatRoom.userId;
+          socket.to(`user_${otherUserId}`).emit('chat_updated', chatRoom);
+
+          // If admin, notify admin room for real-time updates
+          if (chatRoom.adminId) {
+            socket.to('admin_room').emit('admin_chat_updated', chatRoom);
           }
-        } catch (error) {
-          socket.emit("error", { message: "Failed to send message" });
         }
+
+      } catch (error) {
+        console.error('Error sending message:', error);
+        socket.emit('message_error', { error: 'Failed to send message' });
       }
-    );
+    });
 
     // Typing indicators
-    socket.on("typing-start", (roomId: string) => {
-      socket.to(roomId).emit("user-typing", {
-        userId: socket.data.userId,
-        roomId,
-      });
+    socket.on('typing_start', (data: { chatRoomId: string; userId: string }) => {
+      socket.to(`chat_${data.chatRoomId}`).emit('user_typing', { userId: data.userId });
     });
 
-    socket.on("typing-stop", (roomId: string) => {
-      socket.to(roomId).emit("user-stop-typing", {
-        userId: socket.data.userId,
-        roomId,
-      });
+    socket.on('typing_stop', (data: { chatRoomId: string; userId: string }) => {
+      socket.to(`chat_${data.chatRoomId}`).emit('user_stop_typing', { userId: data.userId });
     });
 
-    // Mark messages as read
-    socket.on("mark-read", async (roomId: string) => {
-      try {
-        await ChatService.markMessagesAsRead(roomId, socket.data.userId as string);
-        socket.to(roomId).emit("messages-read", {
-          userId: socket.data.userId,
-          roomId,
-        });
-      } catch (error) {
-        console.error("Error marking messages as read:", error);
+    // Handle disconnection
+    socket.on('disconnect', () => {
+      if ((socket as any).userId) {
+        connectedUsers.delete((socket as any).userId);
       }
-    });
-
-    // Leave room event
-    socket.on("leave-room", (roomId: string) => {
-      socket.leave(roomId);
-      console.log(`User ${socket.data.userId} left room ${roomId}`);
-    });
-
-    // Disconnect event
-    socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.data.userId);
     });
   });
 
   return io;
-}
+};
 
-/**
- * Get Socket.IO instance
- */
-export function getIO(): Server {
-  if (!io) {
-    throw new Error("Socket.io not initialized");
-  }
-  return io;
-}
+// Helper function to get socket instance by user ID
+export const getUserSocket = (userId: string) => {
+  return connectedUsers.get(userId);
+};

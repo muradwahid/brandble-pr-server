@@ -10,7 +10,7 @@ import sendResponse from '../../../shared/sendResponse';
 const allOrders = catchAsync(async (req: Request, res: Response) => {
 
   const options = pick(req.query, paginationFields);
-  const filters = pick(req.query, orderFilterableFields);
+  const filters = pick(req.query, orderFilterableFields as (keyof typeof req.query)[]);
 
 
   const result = await OrderService.allOrders(filters,options);
@@ -28,6 +28,17 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Order created successfully!',
+    data: result,
+  });
+});
+
+const runningOrders = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await OrderService.runningOrders(user?.id as string);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Running Order retrieved successfully!',
     data: result,
   });
 });
@@ -74,12 +85,26 @@ const getOrderStatistics = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { status } = req.body;
+  const result = await OrderService.updateOrderStatus(id, status);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order status update successfully!',
+    data: result,
+  })
+ })
+
 
 export const OrderController = {
   allOrders,
   createOrder,
+  runningOrders,
   getOrderById,
   updateOrder,
   deleteOrder,
-  getOrderStatistics
+  getOrderStatistics,
+  updateOrderStatus
 };

@@ -4,6 +4,7 @@ import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 
 const router = Router();
 
+router.get('/get-admin-role', AuthController.getAdminRole);
 router.get('/all-users', AuthController.allUsers);
 router.get('/:id', AuthController.getSingleUser);
 router.post('/signup', AuthController.createUser);

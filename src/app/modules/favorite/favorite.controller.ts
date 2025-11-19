@@ -14,6 +14,16 @@ const allFavorites = catchAsync(async (req: Request, res: Response) => {
         data: result,
     })
 })
+const getOnlyFavoriteIds = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await FavoriteService.getOnlyFavoriteIds(id);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'All Favorites retrieved successfully!',
+        data: result,
+    })
+})
 
 const createFavorite = catchAsync(async (req: Request, res: Response) => {
   const data = req.body;
@@ -27,8 +37,9 @@ const createFavorite = catchAsync(async (req: Request, res: Response) => {
 })
 
 const deleteFavorite = catchAsync(async (req: Request, res: Response) => {
-  const {id} = req.params;
-  const result = await FavoriteService.deleteFavorite(id);
+  const { id } = req.params;
+  const userId = req.user?.id as string;
+  const result = await FavoriteService.deleteFavorite(id,userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -41,4 +52,5 @@ export const FavoriteController = {
   allFavorites,
   createFavorite,
   deleteFavorite,
+  getOnlyFavoriteIds
 }

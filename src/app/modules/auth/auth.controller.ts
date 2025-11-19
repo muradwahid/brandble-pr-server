@@ -35,7 +35,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   const cookieOptions = {
     domain: config.rootUrl,
     secure: true,
-    httpOnly: false,
+    httpOnly: true,
     path: '/',
     sameSite: 'none' as any
   }
@@ -110,6 +110,17 @@ const deleteUser = catchAsync(async (req: Request, res: Response) => {
 
 })
 
+const getAdminRole = catchAsync(async (req: Request, res: Response) => { 
+  const result = await AuthService.getAdminRole();
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin role retrieved successfully!',
+    data: result
+  })
+})
+
+
 
 export const AuthController = {
     allUsers,
@@ -119,5 +130,6 @@ export const AuthController = {
     updateUser,
     deleteUser,
     getUserByCookie,
-    logOutUser
+  logOutUser,
+  getAdminRole
 }

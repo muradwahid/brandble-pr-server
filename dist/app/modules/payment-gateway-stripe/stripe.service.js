@@ -212,10 +212,7 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
         yield stripe.paymentMethods.attach(paymentMethodId, {
             customer: userId.stripeCustomerId
         });
-        // Retrieve payment method details
         const paymentMethod = yield stripe.paymentMethods.retrieve(paymentMethodId);
-        // console.log("Full payment method details:", JSON.stringify(paymentMethod, null, 2));
-        // Extract common details based on payment method type
         let brand = 'unknown';
         let last4 = '';
         let expMonth = null;

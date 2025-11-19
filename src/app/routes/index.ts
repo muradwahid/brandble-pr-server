@@ -13,6 +13,7 @@ import { WonArticleRoutes } from '../modules/wonArticle/wonArticle.route';
 import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
 import { FavoriteRoutes } from '../modules/favorite/favorite.route';
 import { ChatRoutes } from '../modules/chat/chat.route';
+import { NotificationRoutes } from '../modules/notification/notification.route';
 
 const router = express.Router();
 
@@ -68,6 +69,10 @@ const moduleRoutes = [
   {
     path: '/dofollow',
     routes: DoFollowRoutes,
+  },
+  {
+    path: '/notification',
+    routes: NotificationRoutes
   },
   {
     path: '/payment',

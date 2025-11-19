@@ -144,6 +144,14 @@ const deleteUser = async (id: string) => {
     return result;
 }
 
+const getAdminRole = async () => {
+  const result = await prisma.user.findFirst({
+    where:{
+      role:'admin'
+    }
+  });
+  return result;
+}
 
 
 
@@ -154,5 +162,6 @@ export const AuthService = {
     getSingleUser,
     updateUser,
   deleteUser,
-  getUserByCookie
+  getUserByCookie,
+  getAdminRole
 }
