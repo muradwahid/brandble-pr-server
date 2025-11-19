@@ -41,7 +41,7 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   }
   res.cookie('refreshToken', refreshToken, cookieOptions);
   res.cookie('accessToken', others?.accessToken, cookieOptions);
-  
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
