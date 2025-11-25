@@ -19,12 +19,14 @@ router.post('/create',
         FileUploadHelper.upload.single('file'), (req: Request, res: Response, next: NextFunction) => {
         req.body = JSON.parse(req.body.data);
         return PublicationController.createPublication(req, res,next)
-} );
+});
+router.get('/statistics', PublicationController.getPublicationStatistics)
 router.get('/all-publications',
         auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.CLIENT),
         PublicationController.getAllPublications);
 router.get('/:id',
         auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.CLIENT), PublicationController.getPublicationById);
+
 // router.patch('/:id', PublicationController.updatePublication);
 router.patch('/:id',
         // auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN),

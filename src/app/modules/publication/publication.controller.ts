@@ -4,7 +4,7 @@ import { paginationFields } from '../../../constants/pagination';
 import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
-import { publicationSearchableFields } from './publication.constant';
+import { publicationFilterableFieldsController, publicationSearchableFields } from './publication.constant';
 import { PublicationService } from './publication.service';
 
 const createPublication = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
@@ -23,7 +23,8 @@ const createPublication = catchAsync(async (req: Request, res: Response,next: Ne
 });
 
 const getAllPublications = catchAsync(async (req: Request, res: Response) => {
-  const filters = pick(req.query, publicationSearchableFields);
+
+  const filters = pick(req.query, publicationFilterableFieldsController);
   const options = pick(req.query, paginationFields);
 
   const result = await PublicationService.getAllPublications(filters, options);
@@ -42,6 +43,15 @@ const getPublicationById = catchAsync(async (req: Request, res: Response) => {
     success: true,
     statusCode: httpStatus.OK,
     message: 'Publication fetched successfully',
+    data: result,
+  });
+});
+const getPublicationStatistics = catchAsync(async (req: Request, res: Response) => {
+  const result = await PublicationService.getPublicationStatistics();
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Publication statistics fetched successfully',
     data: result,
   });
 });
@@ -78,4 +88,5 @@ export const PublicationController = {
   getPublicationById,
   updatePublication,
   deletePublication,
+  getPublicationStatistics
 };

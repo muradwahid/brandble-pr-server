@@ -5,6 +5,9 @@ import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { AuthService } from "./auth.service";
+import pick from "../../../shared/pick";
+import { authFilterAbleFields } from "./auth.constant";
+import { paginationFields } from "../../../constants/pagination";
 
 const allUsers = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.allUsers();
@@ -14,6 +17,19 @@ const allUsers = catchAsync(async (req: Request, res: Response) => {
         message: 'User retrieved successfully!',
         data: result,
     })
+})
+
+const userAllInfo = catchAsync(async (req: Request, res: Response) => { 
+
+  const filters = pick(req.query, authFilterAbleFields);
+  const options = pick(req.query, paginationFields);
+  const result = await AuthService.userAllInfo(filters,options as any);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Users all info retrieved successfully!',
+    data: result,
+  })
 })
 
 const createUser = catchAsync(async (req: Request, res: Response) => {
@@ -138,5 +154,6 @@ export const AuthController = {
     deleteUser,
     getUserByCookie,
   logOutUser,
-  getAdminRole
+  getAdminRole,
+  userAllInfo
 }

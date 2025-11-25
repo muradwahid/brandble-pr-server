@@ -42,8 +42,9 @@ model Order {
   orderId          String   @unique @default(nanoid(15))
   detailsSubmitted String?  @default("not-yet")
   status           String   @default("pending")
-  publicationIds   String[]
+  publicationId   String
   methodId         String
+  paymentMethodId String?
   orderType        String   @default("wonArticle")
   amount           Int
 
@@ -51,12 +52,12 @@ model Order {
   wonArticleId   String?
   writeArticleId String?
 
-  userId       String
-  user         User            @relation(fields: [userId], references: [id])
-  publication  Publication[]
+  userId       String?
+  user         User?            @relation(fields: [userId], references: [id])
+  publication  Publication?      @relation(fields: [publicationId], references: [id])
   wonArticle   WonArticle?     @relation(fields: [wonArticleId], references: [id])
   writeArticle WriteArticle?   @relation(fields: [writeArticleId], references: [id])
-  method       PaymentMethod   @relation(fields: [methodId], references: [id])
+  paymentMethod       PaymentMethod?   @relation(fields: [paymentMethodId], references: [id])
   adminAssignments AdminAssignment[] @relation("OrderAdminAssignments")
   chatRoom         ChatRoom?
   createdAt    DateTime        @default(now())
@@ -67,7 +68,7 @@ model Order {
 }
 
 model PaymentMethod {
-  id                    String   @id @default(cuid())
+  id                    String   @id @default(uuid())
   userId                String
   stripePaymentMethodId String   @unique
   type                  String  

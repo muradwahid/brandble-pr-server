@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/get-admin-role', AuthController.getAdminRole);
 router.get('/all-users', AuthController.allUsers);
+router.get('/user-all-info',AuthController.userAllInfo)
 router.get('/:id', AuthController.getSingleUser);
 router.post('/signup', AuthController.createUser);
 router.get('/get-user-by-cookie', AuthController.getUserByCookie);

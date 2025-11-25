@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { StripeController } from './stripe.controller';
-import auth from '../../middlewares/auth';
 import { ENUM_USER_ROLE } from '../../../enums/user';
+import prisma from '../../../shared/prisma';
+import auth from '../../middlewares/auth';
+import { StripeController } from './stripe.controller';
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.post('/process-payment',
   StripeController.processPayment);
 router.get('/methods', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.getPaymentMethods);
 router.post('/set-default', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.setDefaultPaymentMethod);
-router.delete('/delete-method/:id', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN),StripeController.deletePaymentMethod);
+router.delete('/delete-method/:id', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), StripeController.deletePaymentMethod);
+
 // router.get('/default-payment-info',StripeController.getDefaultPayment)
 export const  StripeRoutes= router;

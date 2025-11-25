@@ -10,9 +10,104 @@ import prisma from "../../../shared/prisma";
 import { CustomRequest, ILoginUserResponse, IUser, IUserLogin } from "./auth.interface";
 
 const allUsers = async () => {
+
   const result = await prisma.user.findMany();
     return result;
 }
+
+const userAllInfo = async (
+  filters: { searchTerm?: string },
+  options: { limit: number; page: number; sortBy?: string; sortOrder?: 'asc' | 'desc' }
+) => {
+  const { searchTerm } = filters;
+  const { limit = 10, page = 1, sortBy = 'createdAt', sortOrder = 'desc' } = options;
+
+  const skip = (page - 1) * limit;
+
+  // Build search condition
+  const whereConditions = searchTerm
+    ? ({
+      OR: [
+        { name: { contains: searchTerm, mode: 'insensitive' as const } },
+        { email: { contains: searchTerm, mode: 'insensitive' as const } },
+        { company: { contains: searchTerm, mode: 'insensitive' as const } },
+        { designation: { contains: searchTerm, mode: 'insensitive' as const } },
+      ],
+    })
+    : {};
+
+  // Fetch users with order counts
+  const users = await prisma.user.findMany({
+    where: whereConditions,
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      company: true,
+      designation: true,
+      image: true,
+      role: true,
+      createdAt: true,
+      _count: {
+        select: {
+          orders: true,
+        },
+      },
+
+      // Get actual orders to count by status
+      orders: {
+        select: {
+          status: true,
+        },
+      },
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    skip,
+    take: limit,
+  });
+
+  const total = await prisma.user.count({ where: whereConditions });
+
+  const result = users.map((user) => {
+    const allOrders = user.orders || [];
+    const totalOrders = user._count.orders;
+
+    const runningOrders = allOrders.filter((order) =>
+      ['pending', 'in_progress', 'under_review', 'assigned'].includes(order.status)
+    ).length;
+
+    const publishedOrders = allOrders.filter((order) =>
+      ['completed', 'published', 'live', 'delivered'].includes(order.status)
+    ).length;
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      company: user.company,
+      designation: user.designation,
+      image: user.image,
+      role: user.role,
+      createdAt: user.createdAt,
+
+      totalOrders,
+      runningOrders,
+      publishedOrders,
+    };
+  });
+
+  return {
+    data: result,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPage: Math.ceil(total / limit),
+    },
+  };
+};
 
 const createUser = async (user: IUser) => {
   // Check if user already exists by email
@@ -163,5 +258,6 @@ export const AuthService = {
     updateUser,
   deleteUser,
   getUserByCookie,
-  getAdminRole
+  getAdminRole,
+  userAllInfo
 }

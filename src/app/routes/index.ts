@@ -71,7 +71,7 @@ const moduleRoutes = [
     routes: DoFollowRoutes,
   },
   {
-    path: '/notification',
+    path: '/notifications',
     routes: NotificationRoutes
   },
   {
