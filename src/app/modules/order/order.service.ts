@@ -1,5 +1,5 @@
 
-import { subDays, format, startOfDay, endOfDay, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear } from 'date-fns';
+import { subDays, format, startOfDay, endOfDay, startOfMonth, endOfMonth, subMonths, startOfYear, endOfYear, subWeeks, startOfWeek } from 'date-fns';
 import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -53,7 +53,6 @@ const userAllOrders = async (
         // Search in related Publication fields
         {
           publication: {
-            some: {
               OR: [
                 {
                   title: {
@@ -86,7 +85,6 @@ const userAllOrders = async (
                   }
                 }
               ]
-            }
           }
         },
         // Search in User fields
@@ -229,7 +227,6 @@ const getAdminAllOrders = async (
         // Search in related Publication fields
         {
           publication: {
-            some: {
               OR: [
                 {
                   title: {
@@ -262,7 +259,6 @@ const getAdminAllOrders = async (
                   }
                 }
               ]
-            }
           }
         },
         // Search in User fields
@@ -412,7 +408,6 @@ const userOrders = async (
         // Search in related Publication fields
         {
           publication: {
-            some: {
               OR: [
                 {
                   title: {
@@ -445,7 +440,6 @@ const userOrders = async (
                   }
                 }
               ]
-            }
           }
         },
         // Search in User fields
@@ -734,16 +728,89 @@ const deleteOrder = async (id: string): Promise<Partial<IOrder> | null> => {
   });
   return result as unknown as Partial<IOrder>;
 };
-const getOrderStatistics = async () => {
-  // 1. Get how many orders each user has made
+const getOrderStatistics = async (filters: { today?: string; thisWeek?: string }) => {
+  const now = new Date();
+
+  // Determine date ranges based on filters
+  let currentPeriodRange: { gte: Date };
+  let previousPeriodRange: { gte: Date; lt: Date };
+  let periodLabel: string;
+  let previousPeriodLabel: string;
+
+  if (filters.today) {
+    // Today vs Yesterday
+    const todayStart = startOfDay(now);
+    const yesterdayStart = startOfDay(subDays(now, 1));
+
+    currentPeriodRange = { gte: todayStart };
+    previousPeriodRange = { gte: yesterdayStart, lt: todayStart };
+    periodLabel = 'Today';
+    previousPeriodLabel = 'Yesterday';
+
+  } else if (filters.thisWeek) {
+    // This Week vs Last Week
+    const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const lastWeekStart = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
+
+    currentPeriodRange = { gte: thisWeekStart };
+    previousPeriodRange = { gte: lastWeekStart, lt: thisWeekStart };
+    periodLabel = 'This Week';
+    previousPeriodLabel = 'Last Week';
+
+  } else {
+    // This Month vs Last Month (default)
+    const thisMonth = startOfMonth(now);
+    const lastMonth = startOfMonth(subMonths(now, 1));
+
+    currentPeriodRange = { gte: thisMonth };
+    previousPeriodRange = { gte: lastMonth, lt: thisMonth };
+    periodLabel = 'This Month';
+    previousPeriodLabel = 'Last Month';
+  }
+
+  // Run queries for both periods in parallel
+  const [currentPeriodData, previousPeriodData] = await Promise.all([
+    // Current period data
+    getOrderStatsForPeriod(currentPeriodRange),
+    // Previous period data
+    getOrderStatsForPeriod(previousPeriodRange)
+  ]);
+
+  // Calculate growth rates
+  const growthRates = {
+    totalOrders: calculateGrowthRate(currentPeriodData.totalOrders, previousPeriodData.totalOrders),
+    newClients: calculateGrowthRate(currentPeriodData.newClients, previousPeriodData.newClients),
+    repeatClients: calculateGrowthRate(currentPeriodData.repeatClients, previousPeriodData.repeatClients),
+    delivered: calculateGrowthRate(currentPeriodData.delivered, previousPeriodData.delivered),
+    inProgress: calculateGrowthRate(currentPeriodData.inProgress, previousPeriodData.inProgress),
+  };
+
+  return {
+    summary: {
+      period: periodLabel,
+      previousPeriod: previousPeriodLabel,
+      filter: filters.today ? 'today' : filters.thisWeek ? 'thisWeek' : 'thisMonth'
+    },
+    currentPeriod: currentPeriodData,
+    previousPeriod: previousPeriodData,
+    growthRates,
+  };
+};
+
+// Helper function to get order statistics for a specific period
+const getOrderStatsForPeriod = async (dateRange: { gte: Date; lt?: Date }) => {
+  // 1. Get how many orders each user has made in this period
   const userOrderCounts = await prisma.order.groupBy({
     by: ['userId'],
+    where: {
+      createdAt: dateRange
+    },
     _count: {
       _all: true,
     },
   });
 
-  // 2. Classify users
+  // 2. Classify users for this period
   let newClients = 0;
   let repeatClients = 0;
 
@@ -755,9 +822,12 @@ const getOrderStatistics = async () => {
     }
   }
 
-  // 3. Get status counts
+  // 3. Get status counts for this period
   const statusCounts = await prisma.order.groupBy({
     by: ['status'],
+    where: {
+      createdAt: dateRange
+    },
     _count: {
       _all: true,
     },
@@ -777,6 +847,18 @@ const getOrderStatistics = async () => {
     delivered,
     inProgress,
   };
+};
+
+// Helper function to calculate growth rate
+const calculateGrowthRate = (current: number, previous: number): string => {
+  if (previous === 0) {
+    return current > 0 ? '+100%' : '0%';
+  }
+
+  const rate = ((current - previous) / previous) * 100;
+  const formatted = Math.abs(rate) < 0.1 ? '0%' : rate.toFixed(1) + '%';
+
+  return rate > 0 ? `+${formatted}` : formatted;
 };
 
 

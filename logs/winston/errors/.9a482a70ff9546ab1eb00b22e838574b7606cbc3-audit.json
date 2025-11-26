@@ -169,6 +169,21 @@
             "date": 1764096041152,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-00-error.log",
             "hash": "bd9c6f5815e6dfa7590be3b1dfb4efeb6d142b82cb8985a297e4dda933394c67"
+        },
+        {
+            "date": 1764163643989,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-19-error.log",
+            "hash": "0348b00d09af90cca6e2e1d61c1209a106100389dd2c36353566370c4ec8be26"
+        },
+        {
+            "date": 1764165818805,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-20-error.log",
+            "hash": "c92031c5b178019924963f3c93e9d96b486832320c9c091459cd13875104418e"
+        },
+        {
+            "date": 1764171930078,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-21-error.log",
+            "hash": "72951248d76eb5cccde2205593a048d5d692545107d2ecd27ecc67c81289e90a"
         }
     ],
     "hashType": "sha256"

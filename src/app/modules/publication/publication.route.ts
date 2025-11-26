@@ -20,7 +20,8 @@ router.post('/create',
         req.body = JSON.parse(req.body.data);
         return PublicationController.createPublication(req, res,next)
 });
-router.get('/statistics', PublicationController.getPublicationStatistics)
+router.get('/statistics', auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.CLIENT), PublicationController.getPublicationStatistics)
+router.get('/admin/searchpublications', auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN), PublicationController.getSearchPublications)
 router.get('/all-publications',
         auth(ENUM_USER_ROLE.SUPER_ADMIN, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.CLIENT),
         PublicationController.getAllPublications);

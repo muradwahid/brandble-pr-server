@@ -119,7 +119,9 @@ const deleteOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getOrderStatistics = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.getOrderStatistics();
+  const filters = pick(req.query, ['today', 'thisWeek']);
+
+  const result = await OrderService.getOrderStatistics(filters);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

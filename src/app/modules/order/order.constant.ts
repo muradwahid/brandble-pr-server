@@ -1,4 +1,4 @@
-export const orderSearchableFields = ['orderId', 'title', 'publication.title', 'sortBy', 'sortOrder', 'da', 'dr', 'location', 'region', 'genre', 'doFollow', 'indexed', 'niche'];
+export const orderSearchableFields = ['orderId', 'title', 'sortBy', 'sortOrder', 'da', 'dr', 'location', 'region', 'genre', 'doFollow', 'index', 'niche'];
 export const singleUserOrderSearchableFields = [
   'orderId',
   'status',
@@ -8,7 +8,6 @@ export const singleUserOrderSearchableFields = [
 export const orderFilterableFields = [
   'searchTerm',
   'title',
-  'publication.title',
   'sortBy',
   'sortOrder',
   'da',
@@ -17,8 +16,8 @@ export const orderFilterableFields = [
   'region',
   'genre',
   'doFollow',
-  'indexed',
-  'niche', ,
+  'index',
+  'niche',
   'status'
 ];
 

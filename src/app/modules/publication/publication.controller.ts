@@ -35,6 +35,19 @@ const getAllPublications = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getSearchPublications = catchAsync(async (req: Request, res: Response) => {
+
+  const filters = pick(req.query, ['searchTerm']);
+  const options = pick(req.query, paginationFields);
+
+  const result = await PublicationService.getSearchPublications(filters as any);
+  sendResponse(res, {
+    success: true,
+    statusCode: httpStatus.OK,
+    message: 'Publications fetched successfully',
+    data: result,
+  });
+});
 
 const getPublicationById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -85,6 +98,7 @@ const deletePublication = catchAsync(async (req: Request, res: Response) => {
 export const PublicationController = {
   createPublication,
   getAllPublications,
+  getSearchPublications,
   getPublicationById,
   updatePublication,
   deletePublication,
