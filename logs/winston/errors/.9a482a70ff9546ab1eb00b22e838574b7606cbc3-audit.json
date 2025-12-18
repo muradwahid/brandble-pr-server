@@ -6,184 +6,29 @@
     "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/.9a482a70ff9546ab1eb00b22e838574b7606cbc3-audit.json",
     "files": [
         {
-            "date": 1762964057621,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-12-11-22-error.log",
-            "hash": "2a87ffc9ced43fb3e403cee9dd7bd4d1aafc150348a9fc965bc2a0bca4da736d"
+            "date": 1765882980772,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-17-error.log",
+            "hash": "8c3e94b621392d1ed5b1df04ad30952b2dce6b1e5f00cf0c5aafe08ae836e232"
         },
         {
-            "date": 1762969567620,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-12-11-23-error.log",
-            "hash": "ad4681193bcc5ad97e51c569a45a307c7a6014da7975b5258a1f7a85ae03d839"
+            "date": 1765886731519,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-18-error.log",
+            "hash": "c3bfeed7e9dfafe9f0079ad96991d6fd7ee8c23a3da224cf8ef20a4ffcb6f6f7"
         },
         {
-            "date": 1763053012385,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-13-11-22-error.log",
-            "hash": "25e8c39f19c68c0a5d9a7866dc5d2bb36214b7e5b9a3f33a7b20723649965bf0"
+            "date": 1765900595683,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-21-error.log",
+            "hash": "3ee74972aa54f74437dafc9b4d4b0597ed229c43edfb69b776ca20c4c0a24f27"
         },
         {
-            "date": 1763481490441,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-11-21-error.log",
-            "hash": "ae5cad00b5b3a4b5cd2cd54bf07918628295c14741b335b3a279271801104450"
+            "date": 1765900913596,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-22-error.log",
+            "hash": "9301bbfcec6d697d52f1faa95638875b4c122a3e1997b4ed5704838edcea4327"
         },
         {
-            "date": 1763482924208,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-11-22-error.log",
-            "hash": "dbbcdab00d01062bb7df9d7b9d164236d0344bf0ebbbb79bfa706095e9be8883"
-        },
-        {
-            "date": 1763487127157,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-11-23-error.log",
-            "hash": "db923a9d7843ef5e69152c2c6a7ebec3341564bb92c69f1a75fb386106de11c6"
-        },
-        {
-            "date": 1763488813411,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-19-11-00-error.log",
-            "hash": "c8f971ebb50059cb9ef66185c59e44d92d0b867d0fb11ea2f3cdeb27ef859aec"
-        },
-        {
-            "date": 1763561053334,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-19-11-20-error.log",
-            "hash": "29b1b59aed33bcd6f4a6fbdff5ab2486c5047c2da361af5b0053800f33863fb1"
-        },
-        {
-            "date": 1763565649186,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-19-11-21-error.log",
-            "hash": "2878ac06f5520840efb55e9468cc86978bc72cf4caaf2cdd89707a47c5506a60"
-        },
-        {
-            "date": 1763576326561,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-20-11-00-error.log",
-            "hash": "8b5cd5e1ffb953093e050221bd246cf15e8b973f88aad3bb70dcffcd74f82ca9"
-        },
-        {
-            "date": 1763649125020,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-20-11-20-error.log",
-            "hash": "b9e9a7f3df296fa4db89d20a751d175ed0647d482af2ecddb14a924363d02360"
-        },
-        {
-            "date": 1763659763442,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-20-11-23-error.log",
-            "hash": "326ca331d7a6fd9125ba13a4ab1ce016ae7b8cbc4a0ef7104ba3eb4502f40c9d"
-        },
-        {
-            "date": 1763724357162,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-21-11-17-error.log",
-            "hash": "04c3c3566fd1b81200e9044e4cdbdd9c91a39ad70f9bfbeee6830cecd3ca2db8"
-        },
-        {
-            "date": 1763726488448,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-21-11-18-error.log",
-            "hash": "3a2cf6411aaa0add0574e3b90419541d4fa3df3aa47e61ae7208285a93dc3ab6"
-        },
-        {
-            "date": 1763821606340,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-22-11-20-error.log",
-            "hash": "ba4736fa3c4280c9c375d05e9842f9a4f27aad8271812d62a5b7c48f7adf2bfc"
-        },
-        {
-            "date": 1763826273621,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-22-11-21-error.log",
-            "hash": "c4a41b9f16c3509243d735cb6ffdc32b9980a08448c8468b50e08a79c17d98e6"
-        },
-        {
-            "date": 1763834281783,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-22-11-23-error.log",
-            "hash": "554397aa58c6099cd138f00c826fca719bce592fe5c5bb3ee2270d8d7960a720"
-        },
-        {
-            "date": 1763834402194,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-23-11-00-error.log",
-            "hash": "3a8d8f89c41148e99050651b5d440c16f586c76cf3f2bd49fd111fdaaa0c263e"
-        },
-        {
-            "date": 1763910992783,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-23-11-21-error.log",
-            "hash": "a71fba697bab29e0411b739055b9850c6b30927562f1d5573dab8dd2262548d0"
-        },
-        {
-            "date": 1763913629797,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-23-11-22-error.log",
-            "hash": "f4d3f64c4eb9d1a8a4a213dd4d9b13d7d5f9eccd7213241e4975a118b92026d1"
-        },
-        {
-            "date": 1763918152924,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-23-11-23-error.log",
-            "hash": "f868a5e5fc635ae2ae548a236b38efe3531178ec20fbb55228c330510e94133b"
-        },
-        {
-            "date": 1763921014700,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-00-error.log",
-            "hash": "0f25b74b9b47eaa210ed2156400e9ace580048e9e971d4de31e444e716eb3fe8"
-        },
-        {
-            "date": 1763989981744,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-19-error.log",
-            "hash": "b917f479a3b03b58b5cfb9769d52e1349e36f34d67e80e99fb685657e9f219a2"
-        },
-        {
-            "date": 1763993757374,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-20-error.log",
-            "hash": "ace0544a404a00b0c4b2ffb6ac5e8752c8fb21f7ad97b0ac18f69d0cb6bbac8e"
-        },
-        {
-            "date": 1763996527813,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-21-error.log",
-            "hash": "6f79fe58f88776609a8e9f34a10c46d3348864f16657c535081d432d9aa40f3d"
-        },
-        {
-            "date": 1764001956146,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-22-error.log",
-            "hash": "3f132f778646959980274e19f56cfce77793116748e12fc1c5dfb650bcf99724"
-        },
-        {
-            "date": 1764003631311,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-11-23-error.log",
-            "hash": "ee23c4ed460ddfdfdaa5e83229457a8ea1948f239a8e6cd6a41a666b7d896be5"
-        },
-        {
-            "date": 1764007219805,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-25-11-00-error.log",
-            "hash": "c1f64a5d4b4db7e2e67b1692ce13e324d5e84b094932ed990386d653eae89a44"
-        },
-        {
-            "date": 1764076808674,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-25-11-19-error.log",
-            "hash": "9119d3e4ed8add4720ceca98fd89c259060e684bc635448ab264bd525abc0ff9"
-        },
-        {
-            "date": 1764079762370,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-25-11-20-error.log",
-            "hash": "af944df026ae745d34a97ae4ad5d45828105fa77d004b1da6525dda78eb0811a"
-        },
-        {
-            "date": 1764086945736,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-25-11-22-error.log",
-            "hash": "90e1f0aef5eecca76068fb2f4da6851f820e4aca892fbe62dcff4c3f7f3df40a"
-        },
-        {
-            "date": 1764090968625,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-25-11-23-error.log",
-            "hash": "4306da4b7f037a0e5551806b37f8aba422b3e75635abfdec8f6389bc6fd9471b"
-        },
-        {
-            "date": 1764096041152,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-00-error.log",
-            "hash": "bd9c6f5815e6dfa7590be3b1dfb4efeb6d142b82cb8985a297e4dda933394c67"
-        },
-        {
-            "date": 1764163643989,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-19-error.log",
-            "hash": "0348b00d09af90cca6e2e1d61c1209a106100389dd2c36353566370c4ec8be26"
-        },
-        {
-            "date": 1764165818805,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-20-error.log",
-            "hash": "c92031c5b178019924963f3c93e9d96b486832320c9c091459cd13875104418e"
-        },
-        {
-            "date": 1764171930078,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-26-11-21-error.log",
-            "hash": "72951248d76eb5cccde2205593a048d5d692545107d2ecd27ecc67c81289e90a"
+            "date": 1766069659970,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-12-20-error.log",
+            "hash": "86f3615b85865db568db58d8637a727d7a9ed867a11fd70e9286ea35ddc24490"
         }
     ],
     "hashType": "sha256"

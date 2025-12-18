@@ -160,12 +160,13 @@ const getAllPublications = async (
       return { ...pub, niches };
     }),
   );
+  const totalPublications= await prisma.publication.count();
 
   return {
     meta: {
       page,
       limit,
-      total,
+      total: totalPublications,
       totalPage: Math.ceil(total / limit || 1),
     },
     data: publicationsWithNiches,

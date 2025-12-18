@@ -229,7 +229,6 @@ export const chatController = {
   async getChatRoom(req: Request, res: Response) {
     try {
       const { orderId, userId, adminId } = req.body;
-
       let chatRoom;
       if (orderId) {
         chatRoom = await chatService.getOrCreateOrderRoom(orderId, userId, adminId);

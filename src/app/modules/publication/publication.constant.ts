@@ -9,7 +9,10 @@ export const publicationSearchableFields = [
   'index',
   'da',
   'dr',
-  'region'
+  'region',
+  'scope',
+  'state',
+  'city'
 ];
 
 export const publicationFilterableFields = [

@@ -55,7 +55,18 @@ export const deleteWonArticle = async (id: string): Promise<Partial<WonArticle>>
 
 export const getWonArticleByPublicationId = async (publicationId: string): Promise<WonArticle[]> => {
   const result = await prisma.wonArticle.findMany({
-    where: { orders: { some: { publicationIds: { has: publicationId } } } },
+    where: {
+      orders: {
+        some: {
+          publicationId: publicationId
+        }
+      }
+    },
+    include: {
+      orders: {
+        where: { publicationId: publicationId }
+      }
+    }
   });
   return result;
 };

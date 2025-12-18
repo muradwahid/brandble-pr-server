@@ -1058,6 +1058,10 @@ export const chatService = {
 
   // Send message (general function)
   async sendMessage(chatRoomId: string, senderId: string, content: string, messageType: string = 'text') {
+    console.log("chat service chatRoomId:", chatRoomId);
+    console.log("chat service senderId:", senderId);
+    console.log("chat service content:", content);
+    console.log("chat service messageType:", messageType);
     return this.sendFirstMessage(chatRoomId, senderId, content, messageType);
   },
 

@@ -142,14 +142,17 @@ model Publication {
   publicationId String   @unique @default(nanoid(15))
   title         String
   logo          String?
+  scope         String?
   region        String?
+  state         String?
+  city          String?
   da            String?
   dr            String?
   tat           String?
   ttp           String?
   favorite      String[]
   price         String
-  location      String
+  location      String?
   index         String
   // nicheId   String?
   sponsor       String
