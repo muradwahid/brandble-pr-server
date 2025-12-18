@@ -29,6 +29,11 @@
             "date": 1766069659970,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-12-20-error.log",
             "hash": "86f3615b85865db568db58d8637a727d7a9ed867a11fd70e9286ea35ddc24490"
+        },
+        {
+            "date": 1766074225914,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-12-22-error.log",
+            "hash": "f39dfa1e22b0ca14f26e1e6740a37492690000767a28a997fa08404da99d46bb"
         }
     ],
     "hashType": "sha256"
