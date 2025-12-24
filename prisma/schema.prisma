@@ -42,9 +42,9 @@ model Order {
   orderId          String   @unique @default(nanoid(15))
   detailsSubmitted String?  @default("not-yet")
   status           String   @default("pending")
-  publicationId   String
+  publicationId    String
   methodId         String
-  paymentMethodId String?
+  paymentMethodId  String?
   orderType        String   @default("wonArticle")
   amount           Int
 
@@ -157,7 +157,7 @@ model Publication {
   // nicheId   String?
   sponsor       String
   doFollow      String
-  niches        String[]
+  niches        String[] @default([])
   // genreId   String[]
   genre         String
   orders        Order[]
@@ -171,7 +171,7 @@ model Publication {
 model Favorite {
   id        String   @id @default(uuid())
   userId    String
-  publicationId String @unique
+  publicationId String
   publication Publication @relation(fields: [publicationId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

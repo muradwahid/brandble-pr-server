@@ -73,9 +73,11 @@ async function bootstrap() {
 
   process.on('SIGTERM', () => {
     logger.info('SIGTERM received');
-    if (server) {
-      server.close();
-    }
+    server.close(() => {
+      logger.info('HTTP server closed');
+      process.exit(0);
+    });
+
   });
 }
 

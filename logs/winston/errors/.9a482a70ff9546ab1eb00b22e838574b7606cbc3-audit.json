@@ -6,34 +6,9 @@
     "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/.9a482a70ff9546ab1eb00b22e838574b7606cbc3-audit.json",
     "files": [
         {
-            "date": 1765882980772,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-17-error.log",
-            "hash": "8c3e94b621392d1ed5b1df04ad30952b2dce6b1e5f00cf0c5aafe08ae836e232"
-        },
-        {
-            "date": 1765886731519,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-18-error.log",
-            "hash": "c3bfeed7e9dfafe9f0079ad96991d6fd7ee8c23a3da224cf8ef20a4ffcb6f6f7"
-        },
-        {
-            "date": 1765900595683,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-21-error.log",
-            "hash": "3ee74972aa54f74437dafc9b4d4b0597ed229c43edfb69b776ca20c4c0a24f27"
-        },
-        {
-            "date": 1765900913596,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-16-12-22-error.log",
-            "hash": "9301bbfcec6d697d52f1faa95638875b4c122a3e1997b4ed5704838edcea4327"
-        },
-        {
-            "date": 1766069659970,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-12-20-error.log",
-            "hash": "86f3615b85865db568db58d8637a727d7a9ed867a11fd70e9286ea35ddc24490"
-        },
-        {
-            "date": 1766074225914,
-            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-18-12-22-error.log",
-            "hash": "f39dfa1e22b0ca14f26e1e6740a37492690000767a28a997fa08404da99d46bb"
+            "date": 1766595768347,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2025-24-12-23-error.log",
+            "hash": "b58b5d8622499cfee3ff1fb967aca5ff8ef532807eb1358dd2ede1ca688809e1"
         }
     ],
     "hashType": "sha256"

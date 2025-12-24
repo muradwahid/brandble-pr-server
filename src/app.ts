@@ -55,7 +55,7 @@ import httpStatus from 'http-status';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import routes from './app/routes';
 import cookieParser from 'cookie-parser';
-import { initializeSocket } from './socketServer';
+// import { initializeSocket } from './socketServer';
 
 const app: Application = express();
 app.set('trust proxy', 1);

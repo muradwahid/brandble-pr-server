@@ -24,7 +24,7 @@ const logger = createLogger({
         process.cwd(),
         'logs',
         'winston',
-        'successes',
+        'success',
         'brandable-%DATE%-success.log'
       ),
       datePattern: 'YYYY-DD-MM-HH',

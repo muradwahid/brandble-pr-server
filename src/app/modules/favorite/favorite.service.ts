@@ -48,6 +48,25 @@ const getOnlyFavoriteIds = async (userId: string): Promise<any[] | null> => {
 }
 const createFavorite = async (data: any): Promise<any> => {
   const { userId, itemId } = data;
+
+  const existingFavorite = await prisma.favorite.findFirst({
+    where: {
+      userId: userId,
+      publicationId: itemId
+    }
+  });
+
+  if (existingFavorite) {
+    await prisma.favorite.delete({
+      where: {
+        id: existingFavorite.id
+      }
+    });
+    return {
+      message: "Removed from favorites!"};
+  }
+
+
   const result = await prisma.favorite.create({
     data: {
       userId: userId,
