@@ -8,8 +8,8 @@ export const singleUserOrderSearchableFields = [
 export const orderFilterableFields = [
   'searchTerm',
   'title',
-  'sortBy',
-  'sortOrder',
+  // 'sortBy',
+  // 'sortOrder',
   'da',
   'dr',
   'location',
@@ -18,7 +18,29 @@ export const orderFilterableFields = [
   'doFollow',
   'index',
   'niche',
-  'status'
+  'status',
+  'publication',
+  'sponsor',
+  'amount'
+];
+export const adminOrderFilterableFields = [
+  'status',
+  'orderType',
+  'title',
+  'createdAt'
 ];
 
-export const dayNames = ['Sat','Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+export const dayNames = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+export const directSortableFields = ['amount']
+export const nestedSortableFields = [
+  'genre',
+  'sponsor',
+  'title',
+  'da',
+  'dr',
+  'region',
+  'location',
+  'price',
+  'doFollow'
+]

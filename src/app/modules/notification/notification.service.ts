@@ -26,6 +26,17 @@ const createNotification = async (
     }
   });
 };
+
+const getUnreadNotificationCount = async (userId: string) => {
+   const result=await prisma.notification.count({
+    where: {
+      recipientId: userId,
+      status: 'unread'
+    }
+   });
+  return result || 0;
+};
+
 const getNotifications = async (userId: string, filters: any = {}) => {
   const { page = 1, limit = 20, status } = filters;
   const skip = (page - 1) * limit;
@@ -137,6 +148,7 @@ const groupNotificationsByDate = (notifications: any[]) => {
 
 export const NotificationService = {
   createNotification,
+  getUnreadNotificationCount,
   getNotifications,
   markAsRead,
   markAllAsRead

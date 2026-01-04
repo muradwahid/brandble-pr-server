@@ -10,6 +10,7 @@ router.get('/orders-upcoming-deadlines', OrderController.getUpcomingDeadlines);
 router.get('/specific-user-orders/:id', OrderController.getSpecificUserOrders);
 router.get('/admin/payment-revenue-statistics', OrderController.getPaymentRevenueStatistics);
 router.get('/admin/all-orders', OrderController.getAdminAllOrders);
+router.get('/admin/orders', OrderController.getAdminOrders);
 router.post('/create', OrderController.createOrder);
 router.get('/user/all-orders', auth(ENUM_USER_ROLE.CLIENT), OrderController.userAllOrders);
 router.get('/user-all-orders', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), OrderController.userOrders);

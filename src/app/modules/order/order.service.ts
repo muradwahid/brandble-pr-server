@@ -7,9 +7,10 @@ import { IPaginationOptions } from '../../../interfaces/pagination';
 import prisma from '../../../shared/prisma';
 import { NotificationService } from '../notification/notification.service';
 import { publicationSearchableFields } from '../publication/publication.constant';
-import { dayNames, singleUserOrderSearchableFields } from './order.constant';
+import { dayNames, directSortableFields, nestedSortableFields, singleUserOrderSearchableFields } from './order.constant';
 import { IOrder, IOrderSearchableFields } from './order.interface';
 import { eachDayOfInterval, eachHourOfInterval, eachMonthOfInterval } from './order.functions';
+import { Prisma } from '@prisma/client';
 
 const userAllOrders = async (
   filters: IOrderSearchableFields,
@@ -186,12 +187,14 @@ const userAllOrders = async (
     data: result,
   };
 };
+
+
 const getAdminAllOrders = async (
   filters: IOrderSearchableFields,
   options: IPaginationOptions
 ) => {
 
-  const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+  const { page, limit, skip , sortBy,sortOrder} = paginationHelpers.calculatePagination(options);
   const { searchTerm, ...filterData } = filters;
 
   const andConditions = new Array();
@@ -326,20 +329,35 @@ const getAdminAllOrders = async (
       })
     })
   }
+
+
+  let orderSortBy: any = { createdAt: 'desc' };
+
+  if (sortBy && sortOrder) {
+    if (directSortableFields.includes(sortBy)) {
+      orderSortBy = [
+        { [sortBy]: sortOrder },
+        { createdAt: 'desc' },
+      ];
+    } else if (nestedSortableFields.includes(sortBy)) {
+      orderSortBy = [
+        { publication: { [sortBy]: sortOrder } },
+        { publication: { id: 'asc' } },
+        { createdAt: 'desc' },
+      ];
+    } else {
+      orderSortBy = { createdAt: 'desc' };
+    }
+  }
+
+
   const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.order.findMany({
     where: whereConditions,
     skip,
     take: limit,
-    orderBy:
-      options.sortBy && options.sortOrder
-        ? {
-          [options.sortBy as any]: options.sortOrder,
-        }
-        : {
-          createdAt: 'desc',
-        },
+    orderBy: orderSortBy,
     include: {
       user: true,
       wonArticle: true,
@@ -360,6 +378,93 @@ const getAdminAllOrders = async (
     data: result,
   };
 };
+
+
+export const getAdminOrders = async (filters: any, options: IPaginationOptions) => {
+  const { page, limit, skip, sortBy, sortOrder } =
+    paginationHelpers.calculatePagination(options);
+
+  const andConditions: Prisma.OrderWhereInput[] = [];
+
+  // status
+  if (filters?.status) {
+    andConditions.push({ status: { equals: filters.status as any } });
+  }
+
+  // orderType
+  if (filters?.orderType) {
+    andConditions.push({ orderType: { equals: filters.orderType as any } });
+  }
+
+  // title -> publication.title
+  if (filters?.title) {
+    const t = String(filters.title).trim();
+    if (t.length) {
+      andConditions.push({
+        publication: { title: { contains: t, mode: "insensitive" } },
+      });
+    }
+  }
+
+  // ✅ createdAt default = today, but if filters.date exists then use that day
+  {
+    const baseDate = filters.date ? new Date(filters.date) : new Date();
+
+    // start of day (server local time)
+    const start = new Date(baseDate);
+    start.setHours(0, 0, 0, 0);
+
+    // end of day (server local time)
+    const end = new Date(baseDate);
+    end.setHours(23, 59, 59, 999);
+
+    andConditions.push({
+      createdAt: { gte: start, lte: end },
+    });
+  }
+
+  const whereConditions: Prisma.OrderWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  let orderBy: Prisma.OrderOrderByWithRelationInput[] = [{ createdAt: "desc" }];
+
+  if (sortBy && sortOrder) {
+    if (sortBy === "title") {
+      orderBy = [
+        { publication: { title: sortOrder as Prisma.SortOrder } },
+        { createdAt: "desc" },
+      ];
+    } else {
+      orderBy = [
+        { [sortBy]: sortOrder as Prisma.SortOrder } as Prisma.OrderOrderByWithRelationInput,
+        { createdAt: "desc" },
+      ];
+    }
+  }
+
+  const [data, total] = await Promise.all([
+    prisma.order.findMany({
+      where: whereConditions,
+      skip,
+      take: limit,
+      orderBy,
+      include: {
+        user: true,
+        wonArticle: true,
+        writeArticle: true,
+        paymentMethod: true,
+        publication: true,
+      },
+    }),
+    prisma.order.count({ where: whereConditions }),
+  ]);
+
+  return {
+    meta: { page, limit, total },
+    data,
+  };
+};
+
 const userOrders = async (
   filters: IOrderSearchableFields,
   options: IPaginationOptions,
@@ -1100,9 +1205,7 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
       } catch (error) {
         console.error('Notification failed (but order updated):', error);
       }
-    } else {
-      console.log('No user attached to this order. Notification skipped.');
-    }
+    } 
 
     return updatedOrder;
   });
@@ -1111,6 +1214,7 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
 export const OrderService = {
   userAllOrders,
   getAdminAllOrders,
+  getAdminOrders,
   createOrder,
   runningOrders,
   getOrderById,

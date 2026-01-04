@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import httpStatus from 'http-status';
-import { orderFilterableFields, singleUserOrderSearchableFields } from './order.constant';
+import { adminOrderFilterableFields, orderFilterableFields, singleUserOrderSearchableFields } from './order.constant';
 import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import { paginationFields } from '../../../constants/pagination';
@@ -29,6 +29,19 @@ const getAdminAllOrders = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, orderFilterableFields as (keyof typeof req.query)[]);
 
   const result = await OrderService.getAdminAllOrders(filters,options);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order retrieved successfully!',
+    data: result,
+  });
+});
+const getAdminOrders = catchAsync(async (req: Request, res: Response) => {
+
+  const options = pick(req.query, paginationFields);
+  const filters = pick(req.query, adminOrderFilterableFields as (keyof typeof req.query)[]);
+
+  const result = await OrderService.getAdminOrders(filters,options);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -179,6 +192,7 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
 export const OrderController = {
   userAllOrders,
   getAdminAllOrders,
+  getAdminOrders,
   createOrder,
   runningOrders,
   getOrderById,
