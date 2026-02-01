@@ -21,25 +21,35 @@ const createPublication = async (
 
   const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
   const data = { ...req.body };
-  if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-    data.logo = uploadedProfileImage.secure_url;
-  }
-  //   if (uploadedProfileImage) {
-  //       req.body..profileImage = uploadedProfileImage.secure_url;
-  //   }
+  const { countries, states, cities, niches, ...restData } = data;
 
+  if (uploadedProfileImage && uploadedProfileImage.secure_url) {
+    restData.logo = uploadedProfileImage.secure_url;
+  }
 
   const result = await prisma.publication.create({
-    data
+    data: {
+      ...restData,
+      niches: {
+        connect: niches?.map((id: string) => ({ id })) || [],
+      },
+      countries: {
+        connect: countries?.map((id: string) => ({ id })) || [],
+      },
+      states: {
+        connect: states?.map((id: string) => ({ id })) || [],
+      },
+      cities: {
+        connect: cities?.map((id: string) => ({ id })) || [],
+      },
+    },
+    include: {
+      countries: true,
+      states: true,
+      cities: true,
+      niches:true
+    },
   });
-
-  //   const niches = await prisma.niche.findMany({
-  //   where: {
-  //     id: {
-  //       in: ["2a085369-75b3-45df-968c-f193eac2372d", "55e8c434-1f77-4db7-aa5f-6ee0ba56cdc0"]
-  //     }
-  //   }
-  // });
 
   return result;
 };
@@ -56,12 +66,21 @@ const getAllPublications = async (
     niche,
     minPrice,
     maxPrice,
+    countries,
+    states,
+    cities,
     sortBy: rawSortBy,
     sortOrder = 'desc',
     ...restFilters
   } = filters;
 
   const andConditions = [];
+
+
+  
+  const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
 
   // 1. Full-text search
   if (searchTerm) {
@@ -86,28 +105,49 @@ const getAllPublications = async (
   }
 
   if (niche) {
-    const matchingNiches = await prisma.niche.findMany({
-      where: {
-        title: {
-          contains: niche,
-          mode: 'insensitive',
-        },
-      },
-      select: { id: true },
-    });
-
-    const nicheIds = matchingNiches.map(n => n.id);
-    if (nicheIds.length === 0) {
-      // No matching niche → return empty result early
-      return {
-        meta: { page, limit, total: 0, totalPage: 0 },
-        data: [],
-      };
-    }
-
     andConditions.push({
       niches: {
-        hasSome: nicheIds,
+        some: {
+          title: {
+            contains: niche,
+            mode: 'insensitive', 
+          },
+        },
+      },
+    });
+  }
+  if (countryList?.length) {
+    andConditions.push({
+      countries: {
+        some: {
+          name: {
+            in: countryList
+          },
+        },
+      },
+    });
+  }
+
+  if (stateList?.length) {
+    andConditions.push({
+      states: {
+        some: {
+          name: {
+            in: stateList,
+          },
+        },
+      },
+    });
+  }
+
+  if (cityList?.length) {
+    andConditions.push({
+      cities: {
+        some: {
+          name: {
+            in: cityList,
+          },
+        },
       },
     });
   }
@@ -132,44 +172,35 @@ const getAllPublications = async (
 
   const orderBy = { [sortBy as string]: sortOrder };
 
-  const [publications, total] = await prisma.$transaction([
-    prisma.publication.findMany({
-      where: whereConditions,
-      skip,
-      take: limit,
-      orderBy,
-      include: {
-        favorites: true,
-        orders:true,
-      }
-    }),
-    prisma.publication.count({ where: whereConditions }),
-  ]);
+  const result = await prisma.publication.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy,
+    include: {
+      favorites: true,
+      orders: true,
+      niches:true,
+      countries:true,
+      states:true,
+      cities:true
+    }
+  });
 
-  const publicationsWithNiches = await Promise.all(
-    publications.map(async pub => {
-      if (!pub.niches || pub.niches.length === 0) {
-        return { ...pub, niches: [] };
-      }
 
-      const niches = await prisma.niche.findMany({
-        where: { id: { in: pub.niches as string[] } },
-        select: { id: true, title: true },
-      });
+  const total = await prisma.publication.count({ where: whereConditions });
 
-      return { ...pub, niches };
-    }),
-  );
-  const totalPublications= await prisma.publication.count();
+  const totalPublications = await prisma.publication.count();
+
 
   return {
     meta: {
       page,
       limit,
       total: totalPublications,
-      totalPage: Math.ceil(total / limit || 1),
+      totalPage:  total === 0 ? 0 : Math.ceil(total / limit)
     },
-    data: publicationsWithNiches,
+    data: result,
   };
 };
 
@@ -313,30 +344,20 @@ const getSearchPublications = async (filters:any) => {
 }
 
 const getPublicationById = async (id: string): Promise<Publication | null> => {
-  try {
     const result = await prisma.publication.findUnique({
       where: {
         id,
       },
+      include: {
+        niches:true,
+        countries:true,
+        states:true,
+        cities:true
+      }
 
     });
 
-
-    if (result?.niches) {
-      const nicheDetails = await prisma.niche.findMany({
-        where: {
-          id: {
-            in: result?.niches
-          }
-        }
-      });
-      (result as any).niches = nicheDetails;
-    }
-
     return result;
-  } catch (error) {
-    throw error;
-  }
 };
 
 
@@ -446,8 +467,6 @@ const updatePublication = async (
   id: string,
   req: CustomRequest,
 ) => {
-
-
   const file = req.file as IUploadFile;
   const data = { ...req.body };
 
@@ -456,22 +475,33 @@ const updatePublication = async (
     if (uploadedProfileImage && uploadedProfileImage.secure_url) {
       data.logo = uploadedProfileImage.secure_url;
     }
-
   }
+  const relationalFields = ['countries', 'states', 'cities', 'niches'];
 
-  if (data?.niches) {
-    data.niches = {
-      set: JSON.parse(data.niches)
+  relationalFields.forEach((field) => {
+    if (data[field]) {
+      try {
+        const ids = typeof data[field] === 'string' ? JSON.parse(data[field]) : data[field];
+
+        data[field] = {
+          set: ids.map((id: string) => ({ id }))
+        };
+      } catch (e) {
+        delete data[field]; 
+      }
     }
-  }
-console.log("data : ",data);
+  });
 
   try {
     const result = await prisma.publication.update({
-      where: {
-        id,
-      },
+      where: { id },
       data,
+      include: {
+        countries: true,
+        states: true,
+        cities: true,
+        niches: true
+      }
     });
     return result;
   } catch (error) {

@@ -2,38 +2,58 @@
 import prisma from "../../../shared/prisma";
 
 const allFavorites = async (userId: string): Promise<any[] | undefined> => {
-  return await prisma.$transaction(async (tx) => {
-    // Get publications
-
-    const favoritesIds =  await tx.favorite.findMany({
-      where: { userId: userId },
-      include: {
-        publication: true
+  const publications = await prisma.publication.findMany({
+    where: {
+      favorites: {
+        some: {
+          userId: userId
+        }
       }
-    });
-
-    const favoriteIds = favoritesIds.map(item => item.publicationId);
-    if (favoriteIds) {
-      const publications = await tx.publication.findMany({
-        where: {
-          id: { in: favoriteIds }
-        }
-      });
-
-      const allNicheIds = [...new Set(publications.flatMap(p => p.niches))];
-      const niches = await tx.niche.findMany({
-        where: {
-          id: { in: allNicheIds }
-        }
-      });
-
-     return  publications.map(publication => ({
-        ...publication,
-        niches: niches.filter(niche => publication.niches.includes(niche.id))
-      }));
+    },
+    include: {
+      niches: true,
+      countries: true,
+      states: true,
+      cities: true
     }
-
   });
+
+  return publications;
+
+
+
+  // return await prisma.$transaction(async (tx) => {
+  //   // Get publications
+
+  //   const favoritesIds =  await tx.favorite.findMany({
+  //     where: { userId: userId },
+  //     include: {
+  //       publication: true
+  //     }
+  //   });
+
+  //   const favoriteIds = favoritesIds.map(item => item.publicationId);
+  //   if (favoriteIds) {
+  //     const publications = await tx.publication.findMany({
+  //       where: {
+  //         id: { in: favoriteIds }
+  //       }
+  //     });
+
+  //     const allNicheIds = [...new Set(publications.flatMap(p => p.niches))];
+  //     const niches = await tx.niche.findMany({
+  //       where: {
+  //         id: { in: allNicheIds }
+  //       }
+  //     });
+
+  //    return  publications.map(publication => ({
+  //       ...publication,
+  //       niches: niches.filter(niche => publication.niches.includes(niche.id))
+  //     }));
+  //   }
+
+  // });
 }
 const getOnlyFavoriteIds = async (userId: string): Promise<any[] | null> => {
   const result = await prisma.favorite.findMany({

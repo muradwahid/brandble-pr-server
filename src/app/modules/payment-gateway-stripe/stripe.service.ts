@@ -4,6 +4,7 @@ import config from '../../../config';
 import ApiError from '../../../errors/ApiError';
 import prisma from '../../../shared/prisma';
 import { CustomRequest } from './stripe.interface';
+import { logger } from "../../../shared/logger";
 const stripe = new Stripe(config.stripe.secretKey as string);
 
 const paymentIntent = async (data: any) => {
@@ -318,7 +319,7 @@ const savePaymentMethod = async (req:CustomRequest) => {
         };
 
     } catch (error) {
-        console.error('Error in savePaymentMethod:', error);
+        logger.error('Error in savePaymentMethod:', error);
 
         if (error && typeof error === 'object' && 'type' in error && error.type === 'StripeInvalidRequestError') {
             throw new ApiError(400, `Stripe error: ${(error as any).message as string}`);

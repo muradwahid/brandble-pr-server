@@ -143,9 +143,6 @@ model Publication {
   title         String
   logo          String?
   scope         String?
-  region        String?
-  state         String?
-  city          String?
   da            String?
   dr            String?
   tat           String?
@@ -153,20 +150,65 @@ model Publication {
   favorite      String[]
   price         String
   location      String?
-  index         String
+  index         String?
   // nicheId   String?
-  sponsor       String
-  doFollow      String
-  niches        String[] @default([])
+  sponsor       String?
+  doFollow      String?
   // genreId   String[]
-  genre         String
+  genre         String?
   orders        Order[]
   favorites     Favorite[]
+  niches        Niche[]   @relation("PublicationNiches")
+  countries     Country[] @relation("PublicationCountries")
+  states        State[]   @relation("PublicationStates")
+  cities        City[]    @relation("PublicationCities")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("publications")
 }
+
+model Country {
+  id           String        @id @default(uuid())
+  name         String
+  code         String?
+  states       State[]
+  publications Publication[] @relation("PublicationCountries")
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("countries")
+}
+
+model State {
+  id           String        @id @default(uuid())
+  name         String
+  countryId    String?
+  country      Country?      @relation(fields: [countryId], references: [id])
+  cities       City[]
+  publications Publication[] @relation("PublicationStates")
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("states")
+}
+
+model City {
+  id           String        @id @default(uuid())
+  name         String
+  stateId      String?
+  state        State?        @relation(fields: [stateId], references: [id])
+  publications Publication[] @relation("PublicationCities")
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("cities")
+}
+
+
 
 model Favorite {
   id        String   @id @default(uuid())
@@ -183,6 +225,7 @@ model Niche {
   id        String   @id @default(uuid())
   title     String
   icon      String?
+  publications Publication[] @relation("PublicationNiches")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

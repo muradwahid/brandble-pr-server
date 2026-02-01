@@ -9,10 +9,11 @@ export const publicationSearchableFields = [
   'index',
   'da',
   'dr',
-  'region',
-  'scope',
-  'state',
-  'city'
+  'scope'
+  // 'region',
+  // 'scope',
+  // 'state',
+  // 'city'
 ];
 
 export const publicationFilterableFields = [
@@ -22,7 +23,7 @@ export const publicationFilterableFields = [
   'minPrice',
   'minPrice',
   'maxPrice',
-  'region'
+  // 'region'
 ];
 
 // Define what fields can be sorted (used with ?sortBy=price&sortOrder=desc)
@@ -35,7 +36,7 @@ export const publicationSortableFields = [
   'genre',
   'doFollow',
   'index',
-  'region'
+  // 'region'
 ];
 
 export const publicationFilterableFieldsController = ['searchTerm',
@@ -46,7 +47,11 @@ export const publicationFilterableFieldsController = ['searchTerm',
   'maxPrice',
   'sortBy',
   'sortOrder',
-  'region',
+  'scope',
+  'countries',
+  'states',
+  'cities',
+  // 'region',
   'index',
   'niche'
 ]

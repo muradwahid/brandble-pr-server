@@ -747,6 +747,7 @@
 
 // src/services/chatService.ts
 import { PrismaClient } from '@prisma/client';
+import { logger } from '../../../shared/logger';
 
 const prisma = new PrismaClient();
 
@@ -871,7 +872,7 @@ export const chatService = {
 
       return chatRoom;
     } catch (error) {
-      console.error('Error in getOrCreateUserAdminRoom:', error);
+      logger.error('Error in getOrCreateUserAdminRoom:', error);
       throw error;
     }
   },
@@ -1015,7 +1016,7 @@ export const chatService = {
 
       return chatRoom;
     } catch (error) {
-      console.error('Error in getOrCreateOrderRoom:', error);
+      logger.error('Error in getOrCreateOrderRoom:', error);
       throw error;
     }
   },
@@ -1051,17 +1052,13 @@ export const chatService = {
 
       return message;
     } catch (error) {
-      console.error('Error in sendFirstMessage:', error);
+      logger.error('Error in sendFirstMessage:', error);
       throw error;
     }
   },
 
   // Send message (general function)
   async sendMessage(chatRoomId: string, senderId: string, content: string, messageType: string = 'text') {
-    console.log("chat service chatRoomId:", chatRoomId);
-    console.log("chat service senderId:", senderId);
-    console.log("chat service content:", content);
-    console.log("chat service messageType:", messageType);
     return this.sendFirstMessage(chatRoomId, senderId, content, messageType);
   },
 
@@ -1119,7 +1116,7 @@ export const chatService = {
 
       return chatRooms;
     } catch (error) {
-      console.error('Error in getUserChatRooms:', error);
+      logger.error('Error in getUserChatRooms:', error);
       throw error;
     }
   },
@@ -1177,7 +1174,7 @@ export const chatService = {
 
       return chatRooms;
     } catch (error) {
-      console.error('Error in getUserChatRooms:', error);
+      logger.error('Error in getUserChatRooms:', error);
       throw error;
     }
   },
@@ -1246,7 +1243,7 @@ export const chatService = {
 
       return chatRooms;
     } catch (error) {
-      console.error('Error in getOrderChatRooms:', error);
+      logger.error('Error in getOrderChatRooms:', error);
       throw error;
     }
   },
@@ -1316,7 +1313,7 @@ export const chatService = {
 
       return chatRooms;
     } catch (error) {
-      console.error('Error in getOrderChatRooms:', error);
+      logger.error('Error in getOrderChatRooms:', error);
       throw error;
     }
   },
@@ -1387,7 +1384,7 @@ export const chatService = {
 
       return chatRooms;
     } catch (error) {
-      console.error('Error in getUserChats:', error);
+      logger.error('Error in getUserChats:', error);
       throw error;
     }
   },
@@ -1456,7 +1453,7 @@ export const chatService = {
 
       return chatRoom;
     } catch (error) {
-      console.error('Error in getChatRoom:', error);
+      logger.error('Error in getChatRoom:', error);
       throw error;
     }
   },
@@ -1477,7 +1474,7 @@ export const chatService = {
 
       return !!chatRoom;
     } catch (error) {
-      console.error('Error in canUserAccessChat:', error);
+      logger.error('Error in canUserAccessChat:', error);
       return false;
     }
   }

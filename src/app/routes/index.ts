@@ -14,6 +14,10 @@ import { WriteArticleRoutes } from '../modules/writeArticle/writeArticle.route';
 import { FavoriteRoutes } from '../modules/favorite/favorite.route';
 import { ChatRoutes } from '../modules/chat/chat.route';
 import { NotificationRoutes } from '../modules/notification/notification.route';
+import { CityRoutes } from '../modules/city/city.route';
+import { CountryRoutes } from '../modules/country/country.route';
+import { StateRoutes } from '../modules/state/state.route';
+import { CommonRoutes } from '../modules/common/common.route';
 
 const router = express.Router();
 
@@ -47,6 +51,18 @@ const moduleRoutes = [
     routes: PublicationRoutes,
   },
   {
+    path: '/country',
+    routes: CountryRoutes,
+  },
+  {
+    path: '/states',
+    routes: StateRoutes,
+  },
+  {
+    path: '/cities',
+    routes: CityRoutes,
+  },
+  {
     path: '/favorite',
     routes: FavoriteRoutes,
   },
@@ -69,6 +85,10 @@ const moduleRoutes = [
   {
     path: '/dofollow',
     routes: DoFollowRoutes,
+  },
+  {
+    path: '/common',
+    routes: CommonRoutes
   },
   {
     path: '/notifications',

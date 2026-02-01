@@ -36,7 +36,6 @@ const createWriteArticle = async (req: CustomRequest) => {
             [file.fieldname]: uploadedFile.secure_url
           };
         } catch (error) {
-          console.error(`File upload failed for ${file.fieldname}:`, error);
           throw new ApiError(
             httpStatus.BAD_REQUEST, 
             `Failed to upload ${file.fieldname}: ${(error as Error).message}`
@@ -79,7 +78,6 @@ const createWriteArticle = async (req: CustomRequest) => {
         case 'P2025':
           throw new ApiError(httpStatus.NOT_FOUND, "Related record not found");
         default:
-          console.error('Prisma error:', error);
           throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Database operation failed");
       }
     }
@@ -88,12 +86,10 @@ const createWriteArticle = async (req: CustomRequest) => {
     if (error instanceof Prisma.PrismaClientUnknownRequestError || 
         error instanceof Prisma.PrismaClientInitializationError ||
         error instanceof Prisma.PrismaClientValidationError) {
-      console.error('Prisma error:', error);
       throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Database error occurred");
     }
 
     // Generic error handling
-    console.error('Unexpected error in createWriteArticle:', error);
     throw new ApiError(
       httpStatus.INTERNAL_SERVER_ERROR, 
       "Unable to create article due to an unexpected error"

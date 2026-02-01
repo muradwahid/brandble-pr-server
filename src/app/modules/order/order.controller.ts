@@ -22,6 +22,21 @@ const userAllOrders = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const userPublishedOrders = catchAsync(async (req: Request, res: Response) => {
+
+  const user = req.user;
+  const options = pick(req.query, paginationFields);
+  const filters = pick(req.query, orderFilterableFields as (keyof typeof req.query)[]);
+  const result = await OrderService.userPublishedOrders(filters, options, user?.id as string);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Published Orders retrieved successfully!',
+    data: result,
+  });
+})
+
 const getAdminAllOrders = catchAsync(async (req: Request, res: Response) => {
 
 
@@ -191,6 +206,7 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
 
 export const OrderController = {
   userAllOrders,
+  userPublishedOrders,
   getAdminAllOrders,
   getAdminOrders,
   createOrder,

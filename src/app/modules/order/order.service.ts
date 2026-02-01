@@ -11,6 +11,7 @@ import { dayNames, directSortableFields, nestedSortableFields, singleUserOrderSe
 import { IOrder, IOrderSearchableFields } from './order.interface';
 import { eachDayOfInterval, eachHourOfInterval, eachMonthOfInterval } from './order.functions';
 import { Prisma } from '@prisma/client';
+import { logger } from '../../../shared/logger';
 
 const userAllOrders = async (
   filters: IOrderSearchableFields,
@@ -186,6 +187,51 @@ const userAllOrders = async (
     },
     data: result,
   };
+};
+
+const userPublishedOrders = async (
+  filters: IOrderSearchableFields,
+  options: IPaginationOptions,
+  userId: string
+) => { 
+  // const { searchTerm, ...filterData } = filters;
+
+  const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+  const whereConditions: Prisma.OrderWhereInput = {
+    userId,
+    status: 'published',
+  };
+
+  const result = await prisma.order.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy:
+      options.sortBy && options.sortOrder
+        ? {
+          [options.sortBy as any]: options.sortOrder,
+        }
+        : {
+          createdAt: 'desc',
+        },
+    include: {
+      user: true,
+      wonArticle: true,
+      writeArticle: true,
+      publication:true
+    }
+  });
+
+  const total = await prisma.order.count({ where: whereConditions });
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+
 };
 
 
@@ -1203,7 +1249,7 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
           adminUserId
         );
       } catch (error) {
-        console.error('Notification failed (but order updated):', error);
+        logger.error('Notification failed (but order updated):', error);
       }
     } 
 
@@ -1213,6 +1259,7 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
 
 export const OrderService = {
   userAllOrders,
+  userPublishedOrders,
   getAdminAllOrders,
   getAdminOrders,
   createOrder,

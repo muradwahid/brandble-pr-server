@@ -1,0 +1,4 @@
+Sun Feb 01 2026 21:10:40 } [BRANDABLE] info: SIGTERM received
+Sun Feb 01 2026 21:11:8 } [BRANDABLE] info: Server running on port 5050
+Sun Feb 01 2026 21:11:8 } [BRANDABLE] info: Express API routes available
+Sun Feb 01 2026 21:11:8 } [BRANDABLE] info: Socket.io running on same port
