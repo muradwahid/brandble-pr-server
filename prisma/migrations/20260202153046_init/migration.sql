@@ -1,6 +1,3 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "public";
-
 -- CreateTable
 CREATE TABLE "public"."User" (
     "id" TEXT NOT NULL,
@@ -112,11 +109,10 @@ CREATE TABLE "public"."publications" (
     "favorite" TEXT[],
     "price" TEXT NOT NULL,
     "location" TEXT,
-    "index" TEXT NOT NULL,
-    "sponsor" TEXT NOT NULL,
-    "doFollow" TEXT NOT NULL,
-    "niches" TEXT[] DEFAULT ARRAY[]::TEXT[],
-    "genre" TEXT NOT NULL,
+    "index" TEXT,
+    "sponsor" TEXT,
+    "doFollow" TEXT,
+    "genre" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -306,6 +302,14 @@ CREATE TABLE "public"."_PublicationCities" (
     CONSTRAINT "_PublicationCities_AB_pkey" PRIMARY KEY ("A","B")
 );
 
+-- CreateTable
+CREATE TABLE "public"."_PublicationNiches" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL,
+
+    CONSTRAINT "_PublicationNiches_AB_pkey" PRIMARY KEY ("A","B")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_userId_key" ON "public"."User"("userId");
 
@@ -347,6 +351,9 @@ CREATE INDEX "_PublicationCountries_B_index" ON "public"."_PublicationCountries"
 
 -- CreateIndex
 CREATE INDEX "_PublicationCities_B_index" ON "public"."_PublicationCities"("B");
+
+-- CreateIndex
+CREATE INDEX "_PublicationNiches_B_index" ON "public"."_PublicationNiches"("B");
 
 -- AddForeignKey
 ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -429,3 +436,8 @@ ALTER TABLE "public"."_PublicationCities" ADD CONSTRAINT "_PublicationCities_A_f
 -- AddForeignKey
 ALTER TABLE "public"."_PublicationCities" ADD CONSTRAINT "_PublicationCities_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."publications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AddForeignKey
+ALTER TABLE "public"."_PublicationNiches" ADD CONSTRAINT "_PublicationNiches_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."niches"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."_PublicationNiches" ADD CONSTRAINT "_PublicationNiches_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."publications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
