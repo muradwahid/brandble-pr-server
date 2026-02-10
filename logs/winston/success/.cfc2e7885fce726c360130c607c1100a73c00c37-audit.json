@@ -1,0 +1,40 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/.cfc2e7885fce726c360130c607c1100a73c00c37-audit.json",
+    "files": [
+        {
+            "date": 1770219874116,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-04-02-21-success.log",
+            "hash": "f473553e692cae73a2283051949afb3937826b734bab4e4313f44ba0bfa25cc8"
+        },
+        {
+            "date": 1770221882829,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-04-02-22-success.log",
+            "hash": "1374f32492a95e6aea9375f45548172077ad0b51c46e05c00fb5976091f7bbc7"
+        },
+        {
+            "date": 1770224698876,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-04-02-23-success.log",
+            "hash": "cbfd5d45f652905ce45ecd85af46b5a878afa319e08b8c143774f91aca80596d"
+        },
+        {
+            "date": 1770393133569,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-06-02-21-success.log",
+            "hash": "e3df959b190a96afd6c01a1e9eff88c4a78f04440e5824a99fc57047ecee2b4d"
+        },
+        {
+            "date": 1770396792988,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-06-02-22-success.log",
+            "hash": "b934f600721557052c70ca36b4a0d9437d1e3e17c3d734b0860a0d2190977fb8"
+        },
+        {
+            "date": 1770398818783,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/success/brandable-2026-06-02-23-success.log",
+            "hash": "6782dd702e4ef285f3cbf88b0c546a3cb2fe51ba5d0cdffefd110b179243e1c0"
+        }
+    ],
+    "hashType": "sha256"
+}

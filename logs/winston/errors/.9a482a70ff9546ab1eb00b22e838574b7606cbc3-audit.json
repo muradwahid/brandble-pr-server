@@ -1,0 +1,40 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/.9a482a70ff9546ab1eb00b22e838574b7606cbc3-audit.json",
+    "files": [
+        {
+            "date": 1770219874117,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-04-02-21-error.log",
+            "hash": "62d49c6456c0ca6110661525d3e186bda2329d4eceaf4f8c2521e1a152a94272"
+        },
+        {
+            "date": 1770221882830,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-04-02-22-error.log",
+            "hash": "a5a179a7e2b20b6609663dba6cc722d822b5a48d61df5459b452c42b3abbc440"
+        },
+        {
+            "date": 1770224699178,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-04-02-23-error.log",
+            "hash": "78a5a65a215c3d33b9baa8402e90d34c999eede425f22e1d709222f141468020"
+        },
+        {
+            "date": 1770393133570,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-06-02-21-error.log",
+            "hash": "931c0346a148a886944e164485ae9445e7d454e90b3a488f569b060a2b89caea"
+        },
+        {
+            "date": 1770396792989,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-06-02-22-error.log",
+            "hash": "6605c2924b2800fbb755a62223ea7a8b5486b45312caec350092c5bdeeba6768"
+        },
+        {
+            "date": 1770398819028,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-06-02-23-error.log",
+            "hash": "e48067a97c23d071fe77f909f789ad7e53ef3262728fd7f041f3feb6c1dbc96f"
+        }
+    ],
+    "hashType": "sha256"
+}

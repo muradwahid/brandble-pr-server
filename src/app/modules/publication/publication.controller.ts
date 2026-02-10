@@ -35,6 +35,18 @@ const getAllPublications = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const exportPublicationsToExcel = catchAsync(async (req: Request, res: Response) => {
+  const workbook = await PublicationService.exportPublicationsToExcel();
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader('Content-Disposition', 'attachment; filename=publications.xlsx');
+
+  // সরাসরি রেসপন্স স্ট্রিমে রাইট করুন
+  await (workbook as any).xlsx.write(res);
+  res.end();
+});
+
 const getSearchPublications = catchAsync(async (req: Request, res: Response) => {
 
   const filters = pick(req.query, ['searchTerm']);
@@ -98,6 +110,7 @@ const deletePublication = catchAsync(async (req: Request, res: Response) => {
 export const PublicationController = {
   createPublication,
   getAllPublications,
+  exportPublicationsToExcel,
   getSearchPublications,
   getPublicationById,
   updatePublication,

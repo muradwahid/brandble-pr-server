@@ -1,4 +1,5 @@
 import { Publication } from '@prisma/client';
+import { Workbook } from 'exceljs';
 import { startOfMonth, subMonths, format } from 'date-fns';
 import { FileUploadHelper } from '../../../helpers/FileUploadHelper';
 import { paginationHelpers } from '../../../helpers/paginationHelper';
@@ -27,11 +28,25 @@ const createPublication = async (
     restData.logo = uploadedProfileImage.secure_url;
   }
 
+  const parseToArray = (field: any) => {
+    if (!field || field === "") return []; 
+    if (typeof field === "string") {
+      try {
+        return JSON.parse(field);
+      } catch (e) {
+        return [];
+      }
+    }
+    return Array.isArray(field) ? field : [];
+  };
+
+  const parsedNiches = parseToArray(niches);
+
   const result = await prisma.publication.create({
     data: {
       ...restData,
       niches: {
-        connect: niches?.map((id: string) => ({ id })) || [],
+        connect: parsedNiches.map((id:any) => ({ id })),
       },
       countries: {
         connect: countries?.map((id: string) => ({ id })) || [],
@@ -204,122 +219,70 @@ const getAllPublications = async (
   };
 };
 
+const exportPublicationsToExcel = async () => {
+  const publications = await prisma.publication.findMany({
+    include: {
+      countries: true,
+      states: true,
+      cities: true,
+      niches: true
+    }
+  });
 
-// const getAllPublications = async (
-//   filters: IPublicationFilterableFields,
-//   options: IPaginationOptions,
-// ) => {
-//   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+  const workbook = new Workbook();
+  const worksheet = workbook.addWorksheet('Publications');
 
-//   const {
-//     searchTerm,
-//     minPrice,
-//     maxPrice,
-//     sortBy: rawSortBy,
-//     sortOrder = 'desc',
-//     ...exactFilters
-//   } = filters;
+  worksheet.columns = [
+    { header: 'Publication ID', key: 'publicationId', width: 20 },
+    { header: 'Title', key: 'title', width: 30 },
+    { header: 'Price', key: 'price', width: 12 },
+    { header: 'Scope', key: 'scope', width: 15 },
+    { header: 'DA', key: 'da', width: 8 },
+    { header: 'DR', key: 'dr', width: 8 },
+    { header: 'TAT', key: 'tat', width: 10 },
+    { header: 'TTP', key: 'ttp', width: 10 },
+    { header: 'Location', key: 'location', width: 15 },
+    { header: 'Index', key: 'index', width: 15 },
+    { header: 'Sponsor', key: 'sponsor', width: 15 },
+    { header: 'DoFollow', key: 'doFollow', width: 12 },
+    { header: 'Genre', key: 'genre', width: 15 },
+    { header: 'Niches', key: 'niches', width: 25 },
+    { header: 'Countries', key: 'countries', width: 25 },
+    { header: 'States', key: 'states', width: 20 },
+    { header: 'Cities', key: 'cities', width: 20 },
+    { header: 'Logo URL', key: 'logo', width: 40 },
+    { header: 'Created At', key: 'createdAt', width: 20 },
+  ];
 
-//   // === 1. Build WHERE conditions ===
-//   const andConditions = [];
+  worksheet.getRow(1).font = { bold: true };
 
-//   // Full-text search across multiple fields
-//   if (searchTerm) {
-//     andConditions.push({
-//       OR: publicationSearchableFields.map(field => ({
-//         [field]: {
-//           contains: searchTerm,
-//           mode: 'insensitive' as const,
-//         },
-//       })),
-//     });
-//   }
+  publications.forEach((pub) => {
+    worksheet.addRow({
+      publicationId: pub.publicationId,
+      title: pub.title,
+      price: pub.price,
+      scope: pub.scope || 'N/A',
+      da: pub.da || 'N/A',
+      dr: pub.dr || 'N/A',
+      tat: pub.tat || 'N/A',
+      ttp: pub.ttp || 'N/A',
+      location: pub.location || 'N/A',
+      index: pub.index || 'N/A',
+      sponsor: pub.sponsor || 'N/A',
+      doFollow: pub.doFollow || 'N/A',
+      genre: pub.genre || 'N/A',
+      logo: pub.logo || '',
+      niches: pub.niches?.map((n: any) => n.name).join(', ') || '',
+      countries: pub.countries?.map((c: any) => c.name).join(', ') || '',
+      states: pub.states?.map((s: any) => s.name).join(', ') || '',
+      cities: pub.cities?.map((city: any) => city.name).join(', ') || '',
+      createdAt: pub.createdAt.toISOString(),
+    });
+  });
 
-//   // Price range filter
-//   if (minPrice || maxPrice) {
-//     andConditions.push({
-//       price: {
-//         ...(minPrice && { gte: Number(minPrice) }),
-//         ...(maxPrice && { lte: Number(maxPrice) }),
-//       },
-//     });
-//   }
-
-//   // Exact match filters (genre, doFollow, etc.)
-//   const validFilterKeys = Object.keys(exactFilters).filter(key =>
-//     publicationFilterableFields.includes(key as any),
-//   );
-
-//   if (validFilterKeys.length > 0) {
-//     validFilterKeys.forEach(key => {
-//       andConditions.push({
-//         [key]: exactFilters[key],
-//       });
-//     });
-//   }
-
-//   const whereConditions =
-//     andConditions.length > 0 ? { AND: andConditions as any } : {};
-
-//   // === 2. Build ORDER BY ===
-//   const validSortBy = publicationSortableFields.includes(rawSortBy as any)
-//     ? rawSortBy
-//     : 'createdAt';
-
-//   const orderBy = {
-//     [validSortBy as string]: sortOrder,
-//   };
-
-//   const [publications, total] = await prisma.$transaction([
-//     prisma.publication.findMany({
-//       where: whereConditions,
-//       skip,
-//       take: limit,
-//       orderBy,
-//       // include: {
-//         // niches: {
-//         //   select: {
-//         //     id: true,
-//         //     title: true,
-//         //   },
-//         // },
-//       // }
-//     }),
-
-//     // Count total for pagination
-//     prisma.publication.count({ where: whereConditions }),
-//   ]);
-
-//   const publicationsWithNiches = await Promise.all(
-//     publications.map(async (pub) => {
-//       if (!pub.niches || pub.niches.length === 0) {
-//         return { ...pub, niches: [] };
-//       }
-
-//       const nicheDetails = await prisma.niche.findMany({
-//         where: {
-//           id: { in: pub.niches as string[] },
-//         },
-//         select: { id: true, title: true }
-//       });
-
-//       return {
-//         ...pub,
-//         niches: nicheDetails,
-//       };
-//     }),
-//   );
-
-//   return {
-//     meta: {
-//       page,
-//       limit,
-//       total,
-//       totalPage: Math.ceil(total / limit),
-//     },
-//     data: publicationsWithNiches,
-//   };
-// };
+  const publicationsExcel = await workbook.xlsx.writeBuffer();
+  return workbook;
+};
 
 const getSearchPublications = async (filters:any) => { 
   const { searchTerm } = filters;
@@ -525,6 +488,7 @@ const deletePublication = async (id: string): Promise<Publication | null> => {
 export const PublicationService = {
   createPublication,
   getAllPublications,
+  exportPublicationsToExcel,
   getSearchPublications,
   getPublicationById,
   updatePublication,
