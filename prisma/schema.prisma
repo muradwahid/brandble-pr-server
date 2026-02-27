@@ -8,105 +8,90 @@ datasource db {
 }
 
 model User {
-  id               String    @id @default(uuid())
-  userId           String    @unique @default(nanoid(15))
-  stripeCustomerId String?   @unique
+  id               String            @id @default(uuid())
+  userId           String            @unique @default(nanoid(15))
+  stripeCustomerId String?           @unique
   name             String
-  email            String
+  email            String            @unique
   password         String?
-  role             String    @default("client")
+  role             String            @default("client")
   image            String?
   company          String?
   designation      String?
   phoneNumber      String?
   paymentStatus    String?
-
-  orders           Order[]
-  payment          PaymentMethod[]
+  otp              String?
+  otpExpires       DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   adminAssignments AdminAssignment[] @relation("AdminAssignments")
   userAssignments  AdminAssignment[] @relation("UserAssignments")
-
-  chatParticipants ChatParticipant[]
   chatMessages     ChatMessage[]
-  userChatRooms    ChatRoom[] @relation("UserChatRooms")  // Fixed relation
-  adminChatRooms   ChatRoom[] @relation("AdminChatRooms") // Fixed relation
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  notifications Notification[]
+  chatParticipants ChatParticipant[]
+  adminChatRooms   ChatRoom[]        @relation("AdminChatRooms")
+  userChatRooms    ChatRoom[]        @relation("UserChatRooms")
+  notifications    Notification[]
+  orders           Order[]
+  payment          PaymentMethod[]
 }
 
 model Order {
-  id               String   @id @default(uuid())
-  orderId          String   @unique @default(nanoid(15))
-  detailsSubmitted String?  @default("not-yet")
-  status           String   @default("pending")
+  id               String            @id @default(uuid())
+  orderId          String            @unique @default(nanoid(15))
+  detailsSubmitted String?           @default("not-yet")
+  status           String            @default("pending")
   publicationId    String
-  methodId         String
+  methodId         String?
   paymentMethodId  String?
-  orderType        String   @default("wonArticle")
+  // orderType        String            @default("wonArticle")
+  paymentStatus     String           @default("pending")
+  orderType        String            @default("")
   amount           Int
-
-  // Optional fields for different article types
-  wonArticleId   String?
-  writeArticleId String?
-
-  userId       String?
-  user         User?            @relation(fields: [userId], references: [id])
-  publication  Publication?      @relation(fields: [publicationId], references: [id])
-  wonArticle   WonArticle?     @relation(fields: [wonArticleId], references: [id])
-  writeArticle WriteArticle?   @relation(fields: [writeArticleId], references: [id])
-  paymentMethod       PaymentMethod?   @relation(fields: [paymentMethodId], references: [id])
+  wonArticleId     String?
+  writeArticleId   String?
+  userId           String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   adminAssignments AdminAssignment[] @relation("OrderAdminAssignments")
   chatRoom         ChatRoom?
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  notifications    Notification[]
+  paymentMethod    PaymentMethod?    @relation(fields: [paymentMethodId], references: [id])
+  publication      Publication       @relation(fields: [publicationId], references: [id])
+  user             User?             @relation(fields: [userId], references: [id])
+  wonArticle       WonArticle?       @relation(fields: [wonArticleId], references: [id])
+  writeArticle     WriteArticle?     @relation(fields: [writeArticleId], references: [id])
 
   @@map("orders")
-  notifications Notification[]
 }
 
 model PaymentMethod {
   id                    String   @id @default(uuid())
   userId                String
   stripePaymentMethodId String   @unique
-  type                  String  
+  type                  String
   brand                 String
   last4                 String
   expMonth              Int?
   expYear               Int?
   isDefault             Boolean  @default(false)
-  
-  // Billing details
   email                 String?
   name                  String?
   phone                 String?
   billingAddress        String?
-  
   createdAt             DateTime @default(now())
-  
+  order                 Order[]
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order                  Order[]
-  
+
   @@map("payment_methods")
 }
-
-// model Service {
-//   id     String  @id @default(uuid())
-//   name   String
-//   orders Order[] @relation("OrderToService")
-
-//   @@map("services")
-// }
 
 model WonArticle {
   id        String   @id @default(uuid())
   file      String
   message   String?
-  orders    Order[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 
   @@map("won_articles")
 }
@@ -138,8 +123,8 @@ model WriteArticle {
 }
 
 model Publication {
-  id            String   @id @default(uuid())
-  publicationId String   @unique @default(nanoid(15))
+  id            String     @id @default(uuid())
+  publicationId String     @unique @default(nanoid(15))
   title         String
   logo          String?
   scope         String?
@@ -148,22 +133,20 @@ model Publication {
   tat           String?
   ttp           String?
   favorite      String[]
-  price         String
+  price         Float?
   location      String?
   index         String?
-  // nicheId   String?
   sponsor       String?
   doFollow      String?
-  // genreId   String[]
   genre         String?
-  orders        Order[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
   favorites     Favorite[]
-  niches        Niche[]   @relation("PublicationNiches")
-  countries     Country[] @relation("PublicationCountries")
-  states        State[]   @relation("PublicationStates")
-  cities        City[]    @relation("PublicationCities")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  orders        Order[]
+  cities        City[]     @relation("PublicationCities")
+  countries     Country[]  @relation("PublicationCountries")
+  niches        Niche[]    @relation("PublicationNiches")
+  states        State[]    @relation("PublicationStates")
 
   @@map("publications")
 }
@@ -172,11 +155,10 @@ model Country {
   id           String        @id @default(uuid())
   name         String
   code         String?
-  states       State[]
-  publications Publication[] @relation("PublicationCountries")
-  
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  states       State[]
+  publications Publication[] @relation("PublicationCountries")
 
   @@map("countries")
 }
@@ -185,12 +167,11 @@ model State {
   id           String        @id @default(uuid())
   name         String
   countryId    String?
-  country      Country?      @relation(fields: [countryId], references: [id])
-  cities       City[]
-  publications Publication[] @relation("PublicationStates")
-
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  cities       City[]
+  country      Country?      @relation(fields: [countryId], references: [id])
+  publications Publication[] @relation("PublicationStates")
 
   @@map("states")
 }
@@ -199,35 +180,32 @@ model City {
   id           String        @id @default(uuid())
   name         String
   stateId      String?
-  state        State?        @relation(fields: [stateId], references: [id])
-  publications Publication[] @relation("PublicationCities")
-
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
+  state        State?        @relation(fields: [stateId], references: [id])
+  publications Publication[] @relation("PublicationCities")
 
   @@map("cities")
 }
 
-
-
 model Favorite {
-  id        String   @id @default(uuid())
-  userId    String
+  id            String      @id @default(uuid())
+  userId        String
   publicationId String
-  publication Publication @relation(fields: [publicationId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  publication   Publication @relation(fields: [publicationId], references: [id])
 
   @@map("favorites")
 }
 
 model Niche {
-  id        String   @id @default(uuid())
-  title     String
-  icon      String?
+  id           String        @id @default(uuid())
+  title        String
+  icon         String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   publications Publication[] @relation("PublicationNiches")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("niches")
 }
@@ -268,41 +246,38 @@ model DoFollow {
   @@map("dofollows")
 }
 
-
 model Notification {
-  id           String   @id @default(uuid())
-  title        String
-  message      String
-  type         String 
-  status       String   @default("unread")
-  recipientId  String   
-  orderId      String?  
-  order        Order?   @relation(fields: [orderId], references: [id])
-  userId       String  
-  user         User?    @relation(fields: [userId], references: [id])
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id          String   @id @default(uuid())
+  title       String
+  message     String
+  type        String
+  status      String   @default("unread")
+  recipientId String
+  orderId     String?
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  order       Order?   @relation(fields: [orderId], references: [id])
+  user        User     @relation(fields: [userId], references: [id])
 
-  @@map("notifications")
   @@index([recipientId, status])
   @@index([createdAt])
+  @@map("notifications")
 }
 
 model ChatRoom {
-  id        String   @id @default(uuid())
-  roomId    String   @unique @default(nanoid(15))
-  orderId   String?  @unique
-  userId    String
-  adminId   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt // Fixed: added @updatedAt
-
-  // Relations
-  order       Order?             @relation(fields: [orderId], references: [id])
-  user        User               @relation("UserChatRooms", fields: [userId], references: [id])
-  admin       User               @relation("AdminChatRooms", fields: [adminId], references: [id])
+  id           String            @id @default(uuid())
+  roomId       String            @unique @default(nanoid(15))
+  orderId      String?           @unique
+  userId       String
+  adminId      String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  messages     ChatMessage[]
   participants ChatParticipant[]
-  messages    ChatMessage[]
+  admin        User              @relation("AdminChatRooms", fields: [adminId], references: [id])
+  order        Order?            @relation(fields: [orderId], references: [id])
+  user         User              @relation("UserChatRooms", fields: [userId], references: [id])
 
   @@map("chat_rooms")
 }
@@ -312,10 +287,8 @@ model ChatParticipant {
   userId     String
   chatRoomId String
   joinedAt   DateTime @default(now())
-
-  // Relations
-  user     User     @relation(fields: [userId], references: [id])
-  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+  chatRoom   ChatRoom @relation(fields: [chatRoomId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, chatRoomId])
   @@map("chat_participants")
@@ -327,27 +300,24 @@ model ChatMessage {
   content     String
   senderId    String
   chatRoomId  String
-  messageType String   @default("text") // text, image, file, etc.
+  messageType String   @default("text")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relations
-  sender   User     @relation(fields: [senderId], references: [id])
-  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+  chatRoom    ChatRoom @relation(fields: [chatRoomId], references: [id])
+  sender      User     @relation(fields: [senderId], references: [id])
 
   @@map("chat_messages")
 }
 
 model AdminAssignment {
-  id        String   @id @default(uuid())
-  adminId   String
-  userId    String?
-  orderId   String?
+  id         String   @id @default(uuid())
+  adminId    String
+  userId     String?
+  orderId    String?
   assignedAt DateTime @default(now())
-
-  admin User  @relation("AdminAssignments", fields: [adminId], references: [id])
-  user  User? @relation("UserAssignments", fields: [userId], references: [id])
-  order Order? @relation("OrderAdminAssignments", fields: [orderId], references: [id])
+  admin      User     @relation("AdminAssignments", fields: [adminId], references: [id])
+  order      Order?   @relation("OrderAdminAssignments", fields: [orderId], references: [id])
+  user       User?    @relation("UserAssignments", fields: [userId], references: [id])
 
   @@map("admin_assignments")
 }

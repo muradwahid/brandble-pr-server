@@ -85,17 +85,23 @@ const getAllPublications = async (
     states,
     cities,
     sortBy: rawSortBy,
-    sortOrder = 'desc',
+    sortOrder,
+    title = 'asc',
+    da,
+    dr,
+    scope,
     ...restFilters
   } = filters;
 
   const andConditions = [];
-
-
   
   const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
   const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
   const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  const scopeList = scope?.split(',').map((item: string) => item.trim()).filter(Boolean);
+
+  const priceMin = minPrice ? parseFloat(minPrice) : undefined;
+  const priceMax = maxPrice ? parseFloat(maxPrice) : undefined;
 
   // 1. Full-text search
   if (searchTerm) {
@@ -113,8 +119,8 @@ const getAllPublications = async (
   if (minPrice || maxPrice) {
     andConditions.push({
       price: {
-        ...(minPrice && { gte: String(minPrice) }),
-        ...(maxPrice && { lte: String(maxPrice) }),
+        ...(priceMin !== undefined ? { gte: priceMin } : {}),
+        ...(priceMax !== undefined ? { lte: priceMax } : {}),
       },
     });
   }
@@ -166,26 +172,64 @@ const getAllPublications = async (
       },
     });
   }
+  if (scopeList?.length) {
+    andConditions.push({
+      scope: {
+        in: scopeList,
+        mode:'insensitive'
+      }
+    });
+  }
 
   // 4. Other exact filters
   Object.keys(restFilters).forEach(key => {
     const value = restFilters[key];
     if (value !== undefined && value !== '') {
       if (key === 'doFollow') {
-        andConditions.push({ doFollow: value});
+        andConditions.push({ doFollow: {contains:value, mode: 'insensitive'} });
       } else {
-        andConditions.push({ [key]: value });
+        andConditions.push({ [key]: {contains:value, mode: 'insensitive'} });
       }
     }
   });
 
   const whereConditions: any = andConditions.length > 0 ? { AND: andConditions } : {};
 
-  const sortBy = publicationSortableFields.includes(rawSortBy as any)
-    ? rawSortBy
-    : 'createdAt';
+  // const sortBy = publicationSortableFields.includes(rawSortBy as any)
+    // ? rawSortBy
+    // : 'createdAt';
 
-  const orderBy = { [sortBy as string]: sortOrder };
+  // const orderBy:any = { title: 'asc' };
+
+  // const orderBy: any[] = [{ [sortBy as string]: sortOrder }, { title: title as string }];
+
+  const orderBy: any[] = [];
+
+  if (rawSortBy && publicationSortableFields.includes(rawSortBy as any)) {
+    const direction = sortOrder === 'desc' ? 'desc' : 'asc';
+    orderBy.push({ [rawSortBy as any]: direction });
+  }
+
+  if (da && ['asc', 'desc'].includes(da)) {
+    console.log('Adding DA to orderBy: ', da);
+    orderBy.push({ da: da as 'asc' | 'desc' });
+  }
+
+  if (dr && ['asc', 'desc'].includes(dr)) {
+    console.log('Adding DR to orderBy: ', dr);
+    orderBy.push({ dr: dr as 'asc' | 'desc' });
+  }
+
+  if (title && ['asc', 'desc'].includes(title)) {
+    orderBy.push({ title: title as 'asc' | 'desc' });
+  }
+
+  if (orderBy.length === 0) {
+    orderBy.push(
+      { createdAt: 'desc' },
+      { title: 'asc' }
+    );
+  }
 
   const result = await prisma.publication.findMany({
     where: whereConditions,

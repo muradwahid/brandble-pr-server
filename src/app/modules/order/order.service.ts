@@ -12,6 +12,10 @@ import { IOrder, IOrderSearchableFields } from './order.interface';
 import { eachDayOfInterval, eachHourOfInterval, eachMonthOfInterval } from './order.functions';
 import { Prisma } from '@prisma/client';
 import { logger } from '../../../shared/logger';
+import Stripe from 'stripe';
+import config from '../../../config';
+
+const stripe = new Stripe(config.stripe.secretKey as string);
 
 const userAllOrders = async (
   filters: IOrderSearchableFields,
@@ -177,7 +181,7 @@ const userAllOrders = async (
     },
   });
 
-  const total = await prisma.order.count();
+  const total = await prisma.order.count({ where: whereConditions });
 
   return {
     meta: {
@@ -452,7 +456,7 @@ export const getAdminOrders = async (filters: any, options: IPaginationOptions) 
     }
   }
 
-  // ✅ createdAt default = today, but if filters.date exists then use that day
+  //createdAt default = today, but if filters.date exists then use that day
   {
     const baseDate = filters.date ? new Date(filters.date) : new Date();
 
@@ -696,47 +700,75 @@ const userOrders = async (
 
 
 const createOrder = async (order: any) => {
-  const {
-    userId,
-    publicationId,
-    wonArticleId,
-    writeArticleId,
-    paymentMethodId,
-    methodId,
-    amount,
-  } = order;
-  const data: any = {
-    methodId,
-    amount,
-    ...(userId && {
-      user: { connect: { id: userId } },
-    }),
-    ...(publicationId && {
-      publication: { connect: { id: publicationId } },
-    }),
-    ...(wonArticleId && {
-      wonArticle: { connect: { id: wonArticleId } },
-    }),
-    ...(writeArticleId && {
-      writeArticle: { connect: { id: writeArticleId } },
-    }),
-    ...(paymentMethodId && {
-      paymentMethod: { connect: { id: paymentMethodId } },
-    }),
-  };
+  const { userId, publicationIds, paymentMethodId, currency = 'usd' } = order;
 
-  const result = await prisma.order.create({
-    data,
-    include: {
-      user: true,
-      publication: true,
-      wonArticle: true,
-      writeArticle: true,
-      paymentMethod: true,
-    },
+  const pubIds = publicationIds.split(',').map((id: string) => id.trim());
+  const currentUser = await prisma.user.findUnique({ where: { id: userId } });
+
+  if (!currentUser?.stripeCustomerId) throw new ApiError(400, 'Stripe customer not found');
+
+  const publications = await prisma.publication.findMany({
+    where: { id: { in: pubIds } },
+    select: { id: true, price: true,title:true },
   });
 
-  return result;
+  const paymentMethod = await prisma.paymentMethod.findFirst({
+    where: {
+      stripePaymentMethodId: paymentMethodId
+    }
+  })
+
+  if (!paymentMethod) throw new ApiError(400, 'Payment method not found');
+
+
+
+  const results = [];
+
+  for (const publication of publications) {
+    const pubId = publication.id as string;
+
+    try {
+      if (!publication) {
+        results.push({ pubId, status: 'failed', error: 'Publication not found!' });
+        continue;
+      }
+
+      const amount = Math.round((publication.price || 0) * 100);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount,
+        currency,
+        customer: currentUser.stripeCustomerId,
+        payment_method: paymentMethodId,
+        off_session: true,
+        confirm: true,
+      });
+
+      if (paymentIntent.status === 'succeeded') {
+        const newOrder = await prisma.order.create({
+          data: {
+            userId,
+            publicationId: pubId,
+            amount: publication.price || 0,
+            paymentStatus: 'paid', 
+            status: 'pending',
+            paymentMethodId: paymentMethod.id
+          },
+        });
+
+        results.push({ publication, orderId: newOrder.orderId, status: 'success' });
+      } else {
+        results.push({ publication, status: 'failed', error: 'Payment failed!' });
+      }
+    } catch (error: any) {
+      results.push({ pubId, status: 'failed', error: error.message });
+    }
+  }
+
+  return {
+    message: "Order processing completed",
+    summary: results
+  };
 };
 
 const runningOrders = async (id: string) => {
@@ -747,6 +779,9 @@ const runningOrders = async (id: string) => {
       status: {
         in: ['processing', 'pending']
       }
+    },
+    orderBy: {
+      createdAt: 'desc'
     },
     include: {
       user: true,

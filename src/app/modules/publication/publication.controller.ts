@@ -42,7 +42,6 @@ const exportPublicationsToExcel = catchAsync(async (req: Request, res: Response)
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   res.setHeader('Content-Disposition', 'attachment; filename=publications.xlsx');
 
-  // সরাসরি রেসপন্স স্ট্রিমে রাইট করুন
   await (workbook as any).xlsx.write(res);
   res.end();
 });

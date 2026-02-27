@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import config from "../../../config";
+import { paginationFields } from "../../../constants/pagination";
 import ApiError from "../../../errors/ApiError";
 import catchAsync from "../../../shared/catchAsync";
-import sendResponse from "../../../shared/sendResponse";
-import { AuthService } from "./auth.service";
 import pick from "../../../shared/pick";
+import sendResponse from "../../../shared/sendResponse";
 import { authFilterAbleFields } from "./auth.constant";
-import { paginationFields } from "../../../constants/pagination";
+import { AuthService } from "./auth.service";
 
 const allUsers = catchAsync(async (req: Request, res: Response) => {
     const result = await AuthService.allUsers();
@@ -106,6 +106,38 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
 
 })
 
+const sendEmailOTP = catchAsync(async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const result = await AuthService.sendEmailOTP(email);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OTP sent successfully!',
+    data: result,
+  })
+})
+
+const verifyOTP = catchAsync(async (req: Request, res: Response) => {
+  const { email,otp } = req.body;
+  const result = await AuthService.verifyOTP(email,otp);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'OTP verify successfully!',
+    data: result,
+  })
+})
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const { password,id } = req.body;
+  const result = await AuthService.resetPassword(password, id);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password Reset Successfully!',
+    data: result,
+  })
+})
+
 const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
     const { id } = req.params;
 
@@ -150,6 +182,9 @@ export const AuthController = {
     createUser,
     loginUser,
     getSingleUser,
+    sendEmailOTP,
+  verifyOTP,
+  resetPassword,
     updateUser,
     deleteUser,
     getUserByCookie,

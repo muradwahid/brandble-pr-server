@@ -1,0 +1,47 @@
+Thu Feb 26 2026 22:35:28 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:28 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:28 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:35:40 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:35:41 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:41 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:41 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:35:44 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:35:45 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:45 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:45 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:35:49 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:35:51 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:51 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:51 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:35:53 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:35:55 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:36:27 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:36:28 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:37:55 } [BRANDABLE] error: Error in getOrCreateOrderRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:947:42
+
+  944 
+  945 // If order chat room doesn't exist, create a new one
+  946 if (!chatRoom) {
+→ 947   chatRoom = await prisma.chatRoom.create(
+Unique constraint failed on the fields: (`orderId`)
+Thu Feb 26 2026 22:49:9 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:49:9 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:49:9 } [BRANDABLE] info: Socket.io running on same port
+Thu Feb 26 2026 22:51:17 } [BRANDABLE] info: SIGTERM received
+Thu Feb 26 2026 22:51:25 } [BRANDABLE] info: Server running on port 5050
+Thu Feb 26 2026 22:51:25 } [BRANDABLE] info: Express API routes available
+Thu Feb 26 2026 22:51:25 } [BRANDABLE] info: Socket.io running on same port

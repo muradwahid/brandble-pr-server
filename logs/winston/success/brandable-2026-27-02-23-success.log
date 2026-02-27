@@ -1,0 +1,5 @@
+Fri Feb 27 2026 23:9:17 } [BRANDABLE] info: SIGTERM received
+Fri Feb 27 2026 23:9:39 } [BRANDABLE] info: HTTP server closed
+Fri Feb 27 2026 23:9:40 } [BRANDABLE] info: Server running on port 5050
+Fri Feb 27 2026 23:9:40 } [BRANDABLE] info: Express API routes available
+Fri Feb 27 2026 23:9:40 } [BRANDABLE] info: Socket.io running on same port

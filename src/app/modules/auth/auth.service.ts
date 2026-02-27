@@ -1,13 +1,16 @@
 import bcrypt from "bcrypt";
 import httpStatus from "http-status";
 import { Secret } from "jsonwebtoken";
+import otpGenerator from 'otp-generator';
 import config from "../../../config";
 import ApiError from "../../../errors/ApiError";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 import { jwtHelpers } from "../../../helpers/jwtHelpers";
+import { sendResetOtpEmail } from "../../../helpers/mail";
 import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
 import { CustomRequest, ILoginUserResponse, IUser, IUserLogin } from "./auth.interface";
+import { User } from "@prisma/client";
 
 const allUsers = async () => {
 
@@ -199,6 +202,97 @@ const getSingleUser = async (id: string) => {
     });
     return result;
 }
+
+const sendEmailOTP = async (email: string) => { 
+  const user = await prisma.user.findFirst({
+    where:{
+      email
+    }
+  });
+
+  if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+
+  const otp = otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    specialChars: false,
+    lowerCaseAlphabets: false,
+  });
+  const expiresIn = new Date(Date.now() + 10 * 60 * 1000);
+  const updateUser = await prisma.user.update({
+    where: { email },
+    data: {
+      otp,
+      otpExpires: expiresIn,
+    }
+  });
+
+  if (!updateUser) throw new ApiError(httpStatus.NOT_MODIFIED, 'Something went wrong');
+
+  await sendResetOtpEmail(email, otp);
+
+  return {
+    success:true
+  };
+}
+
+const verifyOTP = async (email: string, otp: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      otp: true,
+      otpExpires: true,
+    }
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found');
+  }
+
+  if (user.otp !== otp) {
+    throw new ApiError(401, 'OTP didn’t matched!');
+  }
+
+  if (user.otpExpires &&  new Date() > user.otpExpires) {
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { otp: null, otpExpires: null },
+    });
+
+    throw new ApiError(410, 'OTP has expired');
+  }
+
+  return user;
+};
+
+const resetPassword = async (password: string, id: string): Promise<User> => { 
+
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      otp: true,
+      otpExpires: true,
+    }
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const updateUser = await prisma.user.update({
+    where: { id },
+    data: {
+      password: hashedPassword,
+      otp: null,
+      otpExpires: null,
+    }
+  });
+
+  return updateUser;
+}
+
 const updateUser = async (
   id: string,
   req: CustomRequest,
@@ -249,13 +343,15 @@ const getAdminRole = async () => {
 }
 
 
-
 export const AuthService = {
     allUsers,
     createUser,
     loginUser,
+  verifyOTP,
+  resetPassword,
     getSingleUser,
-    updateUser,
+      sendEmailOTP,
+      updateUser,
   deleteUser,
   getUserByCookie,
   getAdminRole,

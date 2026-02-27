@@ -59,7 +59,6 @@ export const initializeSocket = (server: any) => {
     }) => {
       try {
         const { chatRoomId, senderId, content, messageType = 'text' } = data;
-        console.log("socket data", data);
         // Save message to database
         const message = await chatService.sendMessage(chatRoomId, senderId, content, messageType);
 

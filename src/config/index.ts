@@ -22,5 +22,9 @@ export default {
   },
   stripe:{
     secretKey: process.env.STRIPE_SECRET_KEY,
+  },
+  mailer: {
+    email: process.env.EMAIL_USER,
+    password: process.env.EMAIL_PASS,
   }
 };

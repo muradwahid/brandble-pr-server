@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 import { AuthController } from "./auth.controller";
+import auth from "../../middlewares/auth";
+import { ENUM_USER_ROLE } from "../../../enums/user";
 
 const router = Router();
 
@@ -9,6 +11,9 @@ router.get('/all-users', AuthController.allUsers);
 router.get('/user-all-info',AuthController.userAllInfo)
 router.get('/:id', AuthController.getSingleUser);
 router.post('/signup', AuthController.createUser);
+router.patch('/send-email-otp', AuthController.sendEmailOTP);
+router.patch('/check-otp', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), AuthController.verifyOTP);
+router.patch('/update-password', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), AuthController.resetPassword);
 router.get('/get-user-by-cookie', AuthController.getUserByCookie);
 router.post('/signout', AuthController.getUserByCookie);
 router.post('/signin', AuthController.loginUser);

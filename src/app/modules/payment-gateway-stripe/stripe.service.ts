@@ -337,7 +337,7 @@ const processPayment = async (req: CustomRequest) => {
         }
     })
 
-    if (!currentUser) throw new ApiError(401, 'User not authenticated');
+    if (!currentUser) throw new ApiError(httpStatus.UNAUTHORIZED, 'User not authenticated');
 
     const total = Math.round(amount * 100);
 
