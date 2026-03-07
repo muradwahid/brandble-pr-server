@@ -1,3 +1,6 @@
+-- CreateSchema
+CREATE SCHEMA IF NOT EXISTS "public";
+
 -- CreateTable
 CREATE TABLE "public"."User" (
     "id" TEXT NOT NULL,
@@ -12,6 +15,8 @@ CREATE TABLE "public"."User" (
     "designation" TEXT,
     "phoneNumber" TEXT,
     "paymentStatus" TEXT,
+    "otp" TEXT,
+    "otpExpires" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -25,9 +30,10 @@ CREATE TABLE "public"."orders" (
     "detailsSubmitted" TEXT DEFAULT 'not-yet',
     "status" TEXT NOT NULL DEFAULT 'pending',
     "publicationId" TEXT NOT NULL,
-    "methodId" TEXT NOT NULL,
+    "methodId" TEXT,
     "paymentMethodId" TEXT,
-    "orderType" TEXT NOT NULL DEFAULT 'wonArticle',
+    "paymentStatus" TEXT NOT NULL DEFAULT 'pending',
+    "orderType" TEXT NOT NULL DEFAULT '',
     "amount" INTEGER NOT NULL,
     "wonArticleId" TEXT,
     "writeArticleId" TEXT,
@@ -53,7 +59,14 @@ CREATE TABLE "public"."payment_methods" (
     "name" TEXT,
     "phone" TEXT,
     "billingAddress" TEXT,
+    "country" TEXT,
+    "state" TEXT,
+    "city" TEXT,
+    "postalCode" TEXT,
+    "line1" TEXT,
+    "line2" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "payment_methods_pkey" PRIMARY KEY ("id")
 );
@@ -107,7 +120,7 @@ CREATE TABLE "public"."publications" (
     "tat" TEXT,
     "ttp" TEXT,
     "favorite" TEXT[],
-    "price" TEXT NOT NULL,
+    "price" DOUBLE PRECISION,
     "location" TEXT,
     "index" TEXT,
     "sponsor" TEXT,
@@ -317,6 +330,9 @@ CREATE UNIQUE INDEX "User_userId_key" ON "public"."User"("userId");
 CREATE UNIQUE INDEX "User_stripeCustomerId_key" ON "public"."User"("stripeCustomerId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "public"."User"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "orders_orderId_key" ON "public"."orders"("orderId");
 
 -- CreateIndex
@@ -356,19 +372,19 @@ CREATE INDEX "_PublicationCities_B_index" ON "public"."_PublicationCities"("B");
 CREATE INDEX "_PublicationNiches_B_index" ON "public"."_PublicationNiches"("B");
 
 -- AddForeignKey
-ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_paymentMethodId_fkey" FOREIGN KEY ("paymentMethodId") REFERENCES "public"."payment_methods"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_publicationId_fkey" FOREIGN KEY ("publicationId") REFERENCES "public"."publications"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_wonArticleId_fkey" FOREIGN KEY ("wonArticleId") REFERENCES "public"."won_articles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_writeArticleId_fkey" FOREIGN KEY ("writeArticleId") REFERENCES "public"."write_articles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "public"."orders" ADD CONSTRAINT "orders_paymentMethodId_fkey" FOREIGN KEY ("paymentMethodId") REFERENCES "public"."payment_methods"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."payment_methods" ADD CONSTRAINT "payment_methods_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -389,34 +405,34 @@ ALTER TABLE "public"."notifications" ADD CONSTRAINT "notifications_orderId_fkey"
 ALTER TABLE "public"."notifications" ADD CONSTRAINT "notifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "public"."chat_rooms" ADD CONSTRAINT "chat_rooms_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "public"."chat_rooms" ADD CONSTRAINT "chat_rooms_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "public"."orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."chat_rooms" ADD CONSTRAINT "chat_rooms_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."chat_rooms" ADD CONSTRAINT "chat_rooms_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."chat_participants" ADD CONSTRAINT "chat_participants_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "public"."chat_rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."chat_participants" ADD CONSTRAINT "chat_participants_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."chat_participants" ADD CONSTRAINT "chat_participants_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "public"."chat_rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "public"."chat_messages" ADD CONSTRAINT "chat_messages_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "public"."chat_rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."chat_messages" ADD CONSTRAINT "chat_messages_senderId_fkey" FOREIGN KEY ("senderId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."chat_messages" ADD CONSTRAINT "chat_messages_chatRoomId_fkey" FOREIGN KEY ("chatRoomId") REFERENCES "public"."chat_rooms"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "public"."admin_assignments" ADD CONSTRAINT "admin_assignments_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "public"."User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."admin_assignments" ADD CONSTRAINT "admin_assignments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "public"."admin_assignments" ADD CONSTRAINT "admin_assignments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "public"."orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "public"."admin_assignments" ADD CONSTRAINT "admin_assignments_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "public"."orders"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "public"."admin_assignments" ADD CONSTRAINT "admin_assignments_userId_fkey" FOREIGN KEY ("userId") REFERENCES "public"."User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "public"."_PublicationStates" ADD CONSTRAINT "_PublicationStates_A_fkey" FOREIGN KEY ("A") REFERENCES "public"."publications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -441,3 +457,4 @@ ALTER TABLE "public"."_PublicationNiches" ADD CONSTRAINT "_PublicationNiches_A_f
 
 -- AddForeignKey
 ALTER TABLE "public"."_PublicationNiches" ADD CONSTRAINT "_PublicationNiches_B_fkey" FOREIGN KEY ("B") REFERENCES "public"."publications"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

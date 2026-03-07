@@ -1,4 +1,6 @@
 import { Notification, Prisma } from "@prisma/client";
+import httpStatus from "http-status";
+import ApiError from "../../../errors/ApiError";
 import prisma from "../../../shared/prisma";
 
 // notification.service.ts
@@ -10,20 +12,24 @@ const createNotification = async (
   orderId?: string,
   userId?: string
 ): Promise<Notification> => {
+  if (!userId) {
+    throw new ApiError(httpStatus.NOT_FOUND,'User not found')
+  }
+  const notificationData: Prisma.NotificationCreateInput = {
+    title,
+    message,
+    type,
+    recipientId,
+    status: 'unread',
+    user: { connect: { id: userId } },
+  };
+
+  if (orderId) {
+    notificationData.order = { connect: { id: orderId } };
+  }
+
   return await prisma.notification.create({
-    data: {
-      title,
-      message,
-      type,
-      recipientId,
-      status: 'unread',
-      ...(orderId && {
-        order: { connect: { id: orderId } }
-      }),
-      ...(userId && {
-        user: { connect: { id: userId } }
-      })
-    }
+    data: notificationData,
   });
 };
 

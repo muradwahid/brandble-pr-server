@@ -292,6 +292,8 @@ const savePaymentMethod = async (req:CustomRequest) => {
             });
         }
 
+        const billingDetails = paymentMethod.billing_details
+
         // Save to database
         const savedPayment = await prisma.paymentMethod.create({
             data: {
@@ -303,11 +305,16 @@ const savePaymentMethod = async (req:CustomRequest) => {
                 expMonth: expMonth as any,
                 expYear: expYear as any,
                 // Billing details from Stripe
-                email: paymentMethod.billing_details?.email || null,
-                name: paymentMethod.billing_details?.name || null,
-                phone: paymentMethod.billing_details?.phone || null,
-                billingAddress: paymentMethod.billing_details?.address ?
-                    JSON.stringify(paymentMethod.billing_details.address) : null,
+                email: billingDetails?.email || null,
+                name: billingDetails?.name || null,
+                phone: billingDetails?.phone || null,
+                // billingAddress: billingDetails?.address,
+                country: billingDetails?.address?.country || null,
+                city: billingDetails?.address?.city || null,
+                state: billingDetails?.address?.state || null,
+                postalCode: billingDetails?.address?.postal_code || null,
+                line1: billingDetails?.address?.line1 || null,
+                line2: billingDetails?.address?.line2 || null,
                 isDefault: isFirstPayment
             }
         });

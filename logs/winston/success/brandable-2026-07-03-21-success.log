@@ -1,0 +1,62 @@
+Sat Mar 07 2026 21:4:26 } [BRANDABLE] info: SIGTERM received
+Sat Mar 07 2026 21:4:40 } [BRANDABLE] info: Server running on port 5050
+Sat Mar 07 2026 21:4:40 } [BRANDABLE] info: Express API routes available
+Sat Mar 07 2026 21:4:40 } [BRANDABLE] info: Socket.io running on same port
+Sat Mar 07 2026 21:4:56 } [BRANDABLE] info: SIGTERM received
+Sat Mar 07 2026 21:4:56 } [BRANDABLE] info: Server running on port 5050
+Sat Mar 07 2026 21:4:56 } [BRANDABLE] info: Express API routes available
+Sat Mar 07 2026 21:4:56 } [BRANDABLE] info: Socket.io running on same port
+Sat Mar 07 2026 21:21:57 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`
+Sat Mar 07 2026 21:22:2 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`
+Sat Mar 07 2026 21:22:9 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`
+Sat Mar 07 2026 21:22:42 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`
+Sat Mar 07 2026 21:22:48 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`
+Sat Mar 07 2026 21:23:4 } [BRANDABLE] error: Error in getOrCreateUserAdminRoom: 
+Invalid `prisma.chatRoom.create()` invocation in
+/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/src/app/modules/chat/chat.service.ts:814:42
+
+  811 
+  812 // If chat room doesn't exist, create a new one
+  813 if (!chatRoom) {
+→ 814   chatRoom = await prisma.chatRoom.create(
+Foreign key constraint violated on the constraint: `chat_rooms_userId_fkey`

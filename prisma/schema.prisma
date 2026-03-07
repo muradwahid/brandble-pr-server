@@ -78,7 +78,14 @@ model PaymentMethod {
   name                  String?
   phone                 String?
   billingAddress        String?
+  country               String?
+  state                 String?
+  city                  String?
+  postalCode            String?
+  line1                 String?
+  line2                 String?
   createdAt             DateTime @default(now())
+  // updatedAt             DateTime @updatedAt
   order                 Order[]
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

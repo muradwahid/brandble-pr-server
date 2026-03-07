@@ -94,7 +94,6 @@ const getAllPublications = async (
   } = filters;
 
   const andConditions = [];
-  
   const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
   const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
   const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
@@ -206,17 +205,14 @@ const getAllPublications = async (
   const orderBy: any[] = [];
 
   if (rawSortBy && publicationSortableFields.includes(rawSortBy as any)) {
-    const direction = sortOrder === 'desc' ? 'desc' : 'asc';
-    orderBy.push({ [rawSortBy as any]: direction });
+    orderBy.push({ [rawSortBy as any]: sortOrder });
   }
 
   if (da && ['asc', 'desc'].includes(da)) {
-    console.log('Adding DA to orderBy: ', da);
     orderBy.push({ da: da as 'asc' | 'desc' });
   }
 
   if (dr && ['asc', 'desc'].includes(dr)) {
-    console.log('Adding DR to orderBy: ', dr);
     orderBy.push({ dr: dr as 'asc' | 'desc' });
   }
 
