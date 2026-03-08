@@ -94,11 +94,11 @@ const getAllPublications = async (
   } = filters;
 
   const andConditions = [];
-  const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
-  const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
-  const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
-  const scopeList = scope?.split(',').map((item: string) => item.trim()).filter(Boolean);
-
+  // const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  // const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  // const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  // const scopeList = scope?.split(',').map((item: string) => item.trim()).filter(Boolean);
+  // console.log({ countryList, stateList, cityList, scopeList ,da});
   const priceMin = minPrice ? parseFloat(minPrice) : undefined;
   const priceMax = maxPrice ? parseFloat(maxPrice) : undefined;
 
@@ -136,45 +136,48 @@ const getAllPublications = async (
       },
     });
   }
-  if (countryList?.length) {
+  if (countries) {
     andConditions.push({
       countries: {
         some: {
           name: {
-            in: countryList
+            contains: countries,
+            mode: 'insensitive'
           },
         },
       },
     });
   }
 
-  if (stateList?.length) {
+  if (states) {
     andConditions.push({
       states: {
         some: {
           name: {
-            in: stateList,
+            contains: states,
+            mode: 'insensitive'
           },
         },
       },
     });
   }
 
-  if (cityList?.length) {
+  if (cities) {
     andConditions.push({
       cities: {
         some: {
           name: {
-            in: cityList,
+            contains: cities,
+            mode: 'insensitive'
           },
         },
       },
     });
   }
-  if (scopeList?.length) {
+  if (scope) {
     andConditions.push({
       scope: {
-        in: scopeList,
+        contains: scope,
         mode:'insensitive'
       }
     });

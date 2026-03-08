@@ -134,6 +134,31 @@
             "date": 1772902804702,
             "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-07-03-23-error.log",
             "hash": "4b8fcd3dcd3fd2c079f5b981d16dfda9e915dd8c461277cb754eaeb19121c100"
+        },
+        {
+            "date": 1772909304946,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-08-03-00-error.log",
+            "hash": "3ee4cd6d8eca19d61ce4842c70ff8a4db195ede38cbb7cf030995b6607c3c98f"
+        },
+        {
+            "date": 1772967102583,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-08-03-16-error.log",
+            "hash": "eb5ffa1c6824de5c3f63ec681a5915f2dca5641a36969ae05e8160e3b25e3cf2"
+        },
+        {
+            "date": 1772967775254,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-08-03-17-error.log",
+            "hash": "41c449f5630ad2b9bc8fa4475ee92c9b9ca81aeed51f51244435c305e5665b83"
+        },
+        {
+            "date": 1772980814385,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-08-03-20-error.log",
+            "hash": "79bdc5f674bf30ce8da319e5d5da7264ffa1f97912381b2e4de7de87e05b40d4"
+        },
+        {
+            "date": 1772983235708,
+            "name": "/Users/muradwahid/Desktop/Personal Projects/sharif-project/server/logs/winston/errors/brandable-2026-08-03-21-error.log",
+            "hash": "5e3e99c82ae51bec50cee627efbd6b47ef925ea167a09bc22921600993137ea6"
         }
     ],
     "hashType": "sha256"
