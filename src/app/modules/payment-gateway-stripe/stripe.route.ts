@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { ENUM_USER_ROLE } from '../../../enums/user';
-import prisma from '../../../shared/prisma';
 import auth from '../../middlewares/auth';
 import { StripeController } from './stripe.controller';
 

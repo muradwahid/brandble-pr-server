@@ -141,7 +141,8 @@ const resetPassword = catchAsync(async (req: Request, res: Response) => {
 const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
     const { id } = req.params;
 
-  try { const result = await AuthService.updateUser(id,req);
+  try {
+    const result = await AuthService.updateUser(id, req);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

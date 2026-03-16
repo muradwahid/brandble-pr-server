@@ -8,8 +8,12 @@ export const createWonArticle = async (req:WonArticleCustomRequest) => {
 
   const files = req.files as IUploadFile[];
   const fileUploadPromises = files.map(async (file) => {
-    const uploadedFile = await FileUploadHelper.uploadPdfToCloudinary(file);
-    return uploadedFile?.secure_url;
+    
+    // const uploadedFile = await FileUploadHelper.uploadPdfToCloudinary(file);
+    // return uploadedFile?.secure_url;
+
+    const uploadedFile = await FileUploadHelper.uploadToR2(file);
+    return uploadedFile?.url;
   });
 
   const uploadedFiles = await Promise.all(fileUploadPromises);

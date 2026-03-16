@@ -26,5 +26,12 @@ export default {
   mailer: {
     email: process.env.EMAIL_USER,
     password: process.env.EMAIL_PASS,
+  },
+  cloudflare: {
+    bucketName: process.env.CLOUDFLARE_BUCKET_NAME,
+    publicUrl: process.env.CLOUDFLARE_PUBLIC_URL,
+    endpoint: process.env.CLOUDFLARE_ENDPOINT,
+    accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY,
+    secretAccessKey: process.env.CLOUDFLARE_SECRET_KEY,
   }
 };

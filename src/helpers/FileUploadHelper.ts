@@ -4,6 +4,9 @@ import multer from 'multer';
 import path from 'path';
 import config from '../config';
 import { ICloudinaryResponse, IUploadFile } from '../interfaces/file';
+import { S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import ApiError from '../errors/ApiError';
 
 // Cloudinary configuration
 cloudinary.config({
@@ -202,10 +205,57 @@ const uploadPdfToCloudinary = async (file: IUploadFile): Promise<ICloudinaryResp
 };
 
 
+//cloudflare
+
+// Cloudflare R2 Configuration
+const s3Client = new S3Client({
+    region: 'auto',
+    endpoint: config.cloudflare.endpoint as string,
+    credentials: {
+        accessKeyId: config.cloudflare.accessKeyId as string,
+        secretAccessKey: config.cloudflare.secretAccessKey as string,
+    },
+});
+const uploadToR2 = async (file: IUploadFile): Promise<any> => {
+    if (!file || !file.path) throw new Error('File not found');
+
+    const fileStream = fs.createReadStream(file.path);
+    const fileKey = `uploads/${Date.now()}-${file.originalname}`;
+
+    try {
+        const parallelUploads3 = new Upload({
+            client: s3Client,
+            params: {
+                Bucket: config.cloudflare.bucketName,
+                Key: fileKey,
+                Body: fileStream,
+                ContentType: file.mimetype,
+            },
+            queueSize: 4,
+            partSize: 5 * 1024 * 1024, // 5MB chunks
+        });
+
+        const result = await parallelUploads3.done();
+        if (fs.existsSync(file.path)) {
+            fs.unlinkSync(file.path);
+        }
+
+        return {
+            url: `${config.cloudflare.publicUrl}/${fileKey}`,
+            key: fileKey,
+            result
+        };
+    } catch (error) {
+        if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        throw new ApiError(500, "R2 Upload Error");
+    }
+};
+
 
 export const FileUploadHelper = {
     uploadToCloudinary,
     upload,
     pdfUpload,
-    uploadPdfToCloudinary
+    uploadPdfToCloudinary,
+    uploadToR2
 };

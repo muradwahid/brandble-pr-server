@@ -6,6 +6,8 @@ import pick from '../../../shared/pick';
 import { paginationFields } from '../../../constants/pagination';
 import { OrderService } from './order.service';
 import sendResponse from '../../../shared/sendResponse';
+import { getSocketIO } from '../../../socketServer';
+import { SocketHelper } from '../../../helpers/SocketHelper';
 
 const userAllOrders = catchAsync(async (req: Request, res: Response) => {
 
@@ -92,7 +94,9 @@ const createOrder = catchAsync(async (req: Request, res: Response) => {
 
 const runningOrders = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const result = await OrderService.runningOrders(user?.id as string);
+  const options = pick(req.query, paginationFields);
+  const filters = pick(req.query, ['searchTerm'] as (keyof typeof req.query)[]);
+  const result = await OrderService.runningOrders(filters,options,user?.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -194,7 +198,10 @@ const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const user = req.user;
   const { status } = req.body;
-  const result = await OrderService.updateOrderStatus(id, status,user?.id as string);
+  const result = await OrderService.updateOrderStatus(id, status, user?.id as string);
+
+
+
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

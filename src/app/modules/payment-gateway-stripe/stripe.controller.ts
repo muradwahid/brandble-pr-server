@@ -3,7 +3,6 @@ import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
 import { StripeService } from "./stripe.service";
-import { CustomRequest } from "./stripe.interface";
 
 const paymentIntent = catchAsync(async (req: Request, res: Response) => {
     const result = await StripeService.paymentIntent(req.body);
@@ -63,7 +62,7 @@ const getPaymentMethods = catchAsync(async (req: Request, res: Response) => {
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Retrive all payment methods successfully',
+        message: 'Retrieve all payment methods successfully',
         data: result,
     })
 

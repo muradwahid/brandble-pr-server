@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client';
 import { logger } from '../../../shared/logger';
 import Stripe from 'stripe';
 import config from '../../../config';
+import { SocketHelper } from '../../../helpers/SocketHelper';
 
 const stripe = new Stripe(config.stripe.secretKey as string);
 
@@ -182,12 +183,16 @@ const userAllOrders = async (
   });
 
   const total = await prisma.order.count({ where: whereConditions });
+  const totalOrders = await prisma.order.count({ where: { userId } })
+
 
   return {
     meta: {
       page,
       limit,
       total,
+      totalOrders,
+      totalPage: Math.ceil(total / limit),
     },
     data: result,
   };
@@ -685,7 +690,7 @@ const userOrders = async (
     },
   });
 
-  const total = await prisma.order.count();
+  const total = await prisma.order.count({ where: whereConditions });
 
   return {
     meta: {
@@ -771,15 +776,65 @@ const createOrder = async (order: any) => {
   };
 };
 
-const runningOrders = async (id: string) => {
+const runningOrders = async (filters: IOrderSearchableFields, options: IPaginationOptions, id: string) => {
   
+  const { page, limit, skip } = paginationHelpers.calculatePagination(options);
+  const { searchTerm } = filters;
+
+  const andConditions = new Array();
+
+  const isUUID = typeof searchTerm === 'string' && searchTerm?.length === 36;
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: [
+        ...(isUUID ? [{ id: { equals: searchTerm } }] : []),
+        {
+          orderId: {
+            contains: searchTerm,
+            mode: 'insensitive'
+          }
+        },
+        {
+          orderType: {
+            contains: searchTerm,
+            mode: 'insensitive'
+          }
+        },
+        {
+          detailsSubmitted: {
+            contains: searchTerm,
+            mode: 'insensitive'
+          }
+        },
+        // Search in related Publication fields
+        {
+          publication: {
+            OR: [
+              {
+                title: {
+                  contains: searchTerm,
+                  mode: 'insensitive'
+                }
+              }
+            ]
+          }
+        }
+      ]
+    })
+  }
+  const fixedConditions = {
+    userId: id,
+    status: {
+      in: ['processing', 'pending']
+    }
+  };
+  const whereConditions = { AND: [...andConditions, fixedConditions] };
+
   const result = await prisma.order.findMany({
-    where: {
-      userId: id,
-      status: {
-        in: ['processing', 'pending']
-      }
-    },
+    where: whereConditions,
+    skip,
+    take: limit,
     orderBy: {
       createdAt: 'desc'
     },
@@ -791,8 +846,20 @@ const runningOrders = async (id: string) => {
     }
   })
 
+  const total = await prisma.order.count({where:whereConditions})
+  const totalOrders = await prisma.order.count({ where: { AND: [fixedConditions]} })
 
-  return result
+
+  return  {
+    meta: {
+      page,
+      limit,
+      total,
+      totalOrders,
+      totalPage: Math.ceil(total / limit),
+    },
+    data: result,
+  };
 }
 
 const getOrderById = async (id: string) => {
@@ -1247,6 +1314,10 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
         publication: true,
       },
     });
+
+    if (updatedOrder && updatedOrder.userId) {
+      SocketHelper.sendToUserAndAdmins(updatedOrder.userId, "order_updated", status)
+    }
 
     // Notification message
     let notificationTitle = 'Order Status Updated';

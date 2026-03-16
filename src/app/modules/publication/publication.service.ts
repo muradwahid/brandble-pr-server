@@ -19,13 +19,14 @@ const createPublication = async (
   req: CustomRequest,
 ) => {
   const file = req.file as IUploadFile;
+  const cloudflare = await FileUploadHelper.uploadToR2(file);
 
-  const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
+  // const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
   const data = { ...req.body };
   const { countries, states, cities, niches, ...restData } = data;
 
-  if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-    restData.logo = uploadedProfileImage.secure_url;
+  if (cloudflare && cloudflare.url) {
+    restData.logo = cloudflare.url;
   }
 
   const parseToArray = (field: any) => {
@@ -477,9 +478,10 @@ const updatePublication = async (
   const data = { ...req.body };
 
   if (file) {
-    const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
-    if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-      data.logo = uploadedProfileImage.secure_url;
+    
+    const uploadedProfileImage = await FileUploadHelper.uploadToR2(file);
+    if (uploadedProfileImage && uploadedProfileImage.url) {
+      data.logo = uploadedProfileImage.url;
     }
   }
   const relationalFields = ['countries', 'states', 'cities', 'niches'];

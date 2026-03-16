@@ -302,9 +302,13 @@ const updateUser = async (
     const file = req.file as IUploadFile;
     const data = { ...req.body };
     if (file) {
-      const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
-      if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-        data.image = uploadedProfileImage.secure_url;
+      const cloudflare = await FileUploadHelper.uploadToR2(file);
+      // const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
+      // if (uploadedProfileImage && uploadedProfileImage.secure_url) {
+      //   data.image = uploadedProfileImage.secure_url;
+      // }
+      if (cloudflare && cloudflare.url) {
+        data.image = cloudflare.url;
       }
       
     }

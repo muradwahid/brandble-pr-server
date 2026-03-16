@@ -1,11 +1,16 @@
 import { Server } from 'socket.io';
+import httpStatus from 'http-status';
 import { chatService } from './app/modules/chat/chat.service';
+import ApiError from './errors/ApiError';
+import { logger } from './shared/logger';
+
+let io: Server;
 
 // Store connected users
 const connectedUsers = new Map();
 
 export const initializeSocket = (server: any) => {
-  const io = new Server(server, {
+    io = new Server(server, {
     cors: {
       origin: [
         'https://app.brandable-pr.com',
@@ -28,10 +33,10 @@ export const initializeSocket = (server: any) => {
       const { userId, userRole } = data;
       connectedUsers.set(userId, socket.id);
       (socket as any).userId = userId;
-
+      
       // Join user to their personal room
       socket.join(`user_${userId}`);
-
+      
       // If admin, join admin room
       if (userRole === 'admin') {
         socket.join('admin_room');
@@ -79,7 +84,7 @@ export const initializeSocket = (server: any) => {
         }
 
       } catch (error) {
-        console.error('Error sending message:', error);
+        logger.error('Error sending message:', error);
         socket.emit('message_error', { error: 'Failed to send message' });
       }
     });
@@ -101,6 +106,13 @@ export const initializeSocket = (server: any) => {
     });
   });
 
+  return io;
+};
+
+export const getSocketIO = (): Server => {
+  if (!io) {
+    throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, "Socket IO not initialized.");
+  }
   return io;
 };
 

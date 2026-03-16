@@ -1,10 +1,10 @@
 import { Prisma, WriteArticle } from "@prisma/client";
 import httpStatus from 'http-status';
+import ApiError from "../../../errors/ApiError";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";
 import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
 import { CustomRequest } from "./writeArticle.interface";
-import ApiError from "../../../errors/ApiError";
 
 const createWriteArticle = async (req: CustomRequest) => {
   try {
@@ -23,17 +23,17 @@ const createWriteArticle = async (req: CustomRequest) => {
     // Only process files if they exist
     if (files && Array.isArray(files) && files.length > 0) {
 
-      // Upload files to Cloudinary with individual error handling
+      // Upload files to Cloudflare with individual error handling
       const fileUploadPromises = files.map(async (file) => {
         try {
-          const uploadedFile = await FileUploadHelper.uploadPdfToCloudinary(file);
+          const uploadedFile = await FileUploadHelper.uploadToR2(file);
           
-          if (!uploadedFile || !uploadedFile.secure_url) {
-            throw new Error(`Cloudinary upload failed for ${file.fieldname}`);
+          if (!uploadedFile || !uploadedFile.url) {
+            throw new ApiError(httpStatus.INTERNAL_SERVER_ERROR, `Upload failed for ${file.fieldname}`);
           }
           
           return {
-            [file.fieldname]: uploadedFile.secure_url
+            [file.fieldname]: uploadedFile.url
           };
         } catch (error) {
           throw new ApiError(
