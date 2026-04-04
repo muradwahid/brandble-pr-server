@@ -1,0 +1,9 @@
+Sat Apr 04 2026 22:0:54 } [BRANDABLE] info: SIGTERM received
+Sat Apr 04 2026 22:2:3 } [BRANDABLE] info: Server running on port 5050
+Sat Apr 04 2026 22:2:3 } [BRANDABLE] info: Express API routes available
+Sat Apr 04 2026 22:2:3 } [BRANDABLE] info: Socket.io running on same port
+Sat Apr 04 2026 22:4:10 } [BRANDABLE] info: SIGTERM received
+Sat Apr 04 2026 22:4:35 } [BRANDABLE] info: HTTP server closed
+Sat Apr 04 2026 22:4:36 } [BRANDABLE] info: Server running on port 5050
+Sat Apr 04 2026 22:4:36 } [BRANDABLE] info: Express API routes available
+Sat Apr 04 2026 22:4:36 } [BRANDABLE] info: Socket.io running on same port

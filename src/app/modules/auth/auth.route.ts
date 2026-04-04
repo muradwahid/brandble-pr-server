@@ -12,8 +12,9 @@ router.get('/user-all-info',AuthController.userAllInfo)
 router.get('/:id', AuthController.getSingleUser);
 router.post('/signup', AuthController.createUser);
 router.patch('/send-email-otp', AuthController.sendEmailOTP);
-router.patch('/check-otp', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), AuthController.verifyOTP);
+router.patch('/check-otp', AuthController.verifyOTP);
 router.patch('/update-password', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), AuthController.resetPassword);
+router.patch('/forgot-password', AuthController.forgotPassword);
 router.get('/get-user-by-cookie', AuthController.getUserByCookie);
 router.post('/signout', AuthController.getUserByCookie);
 router.post('/signin', AuthController.loginUser);

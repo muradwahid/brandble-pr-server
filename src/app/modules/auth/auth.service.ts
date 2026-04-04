@@ -210,7 +210,7 @@ const sendEmailOTP = async (email: string) => {
     }
   });
 
-  if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
+  if (!user) throw new ApiError(httpStatus.NOT_FOUND, 'User not found!');
 
   const otp = otpGenerator.generate(6, {
     upperCaseAlphabets: false,
@@ -226,16 +226,18 @@ const sendEmailOTP = async (email: string) => {
     }
   });
 
-  if (!updateUser) throw new ApiError(httpStatus.NOT_MODIFIED, 'Something went wrong');
+  if (!updateUser) throw new ApiError(httpStatus.NOT_MODIFIED, 'Something went wrong!');
 
-  await sendResetOtpEmail(email, otp);
+  const emailSent = await sendResetOtpEmail(email, otp);
 
   return {
-    success:true
+    success: true,
+    emailSent
   };
 }
 
 const verifyOTP = async (email: string, otp: string) => {
+  
   const user = await prisma.user.findUnique({
     where: { email },
     select: {
@@ -283,6 +285,33 @@ const resetPassword = async (password: string, id: string): Promise<User> => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const updateUser = await prisma.user.update({
     where: { id },
+    data: {
+      password: hashedPassword,
+      otp: null,
+      otpExpires: null,
+    }
+  });
+
+  return updateUser;
+}
+const forgotPassword = async (newPassword: string, email: string): Promise<User> => {
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      otp: true,
+      otpExpires: true,
+    }
+  });
+
+  if (!user) {
+    throw new ApiError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const updateUser = await prisma.user.update({
+    where: { email },
     data: {
       password: hashedPassword,
       otp: null,
@@ -353,6 +382,7 @@ export const AuthService = {
     loginUser,
   verifyOTP,
   resetPassword,
+  forgotPassword,
     getSingleUser,
       sendEmailOTP,
       updateUser,
