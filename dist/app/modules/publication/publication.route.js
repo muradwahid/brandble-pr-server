@@ -23,6 +23,9 @@ FileUploadHelper_1.FileUploadHelper.upload.single('file'), (req, res, next) => {
     req.body = JSON.parse(req.body.data);
     return publication_controller_1.PublicationController.createPublication(req, res, next);
 });
+router.get('/statistics', (0, auth_1.default)(user_1.ENUM_USER_ROLE.SUPER_ADMIN, user_1.ENUM_USER_ROLE.ADMIN, user_1.ENUM_USER_ROLE.CLIENT), publication_controller_1.PublicationController.getPublicationStatistics);
+router.get('/admin/searchpublications', (0, auth_1.default)(user_1.ENUM_USER_ROLE.SUPER_ADMIN, user_1.ENUM_USER_ROLE.ADMIN), publication_controller_1.PublicationController.getSearchPublications);
+router.get('/admin/export-publications', publication_controller_1.PublicationController.exportPublicationsToExcel);
 router.get('/all-publications', (0, auth_1.default)(user_1.ENUM_USER_ROLE.SUPER_ADMIN, user_1.ENUM_USER_ROLE.ADMIN, user_1.ENUM_USER_ROLE.CLIENT), publication_controller_1.PublicationController.getAllPublications);
 router.get('/:id', (0, auth_1.default)(user_1.ENUM_USER_ROLE.SUPER_ADMIN, user_1.ENUM_USER_ROLE.ADMIN, user_1.ENUM_USER_ROLE.CLIENT), publication_controller_1.PublicationController.getPublicationById);
 // router.patch('/:id', PublicationController.updatePublication);

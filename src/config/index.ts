@@ -5,6 +5,7 @@ import path from 'path';
 dotenv.config({ path: path.join(process.cwd(), '.env') });
 
 export default {
+  dbUrl: process.env.DATABASE_URL,
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   rootUrl: process.env.ROOT_URL,
@@ -33,5 +34,13 @@ export default {
     endpoint: process.env.CLOUDFLARE_ENDPOINT,
     accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY,
     secretAccessKey: process.env.CLOUDFLARE_SECRET_KEY,
+  },
+  sendgrid: {
+    apiKey: process.env.SENDGRID_API
+  },
+  twilio: {
+    accountSid: process.env.TWILIO_SID,
+    authToken: process.env.TWILIO_AUTH_TOKEN,
+    phoneNumber: process.env.TWILIO_PHONE_NUMBER
   }
 };

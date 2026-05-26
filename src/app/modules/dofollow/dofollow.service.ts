@@ -1,6 +1,6 @@
 
 
-import { DoFollow } from "@prisma/client";
+import { DoFollow } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createDoFollow = async (data: DoFollow): Promise<DoFollow> => {

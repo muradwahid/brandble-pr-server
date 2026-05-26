@@ -1,4 +1,4 @@
-import { Country } from "@prisma/client";
+import { Country } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createCountry = async (data: Country): Promise<Country> => {

@@ -1,4 +1,4 @@
-import { Genre } from "@prisma/client";
+import { Genre } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createGenre = async (data: Genre): Promise<Genre> => {

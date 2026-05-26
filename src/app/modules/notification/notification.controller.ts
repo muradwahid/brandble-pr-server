@@ -4,6 +4,27 @@ import catchAsync from "../../../shared/catchAsync"
 import sendResponse from "../../../shared/sendResponse";
 import { NotificationService } from "./notification.service";
 
+const getAdminAllNotifications = catchAsync(async (req: Request, res: Response) => { 
+  const user = req.user;
+  const { page, limit, status } = req.query;
+
+  const filters = {
+    page: parseInt(page as string) || 1,
+    limit: parseInt(limit as string) || 20,
+    status: status as string
+  }
+
+  const result = await NotificationService.getAdminAllNotifications(filters);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Notifications retrieved successfully!',
+    data: result,
+  })
+
+})
+
 const getMyNotifications = catchAsync(async (req: Request, res: Response) => { 
   const user = req.user;
   const { page, limit, status } = req.query;
@@ -24,6 +45,19 @@ const getMyNotifications = catchAsync(async (req: Request, res: Response) => {
 })
 
 
+const getAdminUnreadNotificationCount = catchAsync(async (req: Request, res: Response) => { 
+
+  const result = await NotificationService.getAdminUnreadNotificationCount();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Unread notification count retrieved successfully!',
+    data: result,
+  })
+
+})
+
 const getUnreadNotificationCount = catchAsync(async (req: Request, res: Response) => { 
   const user = req.user;
 
@@ -42,7 +76,7 @@ const markNotificationAsRead = catchAsync(async (req: Request, res: Response) =>
   const { notificationId } = req.params;
   const user = req.user;
 
-  const result = await NotificationService.markAsRead(notificationId, user?.id);
+  const result = await NotificationService.markAsRead(notificationId as string, user?.id);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -54,8 +88,9 @@ const markNotificationAsRead = catchAsync(async (req: Request, res: Response) =>
 })
 const markAllNotificationsAsRead = catchAsync(async (req: Request, res: Response) => { 
   const user = req.user;
+  const { type } = req.query;
 
-  const result = await NotificationService.markAllAsRead(user?.id);
+  const result = await NotificationService.markAllAsRead(user?.id, type as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -66,7 +101,9 @@ const markAllNotificationsAsRead = catchAsync(async (req: Request, res: Response
 })
 
 export const NotificationController = {
+  getAdminUnreadNotificationCount,
   getMyNotifications,
+  getAdminAllNotifications,
   getUnreadNotificationCount,
   markAllNotificationsAsRead,
   markNotificationAsRead

@@ -1,44 +1,9 @@
-// import { Server } from 'http';
-// import app from './app';
-// import config from './config';
-// import { errorlogger, logger } from './shared/logger';
-
-// async function bootstrap() {
-//   const server: Server = app.listen(config.port, () => {
-//     logger.info(`Server running on port ${config.port}`);
-//   });
-
-//   const exitHandler = () => {
-//     if (server) {
-//       server.close(() => {
-//         logger.info('Server closed');
-//       });
-//     }
-//     process.exit(1);
-//   };
-
-//   const unexpectedErrorHandler = (error: unknown) => {
-//     errorlogger.error(error);
-//     exitHandler();
-//   };
-
-//   process.on('uncaughtException', unexpectedErrorHandler);
-//   process.on('unhandledRejection', unexpectedErrorHandler);
-
-//   process.on('SIGTERM', () => {
-//     logger.info('SIGTERM received');
-//     if (server) {
-//       server.close();
-//     }
-//   });
-// }
-
-// bootstrap();
 import http, { Server } from 'http';
 import app from './app';
 import config from './config';
 import { errorlogger, logger } from './shared/logger';
 import { initializeSocket } from './socketServer';
+import { initOrderReminderCron } from './app/corn/corn.orderReminder';
 
 async function bootstrap() {
   // Create ONE HTTP server from Express app
@@ -46,6 +11,9 @@ async function bootstrap() {
 
   // Initialize Socket.io with the SAME HTTP server
   initializeSocket(server);
+
+  // Initialize Corn Jobs
+  initOrderReminderCron();
 
   // Start the ONE server
   server.listen(config.port, () => {

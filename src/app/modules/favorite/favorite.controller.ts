@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import httpStatus from "http-status";
 import catchAsync from "../../../shared/catchAsync";
 import sendResponse from "../../../shared/sendResponse";
@@ -6,7 +6,7 @@ import { FavoriteService } from "./favorite.service";
 
 const allFavorites = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await FavoriteService.allFavorites(id);
+  const result = await FavoriteService.allFavorites(id as string);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -16,7 +16,7 @@ const allFavorites = catchAsync(async (req: Request, res: Response) => {
 })
 const getOnlyFavoriteIds = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await FavoriteService.getOnlyFavoriteIds(id);
+  const result = await FavoriteService.getOnlyFavoriteIds(id as string);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -39,7 +39,7 @@ const createFavorite = catchAsync(async (req: Request, res: Response) => {
 const deleteFavorite = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
   const userId = req.user?.id as string;
-  const result = await FavoriteService.deleteFavorite(id,userId);
+  const result = await FavoriteService.deleteFavorite(id as string,userId);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

@@ -26,7 +26,7 @@ const getAllCity = catchAsync(async (req: Request, res: Response) => {
 
 const updateCity = catchAsync(async (req: Request, res: Response) => {
 
-  const city = await CityService.updateCity(req.params.id, req.body);
+  const city = await CityService.updateCity(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateCity = catchAsync(async (req: Request, res: Response) => {
 
 const deleteCity = catchAsync(async (req: Request, res: Response) => {
 
-  const city = await CityService.deleteCity(req.params.id);
+  const city = await CityService.deleteCity(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteCity = catchAsync(async (req: Request, res: Response) => {
 
 const getCityById = catchAsync(async (req: Request, res: Response) => {
 
-  const city = await CityService.getCityById(req.params.id);
+  const city = await CityService.getCityById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

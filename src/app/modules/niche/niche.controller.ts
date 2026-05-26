@@ -25,7 +25,7 @@ const getAllNiches = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateNiche = catchAsync(async (req: Request, res: Response) => {
-  const niche = await NicheService.updateNiche(req.params.id, req.body);
+  const niche = await NicheService.updateNiche(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -35,7 +35,7 @@ const updateNiche = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteNiche = catchAsync(async (req: Request, res: Response) => {
-  const niche = await NicheService.deleteNiche(req.params.id);
+  const niche = await NicheService.deleteNiche(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -45,7 +45,7 @@ const deleteNiche = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getNicheById = catchAsync(async (req: Request, res: Response) => {
-  const niche = await NicheService.getNicheById(req.params.id);
+  const niche = await NicheService.getNicheById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

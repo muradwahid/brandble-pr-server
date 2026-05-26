@@ -1,5 +1,5 @@
 
-import { Sponsored } from "@prisma/client";
+import { Sponsored } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createSponsored = async (data: Sponsored): Promise<Sponsored> => {

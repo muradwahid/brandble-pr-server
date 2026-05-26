@@ -1,128 +1,75 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PublicationService = void 0;
+const exceljs_1 = require("exceljs");
+const date_fns_1 = require("date-fns");
 const FileUploadHelper_1 = require("../../../helpers/FileUploadHelper");
 const paginationHelper_1 = require("../../../helpers/paginationHelper");
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const publication_constant_1 = require("./publication.constant");
-const createPublication = (req) => __awaiter(void 0, void 0, void 0, function* () {
+const createPublication = async (req) => {
     const file = req.file;
-    const uploadedProfileImage = yield FileUploadHelper_1.FileUploadHelper.uploadToCloudinary(file);
-    const data = Object.assign({}, req.body);
-    if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-        data.logo = uploadedProfileImage.secure_url;
+    const cloudflare = await FileUploadHelper_1.FileUploadHelper.uploadToR2(file);
+    // const uploadedProfileImage = await FileUploadHelper.uploadToCloudinary(file);
+    const data = { ...req.body };
+    const { countries, states, cities, niches, ...restData } = data;
+    if (cloudflare && cloudflare.url) {
+        restData.logo = cloudflare.url;
     }
-    //   if (uploadedProfileImage) {
-    //       req.body..profileImage = uploadedProfileImage.secure_url;
-    //   }
-    const result = yield prisma_1.default.publication.create({
-        data
+    const parseToArray = (field) => {
+        if (!field || field === "")
+            return [];
+        if (typeof field === "string") {
+            try {
+                return JSON.parse(field);
+            }
+            catch (e) {
+                return [];
+            }
+        }
+        return Array.isArray(field) ? field : [];
+    };
+    const parsedNiches = parseToArray(niches);
+    const result = await prisma_1.default.publication.create({
+        data: {
+            ...restData,
+            niches: {
+                connect: parsedNiches.map((id) => ({ id })),
+            },
+            countries: {
+                connect: countries?.map((id) => ({ id })) || [],
+            },
+            states: {
+                connect: states?.map((id) => ({ id })) || [],
+            },
+            cities: {
+                connect: cities?.map((id) => ({ id })) || [],
+            },
+        },
+        include: {
+            countries: true,
+            states: true,
+            cities: true,
+            niches: true
+        },
     });
-    //   const niches = await prisma.niche.findMany({
-    //   where: {
-    //     id: {
-    //       in: ["2a085369-75b3-45df-968c-f193eac2372d", "55e8c434-1f77-4db7-aa5f-6ee0ba56cdc0"]
-    //     }
-    //   }
-    // });
     return result;
-});
-// const getAllPublications = async (
-//   filters: IPublicationFilterableFields | any,
-//   options: IPaginationOptions | any,
-// ): Promise<IGenericResponse<Partial<Publication>[]>> => {
-//   const { page, limit, skip } = paginationHelpers.calculatePagination(options);
-//   const {
-//     searchTerm,
-//     price = 'asc',
-//     title = 'asc',
-//     da = 'asc',
-//     dr = 'asc',
-//     ...filterData
-//   } = filters;
-//   const andConditions = new Array();
-//   if (searchTerm) {
-//     andConditions.push({
-//       OR: publicationSearchableFields.map(field => ({
-//         [field]: {
-//           contains: searchTerm,
-//           mode: 'insensitive',
-//         },
-//       })),
-//     });
-//   }
-//   const filterKeys = Object.keys(filterData);
-//   if (filterKeys.length > 0) {
-//     andConditions.push({
-//       AND: filterKeys.map(key => {
-//         return {
-//           [key]: {
-//             equals: (filterData as any)[key],
-//           },
-//         };
-//       }),
-//     });
-//   }
-//   const orderBy: any = {
-//     createdAt: 'desc',
-//   };
-//   if (price) {
-//     orderBy.price = price;
-//   }
-//   if (title) {
-//     orderBy.title = title;
-//   }
-//   if (da) {
-//     orderBy.da = da;
-//   }
-//   if (dr) {
-//     orderBy.dr = dr;
-//   }
-//   const whereConditions =
-//     andConditions.length > 0 ? (andConditions as any) : undefined;
-//   const result = await prisma.publication.findMany({
-//     where: whereConditions,
-//     skip,
-//     take: limit,
-//     orderBy,
-//   });
-//   const total = await prisma.publication.count();
-//   return {
-//     meta: {
-//       page,
-//       limit,
-//       total,
-//     },
-//     data: result,
-//   };
-// };
-const getAllPublications = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getAllPublications = async (filters, options) => {
     const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(options);
-    const { searchTerm, price = 'asc', title = 'asc', da = 'asc', dr = 'asc', genre = 'asc', sponsor = 'asc' } = filters, filterData = __rest(filters, ["searchTerm", "price", "title", "da", "dr", "genre", "sponsor"]);
-    const andConditions = new Array();
+    const { searchTerm, niche, minPrice, maxPrice, countries, states, cities, sortBy: rawSortBy, sortOrder, title = 'asc', da, dr, scope, ...restFilters } = filters;
+    const andConditions = [];
+    // const countryList = countries?.split(',').map((item: string) => item.trim()).filter(Boolean);
+    // const stateList = states?.split(',').map((item: string) => item.trim()).filter(Boolean);
+    // const cityList = cities?.split(',').map((item: string) => item.trim()).filter(Boolean);
+    // const scopeList = scope?.split(',').map((item: string) => item.trim()).filter(Boolean);
+    // console.log({ countryList, stateList, cityList, scopeList ,da});
+    const priceMin = minPrice ? parseFloat(minPrice) : undefined;
+    const priceMax = maxPrice ? parseFloat(maxPrice) : undefined;
+    // 1. Full-text search
     if (searchTerm) {
         andConditions.push({
             OR: publication_constant_1.publicationSearchableFields.map(field => ({
@@ -133,214 +80,348 @@ const getAllPublications = (filters, options) => __awaiter(void 0, void 0, void 
             })),
         });
     }
-    const filterKeys = Object.keys(filterData);
-    if (filterKeys.length > 0) {
+    // 2. Price range
+    if (minPrice || maxPrice) {
         andConditions.push({
-            AND: filterKeys.map(key => {
-                return {
-                    [key]: {
-                        equals: filterData[key],
-                    },
-                };
-            }),
+            price: {
+                ...(priceMin !== undefined ? { gte: priceMin } : {}),
+                ...(priceMax !== undefined ? { lte: priceMax } : {}),
+            },
         });
     }
-    // Fixed: Create orderBy as an array of objects
-    const orderBy = [];
-    // Add additional sorting criteria only if they are explicitly provided
-    // and not just the default values
-    if (price && price !== 'asc') {
-        orderBy.push({ price });
-    }
-    if (title && title !== 'asc') {
-        orderBy.push({ title });
-    }
-    if (da && da !== 'asc') {
-        orderBy.push({ da });
-    }
-    if (dr && dr !== 'asc') {
-        orderBy.push({ dr });
-    }
-    if (genre && genre !== 'asc') {
-        orderBy.push({ genre });
-    }
-    if (sponsor && sponsor !== 'asc') {
-        orderBy.push({ sponsor });
-    }
-    const whereConditions = andConditions.length > 0 ? { AND: andConditions } : undefined;
-    const result = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        const publication = yield transactionClient.publication.findMany({
-            where: whereConditions,
-            skip,
-            take: limit,
-            orderBy,
-        });
-        const newPublication = yield Promise.all(publication.map((publication) => __awaiter(void 0, void 0, void 0, function* () {
-            const niches = yield transactionClient.niche.findMany({
-                where: {
-                    id: {
-                        in: publication.niches
+    if (niche) {
+        andConditions.push({
+            niches: {
+                some: {
+                    title: {
+                        contains: niche,
+                        mode: 'insensitive',
                     },
                 },
-            });
-            return Object.assign(Object.assign({}, publication), { niches });
-        })));
-        return newPublication;
-    }));
-    // const result = await prisma.publication.findMany({
-    //   where: whereConditions,
-    //   skip,
-    //   take: limit,
-    //   orderBy,
-    // });
-    // result.forEach(async (publication) => {
-    //   console.log(publication.niches)
-    //   const nicheDetails = await prisma.niche.findMany({
-    //     where: {
-    //       id: {
-    //         in: publication.niches
-    //       },
-    //     },
-    //   });
-    //   (publication as any).niches = nicheDetails;
-    // });
-    const total = yield prisma_1.default.publication.count({
-        where: whereConditions,
-    });
-    return {
-        meta: {
-            page,
-            limit,
-            total,
-        },
-        data: result,
-    };
-});
-const getAllPublicationssss = (filters, options) => __awaiter(void 0, void 0, void 0, function* () {
-    const { page, limit, skip } = paginationHelper_1.paginationHelpers.calculatePagination(options);
-    const { searchTerm } = filters, filterData = __rest(filters, ["searchTerm"]);
-    // ✅ CORRECT: Use values directly without defaults
-    const sortBy = options.sortBy; // No default
-    const sortOrder = options.sortOrder; // No default
-    // DEBUG: More detailed logging
-    const andConditions = [];
-    // ... (search and filter conditions remain same)
-    // FIXED: Simplified and corrected orderBy logic
-    let orderBy = { createdAt: 'desc' }; // Default fallback
-    if (sortBy && sortOrder) {
-        if (sortBy === 'title') {
-            orderBy = { title: sortOrder };
-        }
-        else if (sortBy === 'price') {
-            orderBy = { price: sortOrder };
-        }
-        else if (sortBy === 'da') {
-            orderBy = { da: sortOrder };
-        }
-        else if (sortBy === 'dr') {
-            orderBy = { dr: sortOrder };
-        }
-        else if (sortBy === 'createdAt') {
-            orderBy = { createdAt: sortOrder };
-        }
-        else if (sortBy === 'updatedAt') {
-            orderBy = { updatedAt: sortOrder };
-        }
-        else if (sortBy === 'genre') {
-            orderBy = { genre: { title: sortOrder } };
-        }
-        else if (sortBy === 'sponsored') {
-            orderBy = { sponsored: { title: sortOrder } };
-        }
-        else if (sortBy === 'doFollow') {
-            orderBy = { doFollow: { title: sortOrder } };
-        }
-        else if (sortBy === 'index') {
-            orderBy = { index: { title: sortOrder } };
-        }
+            },
+        });
     }
+    if (countries) {
+        andConditions.push({
+            countries: {
+                some: {
+                    name: {
+                        contains: countries,
+                        mode: 'insensitive'
+                    },
+                },
+            },
+        });
+    }
+    if (states) {
+        andConditions.push({
+            states: {
+                some: {
+                    name: {
+                        contains: states,
+                        mode: 'insensitive'
+                    },
+                },
+            },
+        });
+    }
+    if (cities) {
+        andConditions.push({
+            cities: {
+                some: {
+                    name: {
+                        contains: cities,
+                        mode: 'insensitive'
+                    },
+                },
+            },
+        });
+    }
+    if (scope) {
+        andConditions.push({
+            scope: {
+                contains: scope,
+                mode: 'insensitive'
+            }
+        });
+    }
+    // 4. Other exact filters
+    Object.keys(restFilters).forEach(key => {
+        const value = restFilters[key];
+        if (value !== undefined && value !== '') {
+            if (key === 'doFollow') {
+                andConditions.push({ doFollow: { contains: value, mode: 'insensitive' } });
+            }
+            else {
+                andConditions.push({ [key]: { contains: value, mode: 'insensitive' } });
+            }
+        }
+    });
     const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
-    // Fetch publications
-    const result = yield prisma_1.default.publication.findMany({
+    // const sortBy = publicationSortableFields.includes(rawSortBy as any)
+    // ? rawSortBy
+    // : 'createdAt';
+    // const orderBy:any = { title: 'asc' };
+    // const orderBy: any[] = [{ [sortBy as string]: sortOrder }, { title: title as string }];
+    const orderBy = [];
+    if (rawSortBy && publication_constant_1.publicationSortableFields.includes(rawSortBy)) {
+        orderBy.push({ [rawSortBy]: sortOrder });
+    }
+    if (da && ['asc', 'desc'].includes(da)) {
+        orderBy.push({ da: da });
+    }
+    if (dr && ['asc', 'desc'].includes(dr)) {
+        orderBy.push({ dr: dr });
+    }
+    if (title && ['asc', 'desc'].includes(title)) {
+        orderBy.push({ title: title });
+    }
+    if (orderBy.length === 0) {
+        orderBy.push({ createdAt: 'desc' }, { title: 'asc' });
+    }
+    const result = await prisma_1.default.publication.findMany({
         where: whereConditions,
         skip,
         take: limit,
-        orderBy, // This should now work correctly
-    });
-    // If using array field for nicheIds instead of relation
-    const publicationsWithNiches = yield Promise.all(result.map((publication) => __awaiter(void 0, void 0, void 0, function* () {
-        if (publication.niches && publication.niches.length > 0) {
-            const nicheDetails = yield prisma_1.default.niche.findMany({
-                where: {
-                    id: {
-                        in: publication.niches
-                    },
-                },
-            });
-            return Object.assign(Object.assign({}, publication), { niches: nicheDetails });
+        orderBy,
+        include: {
+            favorites: true,
+            orders: true,
+            niches: true,
+            countries: true,
+            states: true,
+            cities: true
         }
-        return publication;
-    })));
-    const total = yield prisma_1.default.publication.count({
-        where: whereConditions,
     });
+    const total = await prisma_1.default.publication.count({ where: whereConditions });
+    const totalPublications = await prisma_1.default.publication.count();
     return {
         meta: {
             page,
             limit,
-            total,
+            total: totalPublications,
+            totalPage: total === 0 ? 0 : Math.ceil(total / limit)
         },
-        data: publicationsWithNiches,
+        data: result,
     };
-});
-const getPublicationById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield prisma_1.default.publication.findUnique({
-            where: {
-                id,
-            },
-        });
-        if (result === null || result === void 0 ? void 0 : result.niches) {
-            const nicheDetails = yield prisma_1.default.niche.findMany({
-                where: {
-                    id: {
-                        in: result === null || result === void 0 ? void 0 : result.niches
-                    }
-                }
-            });
-            result.niches = nicheDetails;
+};
+const exportPublicationsToExcel = async () => {
+    const publications = await prisma_1.default.publication.findMany({
+        include: {
+            countries: true,
+            states: true,
+            cities: true,
+            niches: true
         }
-        return result;
+    });
+    const workbook = new exceljs_1.Workbook();
+    const worksheet = workbook.addWorksheet('Publications');
+    worksheet.columns = [
+        { header: 'Publication ID', key: 'publicationId', width: 20 },
+        { header: 'Title', key: 'title', width: 30 },
+        { header: 'Price', key: 'price', width: 12 },
+        { header: 'Scope', key: 'scope', width: 15 },
+        { header: 'DA', key: 'da', width: 8 },
+        { header: 'DR', key: 'dr', width: 8 },
+        { header: 'TAT', key: 'tat', width: 10 },
+        { header: 'TTP', key: 'ttp', width: 10 },
+        { header: 'Location', key: 'location', width: 15 },
+        { header: 'Index', key: 'index', width: 15 },
+        { header: 'Sponsor', key: 'sponsor', width: 15 },
+        { header: 'DoFollow', key: 'doFollow', width: 12 },
+        { header: 'Genre', key: 'genre', width: 15 },
+        { header: 'Niches', key: 'niches', width: 25 },
+        { header: 'Countries', key: 'countries', width: 25 },
+        { header: 'States', key: 'states', width: 20 },
+        { header: 'Cities', key: 'cities', width: 20 },
+        { header: 'Logo URL', key: 'logo', width: 40 },
+        { header: 'Created At', key: 'createdAt', width: 20 },
+    ];
+    worksheet.getRow(1).font = { bold: true };
+    publications.forEach((pub) => {
+        worksheet.addRow({
+            publicationId: pub.publicationId,
+            title: pub.title,
+            price: pub.price,
+            scope: pub.scope || 'N/A',
+            da: pub.da || 'N/A',
+            dr: pub.dr || 'N/A',
+            tat: pub.tat || 'N/A',
+            ttp: pub.ttp || 'N/A',
+            location: pub.location || 'N/A',
+            index: pub.index || 'N/A',
+            sponsor: pub.sponsor || 'N/A',
+            doFollow: pub.doFollow || 'N/A',
+            genre: pub.genre || 'N/A',
+            logo: pub.logo || '',
+            niches: pub.niches?.map((n) => n.name).join(', ') || '',
+            countries: pub.countries?.map((c) => c.name).join(', ') || '',
+            states: pub.states?.map((s) => s.name).join(', ') || '',
+            cities: pub.cities?.map((city) => city.name).join(', ') || '',
+            createdAt: pub.createdAt.toISOString(),
+        });
+    });
+    const publicationsExcel = await workbook.xlsx.writeBuffer();
+    return workbook;
+};
+const getSearchPublications = async (filters) => {
+    const { searchTerm } = filters;
+    const andConditions = [];
+    if (searchTerm) {
+        andConditions.push({
+            OR: publication_constant_1.publicationSearchableFields.map(field => ({
+                [field]: {
+                    contains: searchTerm,
+                    mode: 'insensitive',
+                },
+            })),
+        });
     }
-    catch (error) {
-        throw error;
-    }
-});
-const updatePublication = (id, req) => __awaiter(void 0, void 0, void 0, function* () {
+    const whereConditions = andConditions.length > 0 ? { AND: andConditions } : {};
+    const result = await prisma_1.default.publication.findMany({
+        where: whereConditions
+    });
+    return result;
+};
+const getPublicationById = async (id) => {
+    const result = await prisma_1.default.publication.findUnique({
+        where: {
+            id,
+        },
+        include: {
+            niches: true,
+            countries: true,
+            states: true,
+            cities: true
+        }
+    });
+    return result;
+};
+const getPublicationStatistics = async () => {
+    const now = new Date();
+    const thisMonth = (0, date_fns_1.startOfMonth)(now); // Nov 1, 2025
+    const lastMonth = (0, date_fns_1.startOfMonth)((0, date_fns_1.subMonths)(now, 1)); // Oct 1, 2025
+    // Run both groupBy queries in parallel
+    const [thisMonthStats, lastMonthStats] = await Promise.all([
+        // This month: count orders + sum revenue
+        prisma_1.default.order.groupBy({
+            by: ['publicationId'],
+            where: { createdAt: { gte: thisMonth } },
+            _count: { id: true },
+            _sum: { amount: true }, // your real field
+        }),
+        // Last month: only count orders
+        prisma_1.default.order.groupBy({
+            by: ['publicationId'],
+            where: { createdAt: { gte: lastMonth, lt: thisMonth } },
+            _count: { id: true },
+        }),
+    ]);
+    // This month map: publicationId → { orders, revenue }
+    const thisMonthMap = new Map();
+    thisMonthStats.forEach((item) => {
+        thisMonthMap.set(item.publicationId, {
+            orders: item._count.id,
+            revenue: item._sum.amount || 0,
+        });
+    });
+    const lastMonthMap = new Map();
+    lastMonthStats.forEach((item) => {
+        lastMonthMap.set(item.publicationId, item._count.id);
+    });
+    const allPublicationIds = new Set([
+        ...thisMonthMap.keys(),
+        ...lastMonthMap.keys(),
+    ]);
+    const publications = await prisma_1.default.publication.findMany({
+        where: { id: { in: Array.from(allPublicationIds) } },
+        select: { id: true, title: true },
+    });
+    const titleMap = new Map(publications.map((p) => [p.id, p.title]));
+    const stats = Array.from(allPublicationIds).map((pubId) => {
+        const thisMonthData = thisMonthMap.get(pubId) || { orders: 0, revenue: 0 };
+        const lastMonthOrders = lastMonthMap.get(pubId) || 0;
+        const growthRate = (() => {
+            if (lastMonthOrders === 0) {
+                return thisMonthData.orders > 0 ? '+100%' : '0%';
+            }
+            const rate = ((thisMonthData.orders - lastMonthOrders) / lastMonthOrders) * 100;
+            const formatted = rate.toFixed(1);
+            return rate > 0 ? `+${formatted}%` : `${formatted}%`;
+        })();
+        return {
+            id: pubId,
+            title: titleMap.get(pubId) || 'Unknown Publication',
+            ordersThisMonth: thisMonthData.orders,
+            ordersLastMonth: lastMonthOrders,
+            growthRate, // e.g. "+25.0%", "-42.9%", "+100%", "0%"
+            revenueThisMonth: Number(thisMonthData.revenue.toFixed(2)),
+        };
+    });
+    stats.sort((a, b) => b.ordersThisMonth - a.ordersThisMonth);
+    const totalThisMonth = stats.reduce((sum, p) => sum + p.ordersThisMonth, 0);
+    const totalLastMonth = stats.reduce((sum, p) => sum + p.ordersLastMonth, 0);
+    const totalGrowthRateRaw = totalLastMonth === 0
+        ? totalThisMonth > 0
+            ? 100
+            : 0
+        : ((totalThisMonth - totalLastMonth) / totalLastMonth) * 100;
+    const totalGrowthRate = totalGrowthRateRaw > 0
+        ? `+${totalGrowthRateRaw.toFixed(1)}%`
+        : `${totalGrowthRateRaw.toFixed(1)}%`;
+    return {
+        summary: {
+            totalOrdersThisMonth: totalThisMonth,
+            totalGrowthRate, // e.g. "+18.5%", "-27.3%", "+100%", "0%"
+            currentMonth: (0, date_fns_1.format)(thisMonth, 'MMMM yyyy'),
+            totalPublicationsWithOrders: stats.length,
+        },
+        publications: stats,
+    };
+};
+const updatePublication = async (id, req) => {
     const file = req.file;
-    const data = Object.assign({}, req.body);
+    const data = { ...req.body };
     if (file) {
-        const uploadedProfileImage = yield FileUploadHelper_1.FileUploadHelper.uploadToCloudinary(file);
-        if (uploadedProfileImage && uploadedProfileImage.secure_url) {
-            data.logo = uploadedProfileImage.secure_url;
+        const uploadedProfileImage = await FileUploadHelper_1.FileUploadHelper.uploadToR2(file);
+        if (uploadedProfileImage && uploadedProfileImage.url) {
+            data.logo = uploadedProfileImage.url;
         }
     }
+    const relationalFields = ['countries', 'states', 'cities', 'niches'];
+    relationalFields.forEach((field) => {
+        if (data[field]) {
+            try {
+                const ids = typeof data[field] === 'string' ? JSON.parse(data[field]) : data[field];
+                data[field] = {
+                    set: ids.map((id) => ({ id }))
+                };
+            }
+            catch (e) {
+                delete data[field];
+            }
+        }
+    });
     try {
-        const result = yield prisma_1.default.publication.update({
-            where: {
-                id,
-            },
+        const result = await prisma_1.default.publication.update({
+            where: { id },
             data,
+            include: {
+                countries: true,
+                states: true,
+                cities: true,
+                niches: true
+            }
         });
         return result;
     }
     catch (error) {
         throw error;
     }
-});
-const deletePublication = (id) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const deletePublication = async (id) => {
     try {
-        const result = yield prisma_1.default.publication.delete({
+        const result = await prisma_1.default.publication.delete({
             where: {
                 id,
             },
@@ -350,11 +431,14 @@ const deletePublication = (id) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         throw error;
     }
-});
+};
 exports.PublicationService = {
     createPublication,
     getAllPublications,
+    exportPublicationsToExcel,
+    getSearchPublications,
     getPublicationById,
     updatePublication,
     deletePublication,
+    getPublicationStatistics
 };

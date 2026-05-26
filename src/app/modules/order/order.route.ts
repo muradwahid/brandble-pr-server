@@ -15,6 +15,7 @@ router.post('/create', OrderController.createOrder);
 router.get('/user/all-orders', auth(ENUM_USER_ROLE.CLIENT), OrderController.userAllOrders);
 router.get('/user/published-orders', auth(ENUM_USER_ROLE.CLIENT), OrderController.userPublishedOrders);
 router.get('/user-all-orders', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), OrderController.userOrders);
+router.get('/user/history/:ids',OrderController.getOrderHistory)
 router.get('/running-orders',auth(ENUM_USER_ROLE.CLIENT,ENUM_USER_ROLE.ADMIN,ENUM_USER_ROLE.SUPER_ADMIN),OrderController.runningOrders)
 router.get('/:id', OrderController.getOrderById);
 

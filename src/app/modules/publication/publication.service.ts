@@ -1,4 +1,4 @@
-import { Publication } from '@prisma/client';
+import { Publication } from '../../../generated/client/client';
 import { Workbook } from 'exceljs';
 import { startOfMonth, subMonths, format } from 'date-fns';
 import { FileUploadHelper } from '../../../helpers/FileUploadHelper';

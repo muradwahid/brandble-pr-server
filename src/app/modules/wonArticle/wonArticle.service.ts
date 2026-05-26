@@ -1,4 +1,4 @@
-import { WonArticle } from '@prisma/client';
+import { WonArticle } from '../../../generated/client/client';
 import { FileUploadHelper } from '../../../helpers/FileUploadHelper';
 import { IUploadFile } from '../../../interfaces/file';
 import prisma from '../../../shared/prisma';

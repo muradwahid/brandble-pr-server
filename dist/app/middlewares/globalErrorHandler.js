@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const config_1 = __importDefault(require("../../config"));
 const ApiError_1 = __importDefault(require("../../errors/ApiError"));
 const handleValidationError_1 = __importDefault(require("../../errors/handleValidationError"));
-const client_1 = require("@prisma/client");
+const client_1 = require("../../generated/client/client");
 const zod_1 = require("zod");
 const handleClientError_1 = __importDefault(require("../../errors/handleClientError"));
 const handleZodError_1 = __importDefault(require("../../errors/handleZodError"));
@@ -27,7 +27,7 @@ const globalErrorHandler = (error, req, res, next) => {
     // ========================================
     // STEP 3: HANDLE PRISMA VALIDATION ERRORS
     // ========================================
-    if ((error === null || error === void 0 ? void 0 : error.name) === 'PrismaClientValidationError') {
+    if (error?.name === 'PrismaClientValidationError') {
         const simplifiedError = (0, handleValidationError_1.default)(error);
         statusCode = simplifiedError.statusCode;
         message = simplifiedError.message;
@@ -57,13 +57,13 @@ const globalErrorHandler = (error, req, res, next) => {
     // ========================================
     // Handle custom ApiError instances (thrown by application logic)
     else if (error instanceof ApiError_1.default) {
-        statusCode = error === null || error === void 0 ? void 0 : error.statusCode; // Use the status code from the custom error
+        statusCode = error?.statusCode; // Use the status code from the custom error
         message = error.message; // Use the message from the custom error
-        errorMessages = (error === null || error === void 0 ? void 0 : error.message)
+        errorMessages = error?.message
             ? [
                 {
                     path: '', // No specific field path for general API errors
-                    message: error === null || error === void 0 ? void 0 : error.message,
+                    message: error?.message,
                 },
             ]
             : [];
@@ -72,12 +72,12 @@ const globalErrorHandler = (error, req, res, next) => {
     // STEP 7: HANDLE GENERIC JAVASCRIPT ERRORS
     // ========================================
     else if (error instanceof Error) {
-        message = error === null || error === void 0 ? void 0 : error.message; // Use the error message
-        errorMessages = (error === null || error === void 0 ? void 0 : error.message)
+        message = error?.message; // Use the error message
+        errorMessages = error?.message
             ? [
                 {
                     path: '', // No specific field path for generic errors
-                    message: error === null || error === void 0 ? void 0 : error.message,
+                    message: error?.message,
                 },
             ]
             : [];
@@ -89,7 +89,7 @@ const globalErrorHandler = (error, req, res, next) => {
         success: false, // Always false for error responses
         message, // Main error message
         errorMessages, // Array of detailed error messages with field paths
-        stack: config_1.default.env !== 'production' ? error === null || error === void 0 ? void 0 : error.stack : undefined, // Include stack trace only in development
+        stack: config_1.default.env !== 'production' ? error?.stack : undefined, // Include stack trace only in development
     });
 };
 exports.default = globalErrorHandler;

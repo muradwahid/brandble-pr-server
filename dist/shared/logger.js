@@ -23,7 +23,7 @@ const logger = (0, winston_1.createLogger)({
     transports: [
         new winston_1.transports.Console(),
         new winston_daily_rotate_file_1.default({
-            filename: path_1.default.join(process.cwd(), 'logs', 'winston', 'successes', 'brandable-%DATE%-success.log'),
+            filename: path_1.default.join(process.cwd(), 'logs', 'winston', 'success', 'brandable-%DATE%-success.log'),
             datePattern: 'YYYY-DD-MM-HH',
             zippedArchive: true,
             maxSize: '20m',

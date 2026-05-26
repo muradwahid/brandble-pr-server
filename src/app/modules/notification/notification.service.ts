@@ -1,16 +1,19 @@
-import { Notification, Prisma } from "@prisma/client";
+import { Notification, Prisma } from "../../../generated/client/client";
 import httpStatus from "http-status";
 import ApiError from "../../../errors/ApiError";
 import prisma from "../../../shared/prisma";
+import { SocketHelper } from "../../../helpers/SocketHelper";
 
 // notification.service.ts
 const createNotification = async (
   recipientId: string,
   title: string,
   message: string,
-  type: string = 'order_status',
+  type: string = '',
   orderId?: string,
-  userId?: string
+  userId?: string,
+  recipientType?: string,
+  submitStatus?: string
 ): Promise<Notification> => {
   if (!userId) {
     throw new ApiError(httpStatus.NOT_FOUND,'User not found')
@@ -20,6 +23,8 @@ const createNotification = async (
     message,
     type,
     recipientId,
+    recipientType,
+    submitStatus,
     status: 'unread',
     user: { connect: { id: userId } },
   };
@@ -28,9 +33,27 @@ const createNotification = async (
     notificationData.order = { connect: { id: orderId } };
   }
 
-  return await prisma.notification.create({
+  const result = await prisma.notification.create({
     data: notificationData,
   });
+
+  if (recipientType === 'admin') {
+    SocketHelper.sendAllUsers('new_notification', result);
+  } else { 
+    SocketHelper.sendToUser(recipientId, 'new_notification', result);
+  }
+
+  return result;
+};
+
+const getAdminUnreadNotificationCount = async () => {
+   const result=await prisma.notification.count({
+     where: {
+      recipientType: 'admin',
+      status: 'unread'
+    }
+   });
+  return result || 0;
 };
 
 const getUnreadNotificationCount = async (userId: string) => {
@@ -41,6 +64,56 @@ const getUnreadNotificationCount = async (userId: string) => {
     }
    });
   return result || 0;
+};
+
+const getAdminAllNotifications = async (filters: any = {}) => {
+  const { page = 1, limit = 20, status } = filters;
+  const skip = (page - 1) * limit;
+
+  const where: any = { recipientType: 'admin' };
+
+  if (status) {
+    where.status = status;
+  }
+
+  const [notifications, total] = await Promise.all([
+    prisma.notification.findMany({
+      where,
+      include: {
+        order: {
+          include: {
+            publication: true
+          }
+        },
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      skip,
+      take: limit
+    }),
+    prisma.notification.count({ where })
+  ]);
+
+  // Group notifications by date
+  const groupedNotifications = groupNotificationsByDate(notifications);
+
+  return {
+    data: groupedNotifications,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    }
+  };
 };
 
 const getNotifications = async (userId: string, filters: any = {}) => {
@@ -105,16 +178,34 @@ const markAsRead = async (notificationId: string, userId: string) => {
   });
 };
 
-const markAllAsRead = async (userId: string) => {
-  return await prisma.notification.updateMany({
-    where: {
-      recipientId: userId,
-      status: 'unread'
-    },
-    data: {
-      status: 'read'
-    }
-  });
+const markAllAsRead = async (userId: string, type: string) => {
+  
+  if (type === 'admin') {
+     const result = await prisma.notification.updateMany({
+      where: {
+        recipientType: 'admin',
+        status: 'unread'
+      },
+      data: {
+        status: 'read'
+      }
+     });
+    return result;
+  }
+
+  if (type === 'client') {
+    const result = await prisma.notification.updateMany({
+      where: {
+        recipientId: userId,
+        recipientType: 'client',
+        status: 'unread'
+      },
+      data: {
+        status: 'read'
+      }
+    });
+    return result;
+  }
 };
 
 // Helper function to group notifications by date
@@ -153,8 +244,10 @@ const groupNotificationsByDate = (notifications: any[]) => {
 
 
 export const NotificationService = {
+  getAdminUnreadNotificationCount,
   createNotification,
   getUnreadNotificationCount,
+  getAdminAllNotifications,
   getNotifications,
   markAsRead,
   markAllAsRead

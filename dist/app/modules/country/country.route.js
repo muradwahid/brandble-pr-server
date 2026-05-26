@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CountryRoutes = void 0;
+const express_1 = require("express");
+const country_controller_1 = require("./country.controller");
+const router = (0, express_1.Router)();
+router.post('/create', country_controller_1.CountryController.createCountry);
+router.get('/get-all', country_controller_1.CountryController.getAllCountry);
+router.put('/:id', country_controller_1.CountryController.updateCountry);
+router.delete('/:id', country_controller_1.CountryController.deleteCountry);
+router.get('/:id', country_controller_1.CountryController.getCountryById);
+exports.CountryRoutes = router;

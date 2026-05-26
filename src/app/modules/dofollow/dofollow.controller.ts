@@ -26,7 +26,7 @@ const getAllDoFollow = catchAsync(async (req: Request, res: Response) => {
 
 const updateDoFollow = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await DoFollowService.updateDoFollow(req.params.id, req.body);
+  const genre = await DoFollowService.updateDoFollow(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateDoFollow = catchAsync(async (req: Request, res: Response) => {
 
 const deleteDoFollow = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await DoFollowService.deleteDoFollow(req.params.id);
+  const genre = await DoFollowService.deleteDoFollow(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteDoFollow = catchAsync(async (req: Request, res: Response) => {
 
 const getDoFollowById = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await DoFollowService.getDoFollowById(req.params.id);
+  const genre = await DoFollowService.getDoFollowById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

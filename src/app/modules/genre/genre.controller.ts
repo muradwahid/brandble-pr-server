@@ -26,7 +26,7 @@ const getAllGenres = catchAsync(async (req: Request, res: Response) => {
 
 const updateGenre = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await GenreService.updateGenre(req.params.id, req.body);
+  const genre = await GenreService.updateGenre(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateGenre = catchAsync(async (req: Request, res: Response) => {
 
 const deleteGenre = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await GenreService.deleteGenre(req.params.id);
+  const genre = await GenreService.deleteGenre(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteGenre = catchAsync(async (req: Request, res: Response) => {
 
 const getGenreById = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await GenreService.getGenreById(req.params.id);
+  const genre = await GenreService.getGenreById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

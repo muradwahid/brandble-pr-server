@@ -107,7 +107,7 @@ const runningOrders = catchAsync(async (req: Request, res: Response) => {
 
 const getOrderById = catchAsync(async (req: Request, res: Response) => {
 
-  const result = await OrderService.getOrderById(req.params.id);
+  const result = await OrderService.getOrderById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -115,6 +115,19 @@ const getOrderById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+
+const getOrderHistory = catchAsync(async (req: Request, res: Response) => {
+  const orderIds = req.params.ids as string;
+  const userId = req.user?.id as string;
+  const result = await OrderService.getOrderHistory(orderIds,userId);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Order retrieved successfully!',
+    data: result,
+  });
+});
+
 const getSpecificUserOrders = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params as any;
   
@@ -131,7 +144,7 @@ const getSpecificUserOrders = catchAsync(async (req: Request, res: Response) => 
 
 const updateOrder = catchAsync(async (req: Request, res: Response) => {
 
-  const result = await OrderService.updateOrder(req.params.id, req.body);
+  const result = await OrderService.updateOrder(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -141,7 +154,7 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteOrder = catchAsync(async (req: Request, res: Response) => {
-  const result = await OrderService.deleteOrder(req.params.id);
+  const result = await OrderService.deleteOrder(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -195,7 +208,7 @@ const getUpcomingDeadlines = catchAsync(async (req: Request, res: Response) => {
 
 
 const updateOrderStatus = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const { id } = req.params as { id: string };
   const user = req.user;
   const { status } = req.body;
   const result = await OrderService.updateOrderStatus(id, status, user?.id as string);
@@ -216,6 +229,7 @@ export const OrderController = {
   userPublishedOrders,
   getAdminAllOrders,
   getAdminOrders,
+  getOrderHistory,
   createOrder,
   runningOrders,
   getOrderById,

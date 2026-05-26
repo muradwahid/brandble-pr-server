@@ -31,7 +31,7 @@ const getAllWriteArticles = async (req: Request, res: Response) => {
 
 const getWriteArticleById = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await WriteArticleService.getWriteArticleById(id);
+  const result = await WriteArticleService.getWriteArticleById(id as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -44,7 +44,7 @@ const getWriteArticleById = async (req: Request, res: Response) => {
 const updateWriteArticle = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  const result = await WriteArticleService.updateWriteArticle(id, data);
+  const result = await WriteArticleService.updateWriteArticle(id as string, data);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -56,7 +56,7 @@ const updateWriteArticle = async (req: Request, res: Response) => {
 
 const deleteWriteArticle = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await WriteArticleService.deleteWriteArticle(id);
+  const result = await WriteArticleService.deleteWriteArticle(id as string);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

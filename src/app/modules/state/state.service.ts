@@ -1,4 +1,4 @@
-import { State } from "@prisma/client";
+import { State } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createState = async (data: State): Promise<State> => {

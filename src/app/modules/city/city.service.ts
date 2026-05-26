@@ -1,4 +1,4 @@
-import { City } from "@prisma/client";
+import { City } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createCity = async (data: City): Promise<City> => {

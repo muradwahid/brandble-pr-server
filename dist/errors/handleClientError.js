@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const handleClientError = (error) => {
-    var _a;
     // ========================================
     // STEP 1: INITIALIZE ERROR RESPONSE VARIABLES
     // ========================================
@@ -13,7 +12,7 @@ const handleClientError = (error) => {
     // ========================================
     if (error.code === 'P2025') {
         // Extract the cause from error metadata or use default message
-        message = ((_a = error.meta) === null || _a === void 0 ? void 0 : _a.cause) || 'Record not found!';
+        message = error.meta?.cause || 'Record not found!';
         errors = [
             {
                 path: '', // No specific field path for record not found errors

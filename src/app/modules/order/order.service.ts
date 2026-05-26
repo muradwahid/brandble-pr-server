@@ -10,11 +10,12 @@ import { publicationSearchableFields } from '../publication/publication.constant
 import { dayNames, directSortableFields, nestedSortableFields, singleUserOrderSearchableFields } from './order.constant';
 import { IOrder, IOrderSearchableFields } from './order.interface';
 import { eachDayOfInterval, eachHourOfInterval, eachMonthOfInterval } from './order.functions';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '../../../generated/client/client';
 import { logger } from '../../../shared/logger';
 import Stripe from 'stripe';
 import config from '../../../config';
 import { SocketHelper } from '../../../helpers/SocketHelper';
+import { sendOrderMail } from '../../../helpers/mail';
 
 const stripe = new Stripe(config.stripe.secretKey as string);
 
@@ -702,8 +703,6 @@ const userOrders = async (
   };
 };
 
-
-
 const createOrder = async (order: any) => {
   const { userId, publicationIds, paymentMethodId, currency = 'usd' } = order;
 
@@ -714,32 +713,25 @@ const createOrder = async (order: any) => {
 
   const publications = await prisma.publication.findMany({
     where: { id: { in: pubIds } },
-    select: { id: true, price: true,title:true },
+    select: { id: true, price: true, title: true },
   });
 
   const paymentMethod = await prisma.paymentMethod.findFirst({
-    where: {
-      stripePaymentMethodId: paymentMethodId
-    }
-  })
+    where: { stripePaymentMethodId: paymentMethodId }
+  });
 
   if (!paymentMethod) throw new ApiError(400, 'Payment method not found');
 
-
-
   const results = [];
+  const clientNotificationsToCreate = [];
 
   for (const publication of publications) {
     const pubId = publication.id as string;
 
     try {
-      if (!publication) {
-        results.push({ pubId, status: 'failed', error: 'Publication not found!' });
-        continue;
-      }
-
       const amount = Math.round((publication.price || 0) * 100);
 
+      // Stripe Payment Intent
       const paymentIntent = await stripe.paymentIntents.create({
         amount,
         currency,
@@ -755,18 +747,72 @@ const createOrder = async (order: any) => {
             userId,
             publicationId: pubId,
             amount: publication.price || 0,
-            paymentStatus: 'paid', 
+            paymentStatus: 'paid',
             status: 'pending',
             paymentMethodId: paymentMethod.id
           },
         });
 
-        results.push({ publication, orderId: newOrder.orderId, status: 'success' });
+        if (newOrder.id) {
+          clientNotificationsToCreate.push({
+            userId: currentUser.id,
+            title: 'Order Confirmed',
+            message: `Your order <span class='font-semibold'>#${newOrder.orderId || newOrder.id}</span> has been successfully placed. Kindly submit the required information to processing and stay on schedule.`,
+            type: 'order_status',
+            orderId: newOrder.id,
+            triggeredBy: currentUser.id,
+            role: 'client',
+            status: 'placed'
+          });
+
+          results.push({
+            id: newOrder.id,
+            publication: publication,
+            orderId: newOrder.orderId || newOrder.id,
+            status: 'success',
+            amount: publication.price || 0
+          });
+        }
       } else {
-        results.push({ publication, status: 'failed', error: 'Payment failed!' });
+        results.push({ pubId, status: 'failed', error: 'Payment failed!' });
       }
     } catch (error: any) {
       results.push({ pubId, status: 'failed', error: error.message });
+    }
+  }
+
+  const successfulOrders = results.filter(result => result.status === 'success');
+
+  if (successfulOrders.length > 0) {
+    try {
+      const notificationPromises = clientNotificationsToCreate.map(notif =>
+        NotificationService.createNotification(
+          notif.userId, notif.title, notif.message, notif.type, notif.orderId, notif.triggeredBy, notif.role, notif.status
+        )
+      );
+      await Promise.all(notificationPromises);
+
+      const totalAmount = successfulOrders.reduce((sum, order) => sum + (order.amount || 0), 0);
+      const convertedAmount = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(totalAmount);
+
+      await NotificationService.createNotification(
+        currentUser.id,
+        'New Order Received',
+        `<span class='font-semibold'>#${currentUser.name}</span> placed ${successfulOrders.length} Order(s). Waiting for information submission. Total: ${convertedAmount}`,
+        'order_status',
+        successfulOrders[0].id,
+        currentUser.id,
+        'admin',
+        'placed'
+      );
+    } catch (notifError) {
+      console.error("Notification creation failed:", notifError);
+    }
+
+    try {
+      await sendOrderMail(currentUser.email, successfulOrders, currentUser);
+    } catch (mailError) {
+      console.error("Order process completed successfully, but receipt email failed:", mailError);
     }
   }
 
@@ -878,6 +924,26 @@ const getOrderById = async (id: string) => {
 
   return result;
 };
+
+const getOrderHistory = async (orderIds: string, userId: string) => { 
+  const orderIdsArray = orderIds.split(',');
+  const result = await prisma.order.findMany({
+    where: {
+      id: {
+        in: orderIdsArray,
+      },
+      userId: userId,
+    },
+    include: {
+      user: true,
+      publication: true,
+      wonArticle: true,
+      writeArticle: true,
+    },
+  });
+  return result;
+
+}
 
 const getSpecificUserOrders = async (
   userId: string,
@@ -1114,8 +1180,6 @@ const calculateGrowthRate = (current: number, previous: number): string => {
   return rate > 0 ? `+${formatted}` : formatted;
 };
 
-
-
 const getRevenueStatistics = async () => {
   const today = new Date();
   const sevenDaysAgo = subDays(today, 6); 
@@ -1315,30 +1379,25 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
       },
     });
 
-    if (updatedOrder && updatedOrder.userId) {
-      SocketHelper.sendToUserAndAdmins(updatedOrder.userId, "order_updated", status)
-    }
-
     // Notification message
-    let notificationTitle = 'Order Status Updated';
-    let notificationMessage = `Your order #${updatedOrder.orderId} is now ${status}.`;
-
+    let notificationTitle, notificationMessage,submitStatus;
+    
+    // const orderStatus = ['published', 'submitted', 'processing','unabletopublish']
     switch (status) {
       case 'published':
-        notificationTitle = 'Your Article is Live!';
-        notificationMessage = `Congratulations! Your article for order #${updatedOrder.orderId} has been published on ${updatedOrder.publication?.title || 'the site'}.`;
+        notificationTitle = 'Article Published Successfully';
+        notificationMessage = `Great news! Your article <span class='font-semibold'>"${updatedOrder.orderType === 'wonArticle' ? 'Write Article' : 'Write and Publish Article'}"</span> has been published on <span class='font-semibold'>${updatedOrder.publication?.title || 'the site'}</span>`;
+        submitStatus = status;
         break;
       case 'processing':
-        notificationTitle = 'Order Processing Started';
-        notificationMessage = `Great news! Your order #${updatedOrder.orderId} is now being processed.`;
+        notificationTitle = 'Order Processing';
+        notificationMessage = `Thanks for submitting information. Your order <span class='font-semibold'>#${updatedOrder.orderId}</span> is in processing. Soon we'll update you final status.`;
+        submitStatus = status;
         break;
-      case 'completed':
-        notificationTitle = 'Order Completed';
-        notificationMessage = `Your order #${updatedOrder.orderId} has been completed successfully.`;
-        break;
-      case 'cancelled':
-        notificationTitle = 'Order Cancelled';
-        notificationMessage = `Your order #${updatedOrder.orderId} has been cancelled.`;
+      case 'unabletopublish':
+        notificationTitle = 'Unable to Publish Article';
+        notificationMessage = `We're unable to publish article due to some unwanted issues. We're working on it, and we'll update you again. Message us for further information.`;
+        submitStatus = status;
         break;
     }
 
@@ -1348,11 +1407,13 @@ const updateOrderStatus = async (orderId: string, status: string, adminUserId?: 
       try {
         await NotificationService.createNotification(
           updatedOrder.user.id, 
-          notificationTitle,
-          notificationMessage,
+          notificationTitle as string,
+          notificationMessage as string,
           'order_status',
           orderId,
-          adminUserId
+          adminUserId,
+          'client',
+          submitStatus
         );
       } catch (error) {
         logger.error('Notification failed (but order updated):', error);
@@ -1371,6 +1432,7 @@ export const OrderService = {
   createOrder,
   runningOrders,
   getOrderById,
+  getOrderHistory,
   getSpecificUserOrders,
   updateOrder,
   deleteOrder,

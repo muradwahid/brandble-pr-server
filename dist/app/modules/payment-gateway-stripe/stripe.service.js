@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -18,11 +9,12 @@ const stripe_1 = __importDefault(require("stripe"));
 const config_1 = __importDefault(require("../../../config"));
 const ApiError_1 = __importDefault(require("../../../errors/ApiError"));
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
+const logger_1 = require("../../../shared/logger");
 const stripe = new stripe_1.default(config_1.default.stripe.secretKey);
-const paymentIntent = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const paymentIntent = async (data) => {
     const { price } = data;
     const amount = Math.round(price * 100);
-    const paymentIntent = yield stripe.paymentIntents.create({
+    const paymentIntent = await stripe.paymentIntents.create({
         amount,
         currency: 'usd',
         automatic_payment_methods: {
@@ -30,9 +22,9 @@ const paymentIntent = (data) => __awaiter(void 0, void 0, void 0, function* () {
         },
     });
     return paymentIntent.client_secret;
-});
-const savePaymentInfo = (data) => __awaiter(void 0, void 0, void 0, function* () {
-});
+};
+const savePaymentInfo = async (data) => {
+};
 // const createSetupIntent = async () => {
 //     let customerId = (await user())?.stripeCustomerId as any;
 //     let tempUser = await prisma.user.findUnique({
@@ -130,19 +122,19 @@ const savePaymentInfo = (data) => __awaiter(void 0, void 0, void 0, function* ()
 //     })
 //     return savedPayment;
 // }
-const createSetupIntent = (req) => __awaiter(void 0, void 0, void 0, function* () {
+const createSetupIntent = async (req) => {
     const user = req.user;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
     });
     if (!currentUser)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
-    let customerId = currentUser === null || currentUser === void 0 ? void 0 : currentUser.stripeCustomerId;
+    let customerId = currentUser?.stripeCustomerId;
     //stripe customer create
     if (!currentUser.stripeCustomerId) {
-        let customer = yield stripe.customers.create({
+        let customer = await stripe.customers.create({
             email: currentUser.email,
             metadata: {
                 userId: currentUser.id
@@ -150,7 +142,7 @@ const createSetupIntent = (req) => __awaiter(void 0, void 0, void 0, function* (
         });
         customerId = customer.id;
         //update user 
-        yield prisma_1.default.user.update({
+        await prisma_1.default.user.update({
             where: {
                 id: currentUser.id
             },
@@ -162,8 +154,8 @@ const createSetupIntent = (req) => __awaiter(void 0, void 0, void 0, function* (
     if (!customerId)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'Stripe customer not found');
     //setup intent
-    const setupIntent = yield stripe.setupIntents.create({
-        customer: customerId !== null && customerId !== void 0 ? customerId : '',
+    const setupIntent = await stripe.setupIntents.create({
+        customer: customerId ?? '',
         payment_method_types: [
             'card',
             // 'paypal',
@@ -180,13 +172,12 @@ const createSetupIntent = (req) => __awaiter(void 0, void 0, void 0, function* (
         usage: 'on_session'
     });
     return setupIntent;
-});
-const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+};
+const savePaymentMethod = async (req) => {
     const user = req.user;
     const data = req.body;
     const { paymentMethodId } = data;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
@@ -196,7 +187,7 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
     if (!currentUser) {
         throw new ApiError_1.default(401, 'User not authenticated');
     }
-    const userId = yield prisma_1.default.user.findFirst({
+    const userId = await prisma_1.default.user.findFirst({
         where: {
             id: currentUser.id
         }
@@ -204,15 +195,18 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
     if (!paymentMethodId) {
         throw new ApiError_1.default(400, 'Payment method ID is required');
     }
-    if (!(userId === null || userId === void 0 ? void 0 : userId.stripeCustomerId)) {
+    if (!userId?.stripeCustomerId) {
         throw new ApiError_1.default(400, 'Stripe customer not found');
     }
     try {
         // Attach payment method to customer
-        yield stripe.paymentMethods.attach(paymentMethodId, {
+        await stripe.paymentMethods.attach(paymentMethodId, {
             customer: userId.stripeCustomerId
         });
-        const paymentMethod = yield stripe.paymentMethods.retrieve(paymentMethodId);
+        // Retrieve payment method details
+        const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+        // console.log("Full payment method details:", JSON.stringify(paymentMethod, null, 2));
+        // Extract common details based on payment method type
         let brand = 'unknown';
         let last4 = '';
         let expMonth = null;
@@ -220,10 +214,10 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
         // Handle different payment method types
         switch (paymentMethod.type) {
             case 'card':
-                brand = ((_a = paymentMethod.card) === null || _a === void 0 ? void 0 : _a.brand) || 'card';
-                last4 = ((_b = paymentMethod.card) === null || _b === void 0 ? void 0 : _b.last4) || '';
-                expMonth = (_c = paymentMethod.card) === null || _c === void 0 ? void 0 : _c.exp_month;
-                expYear = (_d = paymentMethod.card) === null || _d === void 0 ? void 0 : _d.exp_year;
+                brand = paymentMethod.card?.brand || 'card';
+                last4 = paymentMethod.card?.last4 || '';
+                expMonth = paymentMethod.card?.exp_month;
+                expYear = paymentMethod.card?.exp_year;
                 break;
             case 'paypal':
                 brand = 'paypal';
@@ -231,11 +225,11 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
                 break;
             case 'us_bank_account':
                 brand = 'bank_account';
-                last4 = ((_e = paymentMethod.us_bank_account) === null || _e === void 0 ? void 0 : _e.last4) || '';
+                last4 = paymentMethod.us_bank_account?.last4 || '';
                 break;
             case 'sepa_debit':
                 brand = 'sepa_debit';
-                last4 = ((_f = paymentMethod.sepa_debit) === null || _f === void 0 ? void 0 : _f.last4) || '';
+                last4 = paymentMethod.sepa_debit?.last4 || '';
                 break;
             case 'link':
                 brand = 'link';
@@ -246,7 +240,7 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
                 last4 = paymentMethod.type.toUpperCase();
         }
         // Retrieve existing payment methods
-        const existingPaymentMethods = yield prisma_1.default.paymentMethod.findMany({
+        const existingPaymentMethods = await prisma_1.default.paymentMethod.findMany({
             where: {
                 userId: currentUser.id
             }
@@ -254,14 +248,15 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
         const isFirstPayment = existingPaymentMethods.length === 0;
         // If first payment method, make it the default
         if (isFirstPayment) {
-            yield stripe.customers.update(userId.stripeCustomerId, {
+            await stripe.customers.update(userId.stripeCustomerId, {
                 invoice_settings: {
                     default_payment_method: paymentMethodId
                 }
             });
         }
+        const billingDetails = paymentMethod.billing_details;
         // Save to database
-        const savedPayment = yield prisma_1.default.paymentMethod.create({
+        const savedPayment = await prisma_1.default.paymentMethod.create({
             data: {
                 userId: currentUser.id,
                 stripePaymentMethodId: paymentMethodId,
@@ -271,11 +266,16 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
                 expMonth: expMonth,
                 expYear: expYear,
                 // Billing details from Stripe
-                email: ((_g = paymentMethod.billing_details) === null || _g === void 0 ? void 0 : _g.email) || null,
-                name: ((_h = paymentMethod.billing_details) === null || _h === void 0 ? void 0 : _h.name) || null,
-                phone: ((_j = paymentMethod.billing_details) === null || _j === void 0 ? void 0 : _j.phone) || null,
-                billingAddress: ((_k = paymentMethod.billing_details) === null || _k === void 0 ? void 0 : _k.address) ?
-                    JSON.stringify(paymentMethod.billing_details.address) : null,
+                email: billingDetails?.email || null,
+                name: billingDetails?.name || null,
+                phone: billingDetails?.phone || null,
+                // billingAddress: billingDetails?.address,
+                country: billingDetails?.address?.country || null,
+                city: billingDetails?.address?.city || null,
+                state: billingDetails?.address?.state || null,
+                postalCode: billingDetails?.address?.postal_code || null,
+                line1: billingDetails?.address?.line1 || null,
+                line2: billingDetails?.address?.line2 || null,
                 isDefault: isFirstPayment
             }
         });
@@ -286,30 +286,30 @@ const savePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* (
         };
     }
     catch (error) {
-        console.error('Error in savePaymentMethod:', error);
+        logger_1.logger.error('Error in savePaymentMethod:', error);
         if (error && typeof error === 'object' && 'type' in error && error.type === 'StripeInvalidRequestError') {
             throw new ApiError_1.default(400, `Stripe error: ${error.message}`);
         }
         throw new ApiError_1.default(500, 'Failed to save payment method');
     }
-});
-const processPayment = (req) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const processPayment = async (req) => {
     const user = req.user;
     const { paymentMethodId, amount, currency = 'usd' } = req.body;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
     });
     if (!currentUser)
-        throw new ApiError_1.default(401, 'User not authenticated');
+        throw new ApiError_1.default(http_status_1.default.UNAUTHORIZED, 'User not authenticated');
     const total = Math.round(amount * 100);
     if (!paymentMethodId || !amount)
         throw new ApiError_1.default(400, 'Payment method id and amount are required');
-    if (!(currentUser === null || currentUser === void 0 ? void 0 : currentUser.stripeCustomerId))
+    if (!currentUser?.stripeCustomerId)
         throw new ApiError_1.default(400, 'Stripe customer not found');
     //create payment intent
-    const paymentIntent = yield stripe.paymentIntents.create({
+    const paymentIntent = await stripe.paymentIntents.create({
         amount: total,
         currency,
         customer: currentUser.stripeCustomerId,
@@ -318,7 +318,7 @@ const processPayment = (req) => __awaiter(void 0, void 0, void 0, function* () {
         confirm: true
     });
     if (paymentIntent.status === 'succeeded') {
-        const paymentMethod = yield prisma_1.default.paymentMethod.findFirst({
+        const paymentMethod = await prisma_1.default.paymentMethod.findFirst({
             where: {
                 stripePaymentMethodId: paymentMethodId
             }
@@ -335,10 +335,10 @@ const processPayment = (req) => __awaiter(void 0, void 0, void 0, function* () {
     else {
         throw new ApiError_1.default(400, 'Payment failed');
     }
-});
-const getPaymentMethods = (req) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const getPaymentMethods = async (req) => {
     const user = req.user;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
@@ -353,29 +353,29 @@ const getPaymentMethods = (req) => __awaiter(void 0, void 0, void 0, function* (
     //         isDefault: 'desc'
     //     }
     // })
-    const paymentMethods = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        const methods = yield transactionClient.paymentMethod.findMany({
+    const paymentMethods = await prisma_1.default.$transaction(async (transactionClient) => {
+        const methods = await transactionClient.paymentMethod.findMany({
             where: {
-                userId: currentUser === null || currentUser === void 0 ? void 0 : currentUser.id
+                userId: currentUser?.id
             },
             orderBy: {
                 isDefault: 'desc'
             }
         });
-        const newData = yield Promise.all(methods.map((method) => __awaiter(void 0, void 0, void 0, function* () {
-            const stripeData = yield stripe.paymentMethods.retrieve(method.stripePaymentMethodId);
-            return Object.assign(Object.assign({}, method), { stripeData });
-        })));
+        const newData = await Promise.all(methods.map(async (method) => {
+            const stripeData = await stripe.paymentMethods.retrieve(method.stripePaymentMethodId);
+            return { ...method, stripeData };
+        }));
         return newData;
-    }));
+    });
     // const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethods[3]?.stripePaymentMethodId as string);
     return paymentMethods;
-});
-const setDefaultPaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const setDefaultPaymentMethod = async (req) => {
     const user = req.user;
     const data = req.body;
     const { paymentMethodId } = data;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
@@ -384,73 +384,73 @@ const setDefaultPaymentMethod = (req) => __awaiter(void 0, void 0, void 0, funct
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
     if (!paymentMethodId)
         throw new ApiError_1.default(400, 'Payment method ID is required');
-    const updatedPayment = yield prisma_1.default.$transaction((transactionClient) => __awaiter(void 0, void 0, void 0, function* () {
-        yield transactionClient.paymentMethod.updateMany({
+    const updatedPayment = await prisma_1.default.$transaction(async (transactionClient) => {
+        await transactionClient.paymentMethod.updateMany({
             where: {
-                userId: currentUser === null || currentUser === void 0 ? void 0 : currentUser.id
+                userId: currentUser?.id
             },
             data: {
                 isDefault: false
             }
         });
-        const setDefault = yield transactionClient.paymentMethod.update({
+        const setDefault = await transactionClient.paymentMethod.update({
             where: {
                 id: paymentMethodId,
-                userId: currentUser === null || currentUser === void 0 ? void 0 : currentUser.id
+                userId: currentUser?.id
             },
             data: {
                 isDefault: true
             }
         });
         return setDefault;
-    }));
+    });
     // update stripe customer default payment method
-    if (currentUser === null || currentUser === void 0 ? void 0 : currentUser.stripeCustomerId) {
-        yield stripe.customers.update(currentUser.stripeCustomerId, {
+    if (currentUser?.stripeCustomerId) {
+        await stripe.customers.update(currentUser.stripeCustomerId, {
             invoice_settings: {
                 default_payment_method: updatedPayment.stripePaymentMethodId
             }
         });
     }
     return updatedPayment;
-});
-const deletePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function* () {
+};
+const deletePaymentMethod = async (req) => {
     const id = req.params.id;
     const user = req.user;
-    const currentUser = yield prisma_1.default.user.findFirst({
+    const currentUser = await prisma_1.default.user.findFirst({
         where: {
             id: user.id
         }
     });
     if (!currentUser)
         throw new ApiError_1.default(http_status_1.default.NOT_FOUND, 'User not found');
-    const paymentMethod = yield prisma_1.default.paymentMethod.findFirst({
+    const paymentMethod = await prisma_1.default.paymentMethod.findFirst({
         where: {
             id: id,
-            userId: currentUser === null || currentUser === void 0 ? void 0 : currentUser.id
+            userId: currentUser?.id
         }
     });
     try {
-        yield stripe.paymentMethods.detach(paymentMethod === null || paymentMethod === void 0 ? void 0 : paymentMethod.stripePaymentMethodId);
+        await stripe.paymentMethods.detach(paymentMethod?.stripePaymentMethodId);
     }
     catch (error) {
         throw new ApiError_1.default(400, 'Payment method not found');
     }
-    const result = yield prisma_1.default.paymentMethod.delete({
+    const result = await prisma_1.default.paymentMethod.delete({
         where: {
             id: id
         }
     });
     // if deleted payment method is default, set new method default
-    if (paymentMethod === null || paymentMethod === void 0 ? void 0 : paymentMethod.isDefault) {
-        const remainingMethods = yield prisma_1.default.paymentMethod.findMany({
+    if (paymentMethod?.isDefault) {
+        const remainingMethods = await prisma_1.default.paymentMethod.findMany({
             where: {
-                userId: currentUser === null || currentUser === void 0 ? void 0 : currentUser.id
+                userId: currentUser?.id
             },
             take: 1
         });
         if (remainingMethods.length > 0) {
-            yield prisma_1.default.paymentMethod.update({
+            await prisma_1.default.paymentMethod.update({
                 where: {
                     id: remainingMethods[0].id
                 },
@@ -461,7 +461,7 @@ const deletePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function*
         }
         // update stripe customer default
         if (user.stripeCustomerId) {
-            yield stripe.customers.update(user.stripeCustomerId, {
+            await stripe.customers.update(user.stripeCustomerId, {
                 invoice_settings: {
                     default_payment_method: remainingMethods[0].stripePaymentMethodId
                 }
@@ -469,7 +469,7 @@ const deletePaymentMethod = (req) => __awaiter(void 0, void 0, void 0, function*
         }
     }
     return result;
-});
+};
 exports.StripeService = {
     paymentIntent,
     savePaymentInfo,

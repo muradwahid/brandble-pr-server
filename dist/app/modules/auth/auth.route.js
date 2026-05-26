@@ -1,13 +1,24 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthRoutes = void 0;
 const express_1 = require("express");
-const auth_controller_1 = require("./auth.controller");
 const FileUploadHelper_1 = require("../../../helpers/FileUploadHelper");
+const auth_controller_1 = require("./auth.controller");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const user_1 = require("../../../enums/user");
 const router = (0, express_1.Router)();
+router.get('/get-admin-role', auth_controller_1.AuthController.getAdminRole);
 router.get('/all-users', auth_controller_1.AuthController.allUsers);
+router.get('/user-all-info', auth_controller_1.AuthController.userAllInfo);
 router.get('/:id', auth_controller_1.AuthController.getSingleUser);
 router.post('/signup', auth_controller_1.AuthController.createUser);
+router.patch('/send-email-otp', auth_controller_1.AuthController.sendEmailOTP);
+router.patch('/check-otp', auth_controller_1.AuthController.verifyOTP);
+router.patch('/update-password', (0, auth_1.default)(user_1.ENUM_USER_ROLE.CLIENT, user_1.ENUM_USER_ROLE.ADMIN, user_1.ENUM_USER_ROLE.SUPER_ADMIN), auth_controller_1.AuthController.resetPassword);
+router.patch('/forgot-password', auth_controller_1.AuthController.forgotPassword);
 router.get('/get-user-by-cookie', auth_controller_1.AuthController.getUserByCookie);
 router.post('/signout', auth_controller_1.AuthController.getUserByCookie);
 router.post('/signin', auth_controller_1.AuthController.loginUser);
@@ -15,6 +26,6 @@ router.patch('/update/:id', FileUploadHelper_1.FileUploadHelper.upload.single('f
     req.body = JSON.parse(req.body.data);
     return auth_controller_1.AuthController.updateUser(req, res, next);
 });
-router.delete('/:id', auth_controller_1.AuthController.deleteUser);
+router.delete('/delete/:id', auth_controller_1.AuthController.deleteUser);
 // router.post('/refresh-token', AuthController.refreshToken);
 exports.AuthRoutes = router;

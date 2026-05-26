@@ -26,7 +26,7 @@ const getAllCountry = catchAsync(async (req: Request, res: Response) => {
 
 const updateCountry = catchAsync(async (req: Request, res: Response) => {
 
-  const country = await CountryService.updateCountry(req.params.id, req.body);
+  const country = await CountryService.updateCountry(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateCountry = catchAsync(async (req: Request, res: Response) => {
 
 const deleteCountry = catchAsync(async (req: Request, res: Response) => {
 
-  const country = await CountryService.deleteCountry(req.params.id);
+  const country = await CountryService.deleteCountry(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteCountry = catchAsync(async (req: Request, res: Response) => {
 
 const getCountryById = catchAsync(async (req: Request, res: Response) => {
 
-  const country = await CountryService.getCountryById(req.params.id);
+  const country = await CountryService.getCountryById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

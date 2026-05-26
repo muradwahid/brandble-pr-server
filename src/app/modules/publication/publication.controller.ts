@@ -4,7 +4,7 @@ import { paginationFields } from '../../../constants/pagination';
 import catchAsync from '../../../shared/catchAsync';
 import pick from '../../../shared/pick';
 import sendResponse from '../../../shared/sendResponse';
-import { publicationFilterableFieldsController, publicationSearchableFields } from './publication.constant';
+import { publicationFilterableFieldsController } from './publication.constant';
 import { PublicationService } from './publication.service';
 
 const createPublication = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
@@ -62,7 +62,7 @@ const getSearchPublications = catchAsync(async (req: Request, res: Response) => 
 
 const getPublicationById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await PublicationService.getPublicationById(id);
+  const result = await PublicationService.getPublicationById(id as string);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -83,7 +83,7 @@ const getPublicationStatistics = catchAsync(async (req: Request, res: Response) 
 const updatePublication = catchAsync(async (req: Request, res: Response,next: NextFunction) => {
     const { id } = req.params;
 
-  try { const result = await PublicationService.updatePublication(id,req);
+  try { const result = await PublicationService.updatePublication(id as string,req);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -97,7 +97,7 @@ const updatePublication = catchAsync(async (req: Request, res: Response,next: Ne
 
 const deletePublication = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await PublicationService.deletePublication(id);
+  const result = await PublicationService.deletePublication(id as string);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,

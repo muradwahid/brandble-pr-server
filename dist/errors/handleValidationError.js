@@ -7,7 +7,7 @@ const handleValidationError = (error) => {
     const errors = [
         {
             path: '', // No specific field path for general validation errors
-            message: error === null || error === void 0 ? void 0 : error.message, // Use the original Prisma validation message
+            message: error?.message, // Use the original Prisma validation message
         },
     ];
     // ========================================

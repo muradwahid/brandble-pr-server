@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.StateRoutes = void 0;
+const express_1 = require("express");
+const state_controller_1 = require("./state.controller");
+const router = (0, express_1.Router)();
+router.post('/create', state_controller_1.StateController.createState);
+router.get('/get-all', state_controller_1.StateController.getAllState);
+router.put('/:id', state_controller_1.StateController.updateState);
+router.delete('/:id', state_controller_1.StateController.deleteState);
+router.get('/:id', state_controller_1.StateController.getStateById);
+exports.StateRoutes = router;

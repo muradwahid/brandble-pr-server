@@ -1,4 +1,4 @@
-import { Niche } from "@prisma/client";
+import { Niche } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createNiche = async (data: Niche): Promise<Niche> => {

@@ -26,7 +26,7 @@ const getAllState = catchAsync(async (req: Request, res: Response) => {
 
 const updateState = catchAsync(async (req: Request, res: Response) => {
 
-  const state = await StateService.updateState(req.params.id, req.body);
+  const state = await StateService.updateState(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateState = catchAsync(async (req: Request, res: Response) => {
 
 const deleteState = catchAsync(async (req: Request, res: Response) => {
 
-  const state = await StateService.deleteState(req.params.id);
+  const state = await StateService.deleteState(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteState = catchAsync(async (req: Request, res: Response) => {
 
 const getStateById = catchAsync(async (req: Request, res: Response) => {
 
-  const state = await StateService.getStateById(req.params.id);
+  const state = await StateService.getStateById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

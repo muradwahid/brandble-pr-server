@@ -18,6 +18,11 @@ const wonArticle_route_1 = require("../modules/wonArticle/wonArticle.route");
 const writeArticle_route_1 = require("../modules/writeArticle/writeArticle.route");
 const favorite_route_1 = require("../modules/favorite/favorite.route");
 const chat_route_1 = require("../modules/chat/chat.route");
+const notification_route_1 = require("../modules/notification/notification.route");
+const city_route_1 = require("../modules/city/city.route");
+const country_route_1 = require("../modules/country/country.route");
+const state_route_1 = require("../modules/state/state.route");
+const common_route_1 = require("../modules/common/common.route");
 const router = express_1.default.Router();
 const moduleRoutes = [
     {
@@ -49,6 +54,18 @@ const moduleRoutes = [
         routes: publication_route_1.PublicationRoutes,
     },
     {
+        path: '/country',
+        routes: country_route_1.CountryRoutes,
+    },
+    {
+        path: '/states',
+        routes: state_route_1.StateRoutes,
+    },
+    {
+        path: '/cities',
+        routes: city_route_1.CityRoutes,
+    },
+    {
         path: '/favorite',
         routes: favorite_route_1.FavoriteRoutes,
     },
@@ -71,6 +88,14 @@ const moduleRoutes = [
     {
         path: '/dofollow',
         routes: dofollow_route_1.DoFollowRoutes,
+    },
+    {
+        path: '/common',
+        routes: common_route_1.CommonRoutes
+    },
+    {
+        path: '/notifications',
+        routes: notification_route_1.NotificationRoutes
     },
     {
         path: '/payment',

@@ -1,4 +1,5 @@
-import { Publication, WonArticle, WriteArticle } from '@prisma/client';
+
+import { Publication, WonArticle, WriteArticle } from '../../../generated/client/client';
 import { IUser } from '../auth/auth.interface';
 
 export interface IOrder {

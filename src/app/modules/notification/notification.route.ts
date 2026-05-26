@@ -5,6 +5,11 @@ import { NotificationController } from './notification.controller';
 
 const router = Router();
 
+// Admin routes
+router.get('/admin/unread-count', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), NotificationController.getAdminUnreadNotificationCount);
+router.get('/admin/get-all-notifications', auth(ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), NotificationController.getAdminAllNotifications);
+
+// Client routes
 router.get('/my-notifications', auth(ENUM_USER_ROLE.CLIENT), NotificationController.getMyNotifications);
 router.get('/unread-count', auth(ENUM_USER_ROLE.CLIENT, ENUM_USER_ROLE.ADMIN, ENUM_USER_ROLE.SUPER_ADMIN), NotificationController.getUnreadNotificationCount);
 router.patch(

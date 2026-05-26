@@ -470,7 +470,7 @@ const setDefaultPaymentMethod = async (req:CustomRequest) => {
 }
 
 const deletePaymentMethod = async (req:CustomRequest) => {
-    const id = req.params.id
+    const id = req.params.id as string;
     const user = req.user;
     const currentUser = await prisma.user.findFirst({
         where: {

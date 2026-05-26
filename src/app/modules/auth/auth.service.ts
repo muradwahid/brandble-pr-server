@@ -10,7 +10,8 @@ import { sendResetOtpEmail } from "../../../helpers/mail";
 import { IUploadFile } from "../../../interfaces/file";
 import prisma from "../../../shared/prisma";
 import { CustomRequest, ILoginUserResponse, IUser, IUserLogin } from "./auth.interface";
-import { User } from "@prisma/client";
+import { User } from "../../../generated/client/client";
+// import { User } from "@prisma/client";
 
 const allUsers = async () => {
 
@@ -73,15 +74,15 @@ const userAllInfo = async (
 
   const total = await prisma.user.count({ where: whereConditions });
 
-  const result = users.map((user) => {
+  const result = users.map((user: any) => {
     const allOrders = user.orders || [];
     const totalOrders = user._count.orders;
 
-    const runningOrders = allOrders.filter((order) =>
+    const runningOrders = allOrders.filter((order: any) =>
       ['pending', 'in_progress', 'under_review', 'assigned'].includes(order.status)
     ).length;
 
-    const publishedOrders = allOrders.filter((order) =>
+    const publishedOrders = allOrders.filter((order:any) =>
       ['completed', 'published', 'live', 'delivered'].includes(order.status)
     ).length;
 
@@ -217,7 +218,7 @@ const sendEmailOTP = async (email: string) => {
     specialChars: false,
     lowerCaseAlphabets: false,
   });
-  const expiresIn = new Date(Date.now() + 10 * 60 * 1000);
+  const expiresIn = new Date(Date.now() + 30 * 60 * 1000);
   const updateUser = await prisma.user.update({
     where: { email },
     data: {

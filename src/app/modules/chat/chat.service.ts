@@ -746,10 +746,9 @@
 // };
 
 // src/services/chatService.ts
-import { PrismaClient } from '@prisma/client';
 import { logger } from '../../../shared/logger';
+import prisma from '../../../shared/prisma';
 
-const prisma = new PrismaClient();
 
 export const chatService = {
   // Get or create chat room for user-admin communication (first time chat)

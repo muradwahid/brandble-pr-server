@@ -26,7 +26,7 @@ const getAllSponsors = catchAsync(async (req: Request, res: Response) => {
 
 const updateSponsored = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await SponsoredService.updateSponsored(req.params.id, req.body);
+  const genre = await SponsoredService.updateSponsored(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateSponsored = catchAsync(async (req: Request, res: Response) => {
 
 const deleteSponsored = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await SponsoredService.deleteSponsored(req.params.id);
+  const genre = await SponsoredService.deleteSponsored(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteSponsored = catchAsync(async (req: Request, res: Response) => {
 
 const getSponsoredById = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await SponsoredService.getSponsoredById(req.params.id);
+  const genre = await SponsoredService.getSponsoredById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

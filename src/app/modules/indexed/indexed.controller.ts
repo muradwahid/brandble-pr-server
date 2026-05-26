@@ -26,7 +26,7 @@ const getAllIndexes = catchAsync(async (req: Request, res: Response) => {
 
 const updateIndexed = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await IndexedService.updateIndexed(req.params.id, req.body);
+  const genre = await IndexedService.updateIndexed(req.params.id as string, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -37,7 +37,7 @@ const updateIndexed = catchAsync(async (req: Request, res: Response) => {
 
 const deleteIndexed = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await IndexedService.deleteIndexed(req.params.id);
+  const genre = await IndexedService.deleteIndexed(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -48,7 +48,7 @@ const deleteIndexed = catchAsync(async (req: Request, res: Response) => {
 
 const getIndexedById = catchAsync(async (req: Request, res: Response) => {
 
-  const genre = await IndexedService.getIndexedById(req.params.id);
+  const genre = await IndexedService.getIndexedById(req.params.id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

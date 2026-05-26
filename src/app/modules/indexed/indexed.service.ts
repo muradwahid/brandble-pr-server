@@ -1,4 +1,4 @@
-import { Indexed } from "@prisma/client";
+import { Indexed } from "../../../generated/client/client";
 import prisma from "../../../shared/prisma";
 
 const createIndexed = async (data: Indexed): Promise<Indexed> => {

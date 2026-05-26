@@ -96,7 +96,7 @@ const getUserByCookie = catchAsync(async (req: Request, res: Response) => {
 
 const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await AuthService.getSingleUser(id);
+  const result = await AuthService.getSingleUser(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success:true,
@@ -153,7 +153,7 @@ const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunct
     const { id } = req.params;
 
   try {
-    const result = await AuthService.updateUser(id, req);
+    const result = await AuthService.updateUser(id as string, req);
   sendResponse(res, {
     success: true,
     statusCode: httpStatus.OK,
@@ -167,7 +167,7 @@ const updateUser = catchAsync(async (req: Request, res: Response,next: NextFunct
 
 const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await AuthService.deleteUser(id);
+  const result = await AuthService.deleteUser(id as string);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success:true,

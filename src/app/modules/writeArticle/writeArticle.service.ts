@@ -1,4 +1,5 @@
-import { Prisma, WriteArticle } from "@prisma/client";
+import { Prisma, WriteArticle } from '../../../generated/client/client';
+
 import httpStatus from 'http-status';
 import ApiError from "../../../errors/ApiError";
 import { FileUploadHelper } from "../../../helpers/FileUploadHelper";

@@ -8,6 +8,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const path_1 = __importDefault(require("path"));
 dotenv_1.default.config({ path: path_1.default.join(process.cwd(), '.env') });
 exports.default = {
+    dbUrl: process.env.DATABASE_URL,
     env: process.env.NODE_ENV,
     port: process.env.PORT,
     rootUrl: process.env.ROOT_URL,
@@ -25,5 +26,16 @@ exports.default = {
     },
     stripe: {
         secretKey: process.env.STRIPE_SECRET_KEY,
+    },
+    mailer: {
+        email: process.env.EMAIL_USER,
+        password: process.env.EMAIL_PASS,
+    },
+    cloudflare: {
+        bucketName: process.env.CLOUDFLARE_BUCKET_NAME,
+        publicUrl: process.env.CLOUDFLARE_PUBLIC_URL,
+        endpoint: process.env.CLOUDFLARE_ENDPOINT,
+        accessKeyId: process.env.CLOUDFLARE_ACCESS_KEY,
+        secretAccessKey: process.env.CLOUDFLARE_SECRET_KEY,
     }
 };

@@ -40,7 +40,7 @@ const getAllWonArticles = async (req: Request, res: Response) => {
 
 const getWonArticleById = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const wonArticle = await WonArticleService.getWonArticleById(id);
+    const wonArticle = await WonArticleService.getWonArticleById(id as string);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
@@ -51,7 +51,7 @@ const getWonArticleById = async (req: Request, res: Response) => {
 
 const updateWonArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const wonArticle = await WonArticleService.updateWonArticle(id, req.body);
+    const wonArticle = await WonArticleService.updateWonArticle(id as string, req.body);
     if (!wonArticle) {
         sendResponse(res, {
             statusCode: httpStatus.NOT_FOUND,
@@ -69,7 +69,7 @@ const updateWonArticle = async (req: Request, res: Response) => {
 
 const deleteWonArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const wonArticle = await WonArticleService.deleteWonArticle(id);
+    const wonArticle = await WonArticleService.deleteWonArticle(id as string);
     if (!wonArticle) {
         sendResponse(res, {
             statusCode: httpStatus.NOT_FOUND,

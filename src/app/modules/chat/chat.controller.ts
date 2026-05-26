@@ -176,7 +176,7 @@ export const chatController = {
   async getUserChats(req: Request, res: Response) {
     try {
       const { adminId } = req.params;
-      const chatRooms = await chatService.getUserChatRooms(adminId);
+      const chatRooms = await chatService.getUserChatRooms(adminId as string);
       res.json(chatRooms);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch user chats' });
@@ -186,7 +186,7 @@ export const chatController = {
   async getClientChats(req: Request, res: Response) {
     try {
       const { clientId } = req.params;
-      const chatRooms = await chatService.getClientChatRooms(clientId);
+      const chatRooms = await chatService.getClientChatRooms(clientId as string);
       res.json(chatRooms);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch user chats' });
@@ -197,7 +197,7 @@ export const chatController = {
   async getOrderChats(req: Request, res: Response) {
     try {
       const { adminId } = req.params;
-      const chatRooms = await chatService.getOrderChatRooms(adminId);
+      const chatRooms = await chatService.getOrderChatRooms(adminId as string);
       res.json(chatRooms);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch order chats' });
@@ -207,7 +207,7 @@ export const chatController = {
   async getOrderUserChats(req: Request, res: Response) { 
       try {
         const { userId } = req.params;
-        const chatRooms = await chatService.getOrderUserChats(userId);
+        const chatRooms = await chatService.getOrderUserChats(userId as string);
         res.json(chatRooms);
       } catch (error) {
         res.status(500).json({ error: 'Failed to fetch order chats' });
@@ -218,7 +218,7 @@ export const chatController = {
   async getUserChatRooms(req: Request, res: Response) {
     try {
       const { userId } = req.params;
-      const chatRooms = await chatService.getUserChats(userId);
+      const chatRooms = await chatService.getUserChats(userId as string);
       res.json(chatRooms);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch chats' });
@@ -258,7 +258,7 @@ export const chatController = {
     try {
       const { chatRoomId } = req.params;
       const messages = await prisma.chatMessage.findMany({
-        where: { chatRoomId },
+        where: { chatRoomId: chatRoomId as string },
         include: {
           sender: {
             select: {

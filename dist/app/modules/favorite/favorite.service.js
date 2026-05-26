@@ -1,39 +1,110 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FavoriteService = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
-const allFavorites = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.favorite.findMany({
-        where: { userId: userId }
+const allFavorites = async (userId) => {
+    const publications = await prisma_1.default.publication.findMany({
+        where: {
+            favorites: {
+                some: {
+                    userId: userId
+                }
+            }
+        },
+        include: {
+            niches: true,
+            countries: true,
+            states: true,
+            cities: true
+        }
+    });
+    return publications;
+    // return await prisma.$transaction(async (tx) => {
+    //   // Get publications
+    //   const favoritesIds =  await tx.favorite.findMany({
+    //     where: { userId: userId },
+    //     include: {
+    //       publication: true
+    //     }
+    //   });
+    //   const favoriteIds = favoritesIds.map(item => item.publicationId);
+    //   if (favoriteIds) {
+    //     const publications = await tx.publication.findMany({
+    //       where: {
+    //         id: { in: favoriteIds }
+    //       }
+    //     });
+    //     const allNicheIds = [...new Set(publications.flatMap(p => p.niches))];
+    //     const niches = await tx.niche.findMany({
+    //       where: {
+    //         id: { in: allNicheIds }
+    //       }
+    //     });
+    //    return  publications.map(publication => ({
+    //       ...publication,
+    //       niches: niches.filter(niche => publication.niches.includes(niche.id))
+    //     }));
+    //   }
+    // });
+};
+const getOnlyFavoriteIds = async (userId) => {
+    const result = await prisma_1.default.favorite.findMany({
+        where: { userId: userId },
+        include: {
+            publication: true
+        }
+    });
+    const favoriteIds = result.map(item => item.publicationId);
+    return favoriteIds;
+};
+const createFavorite = async (data) => {
+    const { userId, itemId } = data;
+    const existingFavorite = await prisma_1.default.favorite.findFirst({
+        where: {
+            userId: userId,
+            publicationId: itemId
+        }
+    });
+    if (existingFavorite) {
+        await prisma_1.default.favorite.delete({
+            where: {
+                id: existingFavorite.id
+            }
+        });
+        return {
+            message: "Removed from favorites!"
+        };
+    }
+    const result = await prisma_1.default.favorite.create({
+        data: {
+            userId: userId,
+            publicationId: itemId
+        }
     });
     return result;
-});
-const createFavorite = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.favorite.create({
-        data: data
+};
+const deleteFavorite = async (publicationId, userId) => {
+    const favorite = await prisma_1.default.favorite.findFirst({
+        where: {
+            publicationId: publicationId,
+            userId: userId
+        }
+    });
+    if (!favorite) {
+        throw new Error("Favorite not found");
+    }
+    // Then delete using the id
+    const result = await prisma_1.default.favorite.delete({
+        where: { id: favorite.id }
     });
     return result;
-});
-const deleteFavorite = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.favorite.delete({
-        where: { id: id }
-    });
-    return result;
-});
+};
 exports.FavoriteService = {
     allFavorites,
     createFavorite,
     deleteFavorite,
+    getOnlyFavoriteIds
 };
