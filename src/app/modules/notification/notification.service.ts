@@ -120,7 +120,7 @@ const getNotifications = async (userId: string, filters: any = {}) => {
   const { page = 1, limit = 20, status } = filters;
   const skip = (page - 1) * limit;
 
-  const where: any = { recipientId: userId };
+  const where: any = { recipientId: userId, recipientType: 'client' };
 
   if (status) {
     where.status = status;

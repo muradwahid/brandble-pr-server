@@ -1,3 +1,10 @@
 Tue May 26 2026 17:4:12 } [BRANDABLE] info: Server running on port 5050
 Tue May 26 2026 17:4:12 } [BRANDABLE] info: Express API routes available
 Tue May 26 2026 17:4:12 } [BRANDABLE] info: Socket.io running on same port
+Tue May 26 2026 17:10:53 } [BRANDABLE] info: Server running on port 5050
+Tue May 26 2026 17:10:53 } [BRANDABLE] info: Express API routes available
+Tue May 26 2026 17:10:53 } [BRANDABLE] info: Socket.io running on same port
+Tue May 26 2026 17:30:8 } [BRANDABLE] info: SIGTERM received
+Tue May 26 2026 17:30:23 } [BRANDABLE] info: Server running on port 5050
+Tue May 26 2026 17:30:23 } [BRANDABLE] info: Express API routes available
+Tue May 26 2026 17:30:23 } [BRANDABLE] info: Socket.io running on same port
